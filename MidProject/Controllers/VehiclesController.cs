@@ -32,6 +32,7 @@ namespace MidProject.Controllers
             return await _context.Vehicles.ToListAsync();
         }
 
+
         // GET: api/Vehicles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Vehicle>> GetVehicle(int id)
