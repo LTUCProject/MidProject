@@ -4,7 +4,7 @@ using MidProject.Repositories.Interfaces;
 
 namespace MidProject.Repositories.Services
 {
-    public class FavoriteServices : Repository<Comment>, IComment
+    public class FavoriteServices : Repository<Favorite>, IFavorite
     {
         private readonly MidprojectDbContext _context;
 
