@@ -10,6 +10,8 @@ using MidProject.Models;
 
 namespace MidProject.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class ChargersController : ControllerBase
