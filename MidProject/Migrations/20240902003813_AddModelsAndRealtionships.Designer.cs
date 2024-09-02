@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MidProject.Data;
 
@@ -11,9 +12,11 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    partial class MidprojectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240902003813_AddModelsAndRealtionships")]
+    partial class AddModelsAndRealtionships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,29 +50,6 @@ namespace MidProject.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "admin",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "client",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
-                            Name = "Client",
-                            NormalizedName = "CLIENT"
-                        },
-                        new
-                        {
-                            Id = "provider",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
-                            Name = "Provider",
-                            NormalizedName = "PROVIDER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

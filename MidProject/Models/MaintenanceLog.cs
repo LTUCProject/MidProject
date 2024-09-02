@@ -3,8 +3,8 @@
     public class MaintenanceLog
     {
         public int MaintenanceLogId { get; set; }
-        public int ChargingStationId { get; set; } // Foreign key
-        public ChargingStation ChargingStation { get; set; } //Navigator
+        public int ChargingStationId { get; set; }
+        public ChargingStation ChargingStation { get; set; }
         public DateTime MaintenanceDate { get; set; }
         public string PerformedBy { get; set; }
         public string Details { get; set; }

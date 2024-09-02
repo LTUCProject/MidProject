@@ -3,10 +3,10 @@
     public class SubscriptionPlan
     {
         public int SubscriptionPlanId { get; set; }
-        public string PlanName { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
-        public int MonthlyFee { get; set; }
-        public string Benefits { get; set; }
-        public ICollection<UserSubscription> UserSubscriptions { get; set; }
+        public decimal Price { get; set; }
+        public int DurationInDays { get; set; }
+        public ICollection<ClientSubscription> ClientSubscriptions { get; set; }
     }
 }

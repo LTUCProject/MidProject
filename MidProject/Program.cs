@@ -1,10 +1,12 @@
 
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MidProject.Data;
-using MidProject.Repositories.Interfaces;
-using MidProject.Repositories.Services;
+using MidProject.Models;
+using MidProject.Repository.Interfaces;
+using MidProject.Repository.Services;
 using NuGet.Protocol.Core.Types;
 
 namespace MidProject
@@ -18,39 +20,24 @@ namespace MidProject
 
             string ConnectionStringVar = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<MidprojectDbContext>(optionsX => optionsX.UseSqlServer(ConnectionStringVar));
-            builder.Services.AddScoped<IBooking, BookingServices>();
-            builder.Services.AddScoped<ICharger, ChargerServices>();
-            builder.Services.AddScoped<IChargingStation, ChargingStationServices>();
-            builder.Services.AddScoped<IChargingStation, ChargingStationServices>();
-            builder.Services.AddScoped<IComment, CommentServices>();
-            builder.Services.AddScoped<IFavorite, FavoriteServices>();
-            builder.Services.AddScoped<IFeedback, FeedbackServices>();
-            builder.Services.AddScoped<ILocation, LocationServices>();
-            builder.Services.AddScoped<IMaintenanceLog, MaintenanceLogServices>();
-            builder.Services.AddScoped<INotification, NotificationServices>();
-            builder.Services.AddScoped<IPaymentTransaction, PaymentTransactionServices>();
-            builder.Services.AddScoped<IPost, PostServices>();
-            builder.Services.AddScoped<IServiceInfo, ServiceInfoServices>();
-            builder.Services.AddScoped<IServiceRequest, ServiceRequestServices>();
-            builder.Services.AddScoped<ISessionx, SessionServices>();
-            builder.Services.AddScoped<ISubscriptionPlan, SubscriptionPlanServices>();
-            builder.Services.AddScoped<IUser, UserServices>();
-            builder.Services.AddScoped<IUserSubscription, UserSubscriptionServices>();
-            builder.Services.AddScoped<IVehicle, VehicleServices>();
+
+            builder.Services.AddIdentity<Account, IdentityRole>()
+   .AddEntityFrameworkStores<MidprojectDbContext>();
+
+
+            builder.Services.AddScoped<IAccountx, IdentityAccountService>();
+            builder.Services.AddScoped<IAdmin, AdminServices>();
+            builder.Services.AddScoped<IProvider, ProviderServices>();
+            builder.Services.AddScoped<IClient, ClientServices>();
 
 
 
+            builder.Services.AddScoped<IAccountx, IdentityAccountService>();
+            builder.Services.AddScoped<JwtTokenService>();
 
 
-
-
-
-
-
-
-
-
-
+           
+            
 
 
 

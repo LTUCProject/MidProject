@@ -13,6 +13,6 @@
         public ICollection<Charger> Chargers { get; set; }
         public ICollection<Session> Sessions { get; set; }
         public ICollection<MaintenanceLog> MaintenanceLogs { get; set; }
-        public ICollection<Favorite> Favorite { get; set; }
+        public ICollection<Favorite> Favorites { get; set; }
     }
 }
