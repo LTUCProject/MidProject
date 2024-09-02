@@ -12,8 +12,8 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    [Migration("20240902014631_SeedRoles")]
-    partial class SeedRoles
+    [Migration("20240902174759_everyThing")]
+    partial class everyThing
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,22 +54,22 @@ namespace MidProject.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "admin",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
+                            Id = "admin_role_id",
+                            ConcurrencyStamp = "6f440484-82ba-4167-8c77-5db190a0ea1e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "client",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
+                            Id = "client_role_id",
+                            ConcurrencyStamp = "7243b17d-82bb-4a5d-a216-496aaf868d59",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "provider",
-                            ConcurrencyStamp = "00000000-0000-0000-0000-000000000000",
+                            Id = "provider_role_id",
+                            ConcurrencyStamp = "4aa9e803-10aa-48f6-990d-44d15ac8457b",
                             Name = "Provider",
                             NormalizedName = "PROVIDER"
                         });
@@ -189,12 +189,6 @@ namespace MidProject.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("AdminId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -229,9 +223,6 @@ namespace MidProject.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProviderId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -244,10 +235,6 @@ namespace MidProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("ClientId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -255,8 +242,6 @@ namespace MidProject.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("ProviderId1");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -413,22 +398,11 @@ namespace MidProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfileImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -966,37 +940,10 @@ namespace MidProject.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MidProject.Models.Account", b =>
-                {
-                    b.HasOne("MidProject.Models.Admin", "Admin")
-                        .WithMany()
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MidProject.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MidProject.Models.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("ProviderId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Provider");
-                });
-
             modelBuilder.Entity("MidProject.Models.Admin", b =>
                 {
                     b.HasOne("MidProject.Models.Account", "Account")
-                        .WithOne()
+                        .WithOne("Admin")
                         .HasForeignKey("MidProject.Models.Admin", "AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1060,7 +1007,7 @@ namespace MidProject.Migrations
             modelBuilder.Entity("MidProject.Models.Client", b =>
                 {
                     b.HasOne("MidProject.Models.Account", "Account")
-                        .WithOne()
+                        .WithOne("Client")
                         .HasForeignKey("MidProject.Models.Client", "AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1211,7 +1158,7 @@ namespace MidProject.Migrations
             modelBuilder.Entity("MidProject.Models.Provider", b =>
                 {
                     b.HasOne("MidProject.Models.Account", "Account")
-                        .WithOne()
+                        .WithOne("Provider")
                         .HasForeignKey("MidProject.Models.Provider", "AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1285,6 +1232,18 @@ namespace MidProject.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("MidProject.Models.Account", b =>
+                {
+                    b.Navigation("Admin")
+                        .IsRequired();
+
+                    b.Navigation("Client")
+                        .IsRequired();
+
+                    b.Navigation("Provider")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MidProject.Models.Admin", b =>

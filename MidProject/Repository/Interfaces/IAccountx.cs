@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace MidProject.Repository.Interfaces
 {
-    public interface IAccountx 
+    public interface IAccountx
     {
         public Task<AccountDto> Register(RegisterdAccountDto registerdAccountDto);
         public Task<AccountDto> AccountAuthentication(string username, string password);

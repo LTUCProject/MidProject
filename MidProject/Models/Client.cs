@@ -3,12 +3,11 @@
     public class Client
     {
         public int ClientId { get; set; }
-        public string UserName { get; set; }
-        public string PasswordHash { get; set; }
+        public string AccountId { get; set; } // Foreign key
+        public string Name { get; set; }
         public string Email { get; set; }
-        public string ProfileImage { get; set; }
-        public DateTime DateOfBirth { get; set; }
         
+
         public Account Account { get; set; } // Navigation property
         public ICollection<Booking> Bookings { get; set; }
         public ICollection<Vehicle> Vehicles { get; set; }

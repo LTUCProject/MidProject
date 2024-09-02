@@ -4,6 +4,8 @@ using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using MidProject.Data;
 
 namespace MidProject.Repository.Services
 {
@@ -11,58 +13,109 @@ namespace MidProject.Repository.Services
     {
         private readonly UserManager<Account> _accountManager;
         private readonly SignInManager<Account> _signInManager;
+        private readonly JwtTokenService _jwtTokenService;
+        private readonly MidprojectDbContext _context;
 
-        private JwtTokenService _jwtTokenService;
-        public IdentityAccountService(UserManager<Account> Manager, SignInManager<Account> signInManager, JwtTokenService jwtTokenService)
+        public IdentityAccountService(
+            UserManager<Account> accountManager,
+            SignInManager<Account> signInManager,
+            JwtTokenService jwtTokenService,
+            MidprojectDbContext context)
         {
-            _accountManager = Manager;
+            _accountManager = accountManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
+            _context = context;
         }
 
         public async Task<AccountDto> Register(RegisterdAccountDto registerdAccountDto)
         {
-            var account = new Account()
+            //Test
+            if (registerdAccountDto.Roles[0] == "Admin")
+            {
+                throw new ArgumentException("Not allowed");
+            }
+            //============
+            var account = new Account
             {
                 UserName = registerdAccountDto.UserName,
                 Email = registerdAccountDto.Email,
-
             };
+
             var result = await _accountManager.CreateAsync(account, registerdAccountDto.Password);
-            var x = registerdAccountDto.Roles;
+
             if (result.Succeeded)
             {
                 await _accountManager.AddToRolesAsync(account, registerdAccountDto.Roles);
-                return new AccountDto()
+
+                // Handle role-specific data insertion
+                foreach (var role in registerdAccountDto.Roles)
+                {
+                    switch (role)
+                    {
+                        //case "Admin":
+                        //    var admin = new Admin
+                        //    {
+                        //        AccountId = account.Id,
+                        //        Name = account.UserName,
+                        //        Email = account.Email,
+                        //        // Populate additional Admin fields if needed
+                        //    };
+                        //    _context.Admins.Add(admin);
+                        case "Client":
+                            var client = new Client
+                            {
+                                AccountId = account.Id,
+                                Name = account.UserName,
+                                Email = account.Email,
+                                // Populate additional Client fields if needed
+                            };
+                            _context.Clients.Add(client);
+                            break;
+                        
+                        case "Provider":
+                            var provider = new Provider
+                            {
+                                AccountId = account.Id,
+                                Name = account.UserName,
+                                Email = account.Email,
+                                // Populate additional Provider fields if needed
+                            };
+                            _context.Providers.Add(provider);
+                            break;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return new AccountDto
                 {
                     Id = account.Id,
                     UserName = account.UserName,
-                    Token = await _jwtTokenService.GenerateToken(account, System.TimeSpan.FromMinutes(7)),
+                    Token = await _jwtTokenService.GenerateToken(account, TimeSpan.FromMinutes(7)),
                     Roles = await _accountManager.GetRolesAsync(account)
                 };
             }
 
-            return null;
+            throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
         public async Task<AccountDto> AccountAuthentication(string username, string password)
         {
             var account = await _accountManager.FindByNameAsync(username);
-            bool passValidation = await _accountManager.CheckPasswordAsync(account, password);
-            if (passValidation)
+            if (account == null || !await _accountManager.CheckPasswordAsync(account, password))
             {
-                return new AccountDto()
-                {
-                    Id = account.Id,
-                    UserName = account.UserName,
-                    Token = await _jwtTokenService.GenerateToken(account, System.TimeSpan.FromMinutes(7)),
-                    Roles = await _accountManager.GetRolesAsync(account)
-                };
+                throw new Exception("Invalid username or password.");
             }
-            return null;
+
+            return new AccountDto
+            {
+                Id = account.Id,
+                UserName = account.UserName,
+                Token = await _jwtTokenService.GenerateToken(account, TimeSpan.FromMinutes(7)),
+                Roles = await _accountManager.GetRolesAsync(account)
+            };
         }
-        
-       
 
         public async Task<AccountDto> LogOut(string username)
         {
@@ -74,13 +127,11 @@ namespace MidProject.Repository.Services
 
             await _signInManager.SignOutAsync();
 
-            var result = new AccountDto()
+            return new AccountDto
             {
                 Id = account.Id,
                 UserName = account.UserName
             };
-
-            return result;
         }
 
         public async Task<AccountDto> DeleteAccount(string username)
@@ -92,30 +143,29 @@ namespace MidProject.Repository.Services
             }
 
             await _accountManager.DeleteAsync(account);
-
-            var result = new AccountDto()
+            return new AccountDto
             {
                 Id = account.Id,
                 UserName = account.UserName
             };
-
-            return result;
         }
 
         public async Task<AccountDto> GetTokens(ClaimsPrincipal claimsPrincipal)
         {
-            var newToken = await _accountManager.GetUserAsync(claimsPrincipal);
-
-            if (newToken == null)
+            var user = await _accountManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
             {
-                throw new InvalidOperationException("Token is not exist");
+                throw new Exception("User not found.");
             }
-            return new AccountDto()
+
+            return new AccountDto
             {
-                Id = newToken.Id,
-                UserName = newToken.UserName,
-                Token = await _jwtTokenService.GenerateToken(newToken, System.TimeSpan.FromMinutes(5))
+                Id = user.Id,
+                UserName = user.UserName,
+                Token = await _jwtTokenService.GenerateToken(user, TimeSpan.FromMinutes(5))
             };
         }
     }
 }
+
+

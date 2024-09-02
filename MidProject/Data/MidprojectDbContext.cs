@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MidProject.Models;
+using MidProject.Constants;
 
 namespace MidProject.Data
 {
@@ -14,7 +15,6 @@ namespace MidProject.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Provider> Providers { get; set; }
-        public DbSet<Account> Accounts { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Charger> Chargers { get; set; }
         public DbSet<ChargingStation> ChargingStations { get; set; }
@@ -33,26 +33,27 @@ namespace MidProject.Data
         public DbSet<ClientSubscription> ClientSubscriptions { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Admin>()
                 .HasOne(a => a.Account)
-                .WithOne()
-                .HasPrincipalKey<Account>(a => a.Id)
+                .WithOne(a => a.Admin)
+                .HasForeignKey<Admin>(a => a.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Client>()
                 .HasOne(c => c.Account)
-                .WithOne()
-                .HasPrincipalKey<Account>(a => a.Id)
+                .WithOne(a => a.Client)
+                .HasForeignKey<Client>(c => c.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Provider>()
                 .HasOne(p => p.Account)
-                .WithOne()
-                .HasPrincipalKey<Account>(a => a.Id)
+                .WithOne(a => a.Provider)
+                .HasForeignKey<Provider>(p => p.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Booking>()
@@ -206,56 +207,46 @@ namespace MidProject.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            seedRoles(modelBuilder, "Admin");
-            seedRoles(modelBuilder, "Client");
-            seedRoles(modelBuilder, "Provider");
+            // Seed roles
+            seedRoles(modelBuilder);
 
+            // Seed admin user
+            
         }
-        private void seedRoles(ModelBuilder modelBuilder, string roleName)
+
+        private void seedRoles(ModelBuilder modelBuilder)
         {
-            var role = new IdentityRole
-            {
-                Id = roleName.ToLower(),
-                Name = roleName,
-                NormalizedName = roleName.ToUpper(),
-                ConcurrencyStamp = Guid.Empty.ToString()
-            };
-
-            // add claims for the users
-            // complete
-
-
-            modelBuilder.Entity<IdentityRole>().HasData(role);
-
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole
+                {
+                    Id = RoleConstants.AdminRoleId,
+                    Name = "Admin",
+                    NormalizedName = "ADMIN",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                },
+                new IdentityRole
+                {
+                    Id = RoleConstants.ClientRoleId,
+                    Name = "Client",
+                    NormalizedName = "CLIENT",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                },
+                new IdentityRole
+                {
+                    Id = RoleConstants.ProviderRoleId,
+                    Name = "Provider",
+                    NormalizedName = "PROVIDER",
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                }
+            );
         }
-        private void seedAdminUser(ModelBuilder modelBuilder)
-        {
-            var adminUser = new Account
-            {
-                Id = "admin_user_id",
-                UserName = "admin",
-                NormalizedUserName = "ADMIN",
-                Email = "admin@example.com",
-                NormalizedEmail = "ADMIN@EXAMPLE.COM",
-                EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString("D"),
-                ConcurrencyStamp = Guid.NewGuid().ToString("D"),
-            };
 
-            // Set password for the admin userr
-            var passwordHasher = new PasswordHasher<Account>();
-            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "AdminPassword123!");
 
-            modelBuilder.Entity<Account>().HasData(adminUser);
 
-            // Assign the admin role to the admin user
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-            {
-                RoleId = "admin",
-                UserId = adminUser.Id
-            });
 
-           
-        }
+
+        
+
+
     }
 }

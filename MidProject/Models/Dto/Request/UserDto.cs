@@ -10,5 +10,6 @@
         public string ProfileImage { get; set; }
         public DateTime DateOfBirth { get; set; }
 
+
     }
 }
