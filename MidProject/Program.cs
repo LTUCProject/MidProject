@@ -1,5 +1,4 @@
-
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -25,67 +24,68 @@ namespace MidProject
    .AddEntityFrameworkStores<MidprojectDbContext>();
 
 
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = JwtTokenService.ValidatToken(builder.Configuration);
+            });
+
+
             builder.Services.AddScoped<IAccountx, IdentityAccountService>();
             builder.Services.AddScoped<IAdmin, AdminServices>();
             builder.Services.AddScoped<IProvider, ProviderServices>();
             builder.Services.AddScoped<IClient, ClientServices>();
-
-
-
             builder.Services.AddScoped<IAccountx, IdentityAccountService>();
             builder.Services.AddScoped<JwtTokenService>();
 
-
-           
-            
-
-
-
-
-
             //============swagger============================
 
-            builder.Services.AddSwaggerGen
-                (
-                option =>
-                {
-                    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
-                    {
-                        Title = "EV api doc",
-                        Version = "v1",
-                        Description = "Api for EV"
-                        
-                    });
-                    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.Http,
-                        Scheme = "bearer",
-                        BearerFormat = "JWT",
-                        In = ParameterLocation.Header,
-                        Description = "Please enter user token below."
-                    });
-                    option.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
+            // Swagger configuration
+            builder.Services.AddSwaggerGen(options =>
             {
-                Reference = new OpenApiReference
+                options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+                    Title = "EV Management System API",
+                    Version = "v1",
+                    Description = "API for EV"
+                });
 
-                }
-                );
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Please enter user token below."
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
 
             //===================================
 
             var app = builder.Build();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
 
             //====continue swagger==========================
