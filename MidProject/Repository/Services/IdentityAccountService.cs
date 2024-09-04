@@ -26,13 +26,17 @@ namespace MidProject.Repository.Services
             _jwtTokenService = jwtTokenService;
             _context = context;
         }
-        public async Task<AccountDto> Register(RegisterdAccountDto registerdAccountDto)
+        public async Task<AccountRegisterdResponseDto> Register(RegisterdAccountDto registerdAccountDto)
         {
-            // Test
-            //if (registerdAccountDto.Roles[0] == "Admin")
-            //{
-            //    throw new ArgumentException("Not allowed");
-            //}
+            // Validate roles
+            var validRoles = new List<string> { "Admin", "Client", "Owner", "Servicer" };
+            foreach (var role in registerdAccountDto.Roles)
+            {
+                if (!validRoles.Contains(role))
+                {
+                    throw new ArgumentException($"Invalid role: {role}. Allowed roles are: Admin, Client, Owner, Servicer.");
+                }
+            }
             var account = new Account
             {
                 UserName = registerdAccountDto.UserName,
@@ -42,7 +46,6 @@ namespace MidProject.Repository.Services
             if (result.Succeeded)
             {
                 await _accountManager.AddToRolesAsync(account, registerdAccountDto.Roles);
-                // Handle role-specific data insertion
                 foreach (var role in registerdAccountDto.Roles)
                 {
                     switch (role)
@@ -81,11 +84,10 @@ namespace MidProject.Repository.Services
                     }
                 }
                 await _context.SaveChangesAsync();
-                return new AccountDto
+                return new AccountRegisterdResponseDto
                 {
                     Id = account.Id,
                     UserName = account.UserName,
-                    Token = await _jwtTokenService.GenerateToken(account, TimeSpan.FromMinutes(7)),
                     Roles = await _accountManager.GetRolesAsync(account)
                 };
             }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MidProject.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatingDatabase : Migration
+    public partial class CreatingDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -123,7 +123,7 @@ namespace MidProject.Migrations
                         column: x => x.AccountId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -229,7 +229,7 @@ namespace MidProject.Migrations
                         column: x => x.AccountId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -251,7 +251,7 @@ namespace MidProject.Migrations
                         column: x => x.AccountId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -325,30 +325,6 @@ namespace MidProject.Migrations
                         principalTable: "Clients",
                         principalColumn: "ClientId",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vehicles",
-                columns: table => new
-                {
-                    VehicleId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    LicensePlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    BatteryCapacity = table.Column<int>(type: "int", nullable: false),
-                    ElectricType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vehicles", x => x.VehicleId);
-                    table.ForeignKey(
-                        name: "FK_Vehicles_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -520,43 +496,6 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    BookingId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    ServiceInfoId = table.Column<int>(type: "int", nullable: false),
-                    VehicleId = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cost = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_ServiceInfos_ServiceInfoId",
-                        column: x => x.ServiceInfoId,
-                        principalTable: "ServiceInfos",
-                        principalColumn: "ServiceInfoId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Vehicles_VehicleId",
-                        column: x => x.VehicleId,
-                        principalTable: "Vehicles",
-                        principalColumn: "VehicleId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Favorites",
                 columns: table => new
                 {
@@ -653,6 +592,37 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    VehicleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LicensePlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    BatteryCapacity = table.Column<int>(type: "int", nullable: false),
+                    ElectricType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    ServiceInfoId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.VehicleId);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_ServiceInfos_ServiceInfoId",
+                        column: x => x.ServiceInfoId,
+                        principalTable: "ServiceInfos",
+                        principalColumn: "ServiceInfoId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PaymentTransactions",
                 columns: table => new
                 {
@@ -682,15 +652,52 @@ namespace MidProject.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    BookingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    ServiceInfoId = table.Column<int>(type: "int", nullable: false),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cost = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_ServiceInfos_ServiceInfoId",
+                        column: x => x.ServiceInfoId,
+                        principalTable: "ServiceInfos",
+                        principalColumn: "ServiceInfoId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "admin_role_id", "228fff62-5c63-4e88-8fdf-1f70d3a90e80", "Admin", "ADMIN" },
-                    { "client_role_id", "e822f26c-4a93-475a-b3d6-46f579cce20c", "Client", "CLIENT" },
-                    { "owner_role_id", "daf4377d-adcf-4cfc-a8ab-a08e75f871e3", "Owner", "OWNER" },
-                    { "servicer_role_id", "dd815100-a049-4c6c-ad67-206f5e5e1194", "Servicer", "SERVICER" }
+                    { "admin_role_id", "e1da6bef-d87c-4685-b2d9-b84848de3a96", "Admin", "ADMIN" },
+                    { "client_role_id", "d86ef880-9967-4aac-9bf3-dc15dbb27b2e", "Client", "CLIENT" },
+                    { "owner_role_id", "cde6b16c-b6d1-440c-b496-b11c3df0630e", "Owner", "OWNER" },
+                    { "servicer_role_id", "5a560be7-ee53-4daf-a430-31602ce33dc8", "Servicer", "SERVICER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -894,6 +901,11 @@ namespace MidProject.Migrations
                 name: "IX_Vehicles_ClientId",
                 table: "Vehicles",
                 column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_ServiceInfoId",
+                table: "Vehicles",
+                column: "ServiceInfoId");
         }
 
         /// <inheritdoc />

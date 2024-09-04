@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MidProject.Models;
 using MidProject.Constants;
-
 namespace MidProject.Data
 {
     public class MidprojectDbContext : IdentityDbContext<Account>
@@ -11,7 +10,6 @@ namespace MidProject.Data
         public MidprojectDbContext(DbContextOptions<MidprojectDbContext> options) : base(options)
         {
         }
-
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Provider> Providers { get; set; }
@@ -35,21 +33,22 @@ namespace MidProject.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // Configure relationships with cascading delete
             modelBuilder.Entity<Admin>()
-                     .HasOne(a => a.Account)
-                     .WithOne(a => a.Admin)
-                     .HasForeignKey<Admin>(a => a.AccountId)
-                     .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(a => a.Account)
+                .WithOne(a => a.Admin)
+                .HasForeignKey<Admin>(a => a.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Client>()
                 .HasOne(c => c.Account)
                 .WithOne(a => a.Client)
                 .HasForeignKey<Client>(c => c.AccountId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Provider>()
                 .HasOne(p => p.Account)
                 .WithOne(a => a.Provider)
                 .HasForeignKey<Provider>(p => p.AccountId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Client)
                 .WithMany(c => c.Bookings)
@@ -75,7 +74,6 @@ namespace MidProject.Data
                 .WithMany(l => l.ChargingStations)
                 .HasForeignKey(cs => cs.LocationId)
                 .OnDelete(DeleteBehavior.Restrict);
-            // Configure Provider and ChargingStation relationship
             modelBuilder.Entity<ChargingStation>()
                 .HasOne(cs => cs.Provider)
                 .WithMany(p => p.ChargingStations)
@@ -181,9 +179,17 @@ namespace MidProject.Data
                 .WithMany(sp => sp.ClientSubscriptions)
                 .HasForeignKey(cs => cs.SubscriptionPlanId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.ServiceInfo)
+                .WithMany(s => s.Vehicles)
+                .HasForeignKey(v => v.ServiceInfoId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ServiceInfo>()
+                .HasMany(s => s.Vehicles)
+                .WithOne(v => v.ServiceInfo)
+                .HasForeignKey(v => v.ServiceInfoId);
             // Seed roles
             seedRoles(modelBuilder);
-            
         }
         private void seedRoles(ModelBuilder modelBuilder)
         {
@@ -218,6 +224,5 @@ namespace MidProject.Data
                 }
             );
         }
-       
     }
 }

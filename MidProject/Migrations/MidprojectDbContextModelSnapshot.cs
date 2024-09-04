@@ -52,28 +52,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "228fff62-5c63-4e88-8fdf-1f70d3a90e80",
+                            ConcurrencyStamp = "e1da6bef-d87c-4685-b2d9-b84848de3a96",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "e822f26c-4a93-475a-b3d6-46f579cce20c",
+                            ConcurrencyStamp = "d86ef880-9967-4aac-9bf3-dc15dbb27b2e",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "daf4377d-adcf-4cfc-a8ab-a08e75f871e3",
+                            ConcurrencyStamp = "cde6b16c-b6d1-440c-b496-b11c3df0630e",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "dd815100-a049-4c6c-ad67-206f5e5e1194",
+                            ConcurrencyStamp = "5a560be7-ee53-4daf-a430-31602ce33dc8",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -889,12 +889,17 @@ namespace MidProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ServiceInfoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("VehicleId");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("ServiceInfoId");
 
                     b.ToTable("Vehicles");
                 });
@@ -955,7 +960,7 @@ namespace MidProject.Migrations
                     b.HasOne("MidProject.Models.Account", "Account")
                         .WithOne("Admin")
                         .HasForeignKey("MidProject.Models.Admin", "AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -1027,7 +1032,7 @@ namespace MidProject.Migrations
                     b.HasOne("MidProject.Models.Account", "Account")
                         .WithOne("Client")
                         .HasForeignKey("MidProject.Models.Client", "AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -1178,7 +1183,7 @@ namespace MidProject.Migrations
                     b.HasOne("MidProject.Models.Account", "Account")
                         .WithOne("Provider")
                         .HasForeignKey("MidProject.Models.Provider", "AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -1249,7 +1254,15 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MidProject.Models.ServiceInfo", "ServiceInfo")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("ServiceInfoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Client");
+
+                    b.Navigation("ServiceInfo");
                 });
 
             modelBuilder.Entity("MidProject.Models.Account", b =>
@@ -1335,6 +1348,8 @@ namespace MidProject.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("ServiceRequests");
+
+                    b.Navigation("Vehicles");
                 });
 
             modelBuilder.Entity("MidProject.Models.Session", b =>

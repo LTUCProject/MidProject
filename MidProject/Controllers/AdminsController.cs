@@ -10,11 +10,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using MidProject.Models.Dto.Response;
 using MidProject.Models.Dto.Request2;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "AdminPolicy")]
     public class AdminsController : ControllerBase
     {
         private readonly MidprojectDbContext _context;

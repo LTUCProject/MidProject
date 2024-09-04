@@ -1,4 +1,5 @@
 using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 
@@ -18,21 +19,20 @@ namespace MidProject.Repository.Interfaces
         Task AddServiceRequestAsync(ServiceRequestDtoRequest requestDto);
         Task RemoveServiceRequestAsync(int requestId);
 
-        //// Booking management
-        //Task<IEnumerable<Booking>> GetBookingsAsync(int serviceId);
-        //Task<Booking> GetBookingByIdAsync(int bookingId);
-        //Task AddBookingAsync(Booking booking);
-        //Task RemoveBookingAsync(int bookingId);
+        // Booking management
+        Task<IEnumerable<BookingResponseDto>> GetBookingsAsync(int serviceId);
+        Task<BookingResponseDto> GetBookingByIdAsync(int bookingId);
+        Task AddBookingAsync(BookingDto bookingDto);
+        Task RemoveBookingAsync(int bookingId);
 
-        //// Vehicle management
-        //Task<IEnumerable<Vehicle>> GetVehiclesAsync(int serviceId);
-        //Task<Vehicle> GetVehicleByIdAsync(int vehicleId);
-        //Task AddVehicleAsync(Vehicle vehicle);
-        //Task RemoveVehicleAsync(int vehicleId);
+        // Vehicle management
+        Task<IEnumerable<VehicleDtoResponse>> GetVehiclesAsync(int serviceId);
+        Task<VehicleDtoResponse> GetVehicleByIdAsync(int vehicleId);
+        Task AddVehicleAsync(VehicleDto vehicleDto);
+        Task RemoveVehicleAsync(int vehicleId);
 
         //// Feedback management
-        //Task<IEnumerable<Feedback>> GetFeedbacksAsync(int serviceId);
-        //Task AddFeedbackAsync(Feedback feedback);
-        //Task RemoveFeedbackAsync(int feedbackId);
+        Task<IEnumerable<FeedbackDtoResponse>> GetFeedbacksAsync(int serviceId);
+
     }
 }
