@@ -19,16 +19,31 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<ActionResult<AccountDto>> Register(RegisterdAccountDto registerdAccount)
+        public async Task<ActionResult<AccountRegisterdResponseDto>> Register(RegisterdAccountDto registerdAccount)
         {
             try
             {
+                // Validate roles
+                var validRoles = new List<string> { "Admin", "Client", "Owner", "Servicer" };
+                foreach (var role in registerdAccount.Roles)
+                {
+                    if (!validRoles.Contains(role))
+                    {
+                        return BadRequest($"Invalid role: {role}. Allowed roles are: Admin, Client, Owner, Servicer.");
+                    }
+                }
                 var account = await _accountServices.Register(registerdAccount);
                 if (account == null)
                 {
                     return BadRequest("Registration failed");
                 }
-                return CreatedAtAction(nameof(Profile), new { id = account.Id }, account);
+                var responseDto = new AccountRegisterdResponseDto
+                {
+                    Id = account.Id,
+                    UserName = account.UserName,
+                    Roles = account.Roles
+                };
+                return CreatedAtAction(nameof(Profile), new { id = responseDto.Id }, responseDto);
             }
             catch (Exception ex)
             {

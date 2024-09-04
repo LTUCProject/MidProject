@@ -40,10 +40,14 @@ namespace MidProject
             // Add authorization policies here
             builder.Services.AddAuthorization(options =>
             {
+                options.AddPolicy("AdminPolicy", policy =>
+                    policy.RequireRole("Admin"));
                 options.AddPolicy("OwnerPolicy", policy =>
                     policy.RequireRole("Owner"));
                 options.AddPolicy("ServicerPolicy", policy =>
                     policy.RequireRole("Servicer"));
+                options.AddPolicy("ClientPolicy", policy =>
+                    policy.RequireRole("Client"));
             });
 
 

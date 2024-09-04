@@ -10,6 +10,7 @@ namespace MidProject.Models.Dto.Request
         public int Year { get; set; }
         public int BatteryCapacity { get; set; }
         public string ElectricType { get; set; }
-        public int ClientId { get; set; } // Foreign key
+        public int ClientId { get; set; }
+        public int ServiceInfoId { get; set; } // Added
     }
 }

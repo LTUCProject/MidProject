@@ -1,6 +1,6 @@
-﻿namespace MidProject.Models
+﻿namespace MidProject.Models.Dto.Response
 {
-    public class Vehicle
+    public class VehicleDtoResponse
     {
         public int VehicleId { get; set; }
         public string LicensePlate { get; set; }
@@ -8,10 +8,7 @@
         public int Year { get; set; }
         public int BatteryCapacity { get; set; }
         public string ElectricType { get; set; }
-        public int ClientId { get; set; } // Changed to string to match IdentityUser key type
-        public Client Client { get; set; }
+        public int ClientId { get; set; }
         public int ServiceInfoId { get; set; } // Added
-        public ServiceInfo ServiceInfo { get; set; } // Added
-        public ICollection<Booking> Bookings { get; set; }
     }
 }

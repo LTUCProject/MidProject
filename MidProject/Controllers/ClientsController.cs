@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MidProject.Models;
 using MidProject.Models.Dto.Request;
 using MidProject.Repository.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "ClientPolicy")] 
     public class ClientsController : ControllerBase
     {
         private readonly IClient _context;
@@ -118,6 +122,7 @@ namespace MidProject.Controllers
             return NoContent();
         }
 
+        // Booking management
         [HttpGet("bookings/{clientId}")]
         public async Task<ActionResult<IEnumerable<Booking>>> GetClientBookings(int clientId)
         {
@@ -217,7 +222,5 @@ namespace MidProject.Controllers
                 return NotFound();
             return Ok(notification);
         }
-
-       
     }
 }

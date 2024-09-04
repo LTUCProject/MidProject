@@ -13,6 +13,7 @@
         public ICollection<ServiceRequest> ServiceRequests { get; set; }
         public ICollection<Booking> Bookings { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
+        public ICollection<Vehicle> Vehicles { get; set; } // Added
 
     }
 }
