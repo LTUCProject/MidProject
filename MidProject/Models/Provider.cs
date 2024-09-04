@@ -1,9 +1,17 @@
-﻿namespace MidProject.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MidProject.Models
 {
     public class Provider
     {
         public int ProviderId { get; set; }
+
+        [Required]
+        [MaxLength(256)]
         public string AccountId { get; set; } // Foreign key
+
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
         public string Email { get; set; }
         public string Type { get; set; }

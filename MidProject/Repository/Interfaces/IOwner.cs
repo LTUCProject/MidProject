@@ -26,7 +26,7 @@ namespace MidProject.Repository.Interfaces
         Task AddMaintenanceLogAsync(MaintenanceLogDtoRequest logDtoRequest);
         Task RemoveMaintenanceLogAsync(int logId);
 
- 
+
 
         //// Location management
         //Task<IEnumerable<LocationDtoResponse>> GetAllLocationsAsync();

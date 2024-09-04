@@ -1,12 +1,22 @@
-﻿namespace MidProject.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MidProject.Models
 {
     public class Client
     {
         public int ClientId { get; set; }
+
+        [Required]
+        [MaxLength(256)]
         public string AccountId { get; set; } // Foreign key
+
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
+
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
-        
 
         public Account Account { get; set; } // Navigation property
         public ICollection<Booking> Bookings { get; set; }
