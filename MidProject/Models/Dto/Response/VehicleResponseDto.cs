@@ -1,8 +1,6 @@
-﻿using MidProject.Models;
-
-namespace MidProject.Models.Dto.Request
+namespace MidProject.Models.Dto.Response
 {
-    public class VehicleDto
+    public class VehicleResponseDto
     {
         public int VehicleId { get; set; }
         public string LicensePlate { get; set; }
@@ -10,6 +8,6 @@ namespace MidProject.Models.Dto.Request
         public int Year { get; set; }
         public int BatteryCapacity { get; set; }
         public string ElectricType { get; set; }
-        public int ClientId { get; set; } // Foreign key
+        public int ClientId { get; set; }
     }
 }

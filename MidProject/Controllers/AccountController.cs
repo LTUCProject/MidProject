@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MidProject.Models.Dto.Request2;
@@ -92,7 +92,7 @@ namespace MidProject.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("DeleteAccount")]
+        [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount(string username)
         {
             try

@@ -36,13 +36,26 @@ namespace MidProject
             });
 
 
+            //policy 
+            // Add authorization policies here
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("OwnerPolicy", policy =>
+                    policy.RequireRole("Owner"));
+                options.AddPolicy("ServicerPolicy", policy =>
+                    policy.RequireRole("Servicer"));
+            });
+
+
             builder.Services.AddScoped<IAccountx, IdentityAccountService>();
-            builder.Services.AddScoped<IAdmin, AdminServices>();
-            builder.Services.AddScoped<IProvider, ProviderServices>();
+           builder.Services.AddScoped<IAdmin, AdminServices>();
             builder.Services.AddScoped<IClient, ClientServices>();
+            builder.Services.AddScoped<IOwner, OwnerServices>();
+            builder.Services.AddScoped<IServicer, ServicerService>();
             builder.Services.AddScoped<IAccountx, IdentityAccountService>();
             builder.Services.AddScoped<JwtTokenService>();
 
+            
             //============swagger============================
 
             // Swagger configuration
@@ -103,7 +116,7 @@ namespace MidProject
                 (
                 options =>
                 {
-                    options.SwaggerEndpoint("/api/v1/swagger.json", "Tunify Api");
+                    options.SwaggerEndpoint("/api/v1/swagger.json", "ibrahim nemer");
                     options.RoutePrefix = "";
                 }
                 );

@@ -10,6 +10,8 @@
         public bool HasParking { get; set; }
         public string Status { get; set; }
         public string PaymentMethod { get; set; }
+        public int ProviderId { get; set; } // New foreign key
+        public Provider Provider { get; set; } // Navigation property
         public ICollection<Charger> Chargers { get; set; }
         public ICollection<Session> Sessions { get; set; }
         public ICollection<MaintenanceLog> MaintenanceLogs { get; set; }
