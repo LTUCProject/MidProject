@@ -52,23 +52,30 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "6f440484-82ba-4167-8c77-5db190a0ea1e",
+                            ConcurrencyStamp = "228fff62-5c63-4e88-8fdf-1f70d3a90e80",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "7243b17d-82bb-4a5d-a216-496aaf868d59",
+                            ConcurrencyStamp = "e822f26c-4a93-475a-b3d6-46f579cce20c",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "provider_role_id",
-                            ConcurrencyStamp = "4aa9e803-10aa-48f6-990d-44d15ac8457b",
-                            Name = "Provider",
-                            NormalizedName = "PROVIDER"
+                            Id = "owner_role_id",
+                            ConcurrencyStamp = "daf4377d-adcf-4cfc-a8ab-a08e75f871e3",
+                            Name = "Owner",
+                            NormalizedName = "OWNER"
+                        },
+                        new
+                        {
+                            Id = "servicer_role_id",
+                            ConcurrencyStamp = "dd815100-a049-4c6c-ad67-206f5e5e1194",
+                            Name = "Servicer",
+                            NormalizedName = "SERVICER"
                         });
                 });
 
@@ -366,6 +373,9 @@ namespace MidProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProviderId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StationLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -379,6 +389,8 @@ namespace MidProject.Migrations
                     b.HasIndex("AdminId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("ChargingStations");
                 });
@@ -613,9 +625,6 @@ namespace MidProject.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -714,6 +723,10 @@ namespace MidProject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -980,7 +993,7 @@ namespace MidProject.Migrations
                     b.HasOne("MidProject.Models.ChargingStation", "ChargingStation")
                         .WithMany("Chargers")
                         .HasForeignKey("ChargingStationId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ChargingStation");
@@ -998,7 +1011,15 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MidProject.Models.Provider", "Provider")
+                        .WithMany("ChargingStations")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Location");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("MidProject.Models.Client", b =>
@@ -1298,6 +1319,8 @@ namespace MidProject.Migrations
 
             modelBuilder.Entity("MidProject.Models.Provider", b =>
                 {
+                    b.Navigation("ChargingStations");
+
                     b.Navigation("ServiceRequests");
 
                     b.Navigation("Services");
