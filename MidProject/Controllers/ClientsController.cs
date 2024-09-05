@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MidProject.Models;
-using MidProject.Models.Dto.Request;
+using MidProject.Models.Dto.Request2;
 using MidProject.Repository.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;

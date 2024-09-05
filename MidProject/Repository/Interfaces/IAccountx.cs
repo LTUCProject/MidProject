@@ -8,9 +8,9 @@ namespace MidProject.Repository.Interfaces
     public interface IAccountx
     {
         public Task<AccountRegisterdResponseDto> Register(RegisterdAccountDto registerdAccountDto);
-        public Task<AccountDto> AccountAuthentication(string username, string password);
-        public Task<AccountDto> LogOut(string username);
-        public Task<AccountDto> GetTokens(ClaimsPrincipal claimsPrincipal);
-        public Task<AccountDto> DeleteAccount(string username);
+        public Task<AccountLoginDto> AccountAuthentication(string username, string password);
+        public Task<AccountRegisterdResponseDto> LogOut(string username);
+        public Task<AccountRegisterdResponseDto> GetTokens(ClaimsPrincipal claimsPrincipal);
+        public Task<AccountRegisterdResponseDto> DeleteAccount(string username);
     }
 }

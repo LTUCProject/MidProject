@@ -8,22 +8,22 @@ namespace MidProject.Repository.Interfaces
     public interface IOwner
     {
         // Charging station and charger management
-        Task<IEnumerable<ChargingStationDtoResponse>> GetAllChargingStationsAsync(string accountId);
-        Task<ChargingStationDtoResponse> GetChargingStationByIdAsync(int stationId);
-        Task<ChargingStationDtoResponse> CreateChargingStationAsync(ChargingStationDtoRequest stationDtoRequest, string accountId);
-        Task UpdateChargingStationAsync(int stationId, ChargingStationDtoRequest stationDtoRequest, string accountId);
+        Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync(string accountId);
+        Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int stationId);
+        Task<ChargingStationResponseDto> CreateChargingStationAsync(ChargingStationDto stationDtoRequest, string accountId);
+        Task UpdateChargingStationAsync(int stationId, ChargingStationDto stationDtoRequest, string accountId);
         Task DeleteChargingStationAsync(int stationId, string accountId);
 
 
-        Task<IEnumerable<ChargerDtoResponse>> GetChargersAsync(int stationId);
-        Task<ChargerDtoResponse> GetChargerByIdAsync(int chargerId);
-        Task CreateChargerAsync(ChargerDtoRequest chargerDtoRequest);
-        Task UpdateChargerAsync(int chargerId, ChargerDtoRequest chargerDtoRequest);
+        Task<IEnumerable<ChargerResponseDto>> GetChargersAsync(int stationId);
+        Task<ChargerResponseDto> GetChargerByIdAsync(int chargerId);
+        Task CreateChargerAsync(ChargerDto chargerDtoRequest);
+        Task UpdateChargerAsync(int chargerId, ChargerDto chargerDtoRequest);
         Task DeleteChargerAsync(int chargerId);
 
         // Maintenance logs management
         Task<IEnumerable<MaintenanceLogDtoResponse>> GetMaintenanceLogsAsync(int stationId);
-        Task AddMaintenanceLogAsync(MaintenanceLogDtoRequest logDtoRequest);
+        Task AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest);
         Task RemoveMaintenanceLogAsync(int logId);
 
 

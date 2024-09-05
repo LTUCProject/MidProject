@@ -1,9 +1,8 @@
-﻿namespace MidProject.Models.Dto.Request
+namespace MidProject.Models.Dto.Request
 {
     public class MaintenanceLogDto
     {
-        public int MaintenanceLogId { get; set; }
-        public int ChargingStationId { get; set; } // Foreign key
+        public int ChargingStationId { get; set; }
         public DateTime MaintenanceDate { get; set; }
         public string PerformedBy { get; set; }
         public string Details { get; set; }

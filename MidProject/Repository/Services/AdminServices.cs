@@ -213,7 +213,7 @@ namespace MidProject.Repository.Services
         }
 
         // Add a new notification for a client
-        public async Task AddNotificationAsync(NotificationRequestDto notificationDto)
+        public async Task AddNotificationAsync(NotificationDto notificationDto)
         {
             var notification = new Notification
             {
@@ -236,6 +236,7 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
+                    LocationId = cs.LocationId,
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
@@ -252,6 +253,7 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
+                    LocationId = cs.LocationId,
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,

@@ -1,6 +1,6 @@
 ﻿namespace MidProject.Models.Dto.Response
 {
-    public class AccountDto
+    public class AccountLoginDto
     {
         public string Id { get; set; }
         public string UserName { get; set; }

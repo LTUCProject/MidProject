@@ -1,6 +1,6 @@
 namespace MidProject.Models.Dto.Response
 {
-    public class ChargerDtoResponse
+    public class ChargerResponseDto
     {
         public int ChargerId { get; set; }
         public string Type { get; set; }

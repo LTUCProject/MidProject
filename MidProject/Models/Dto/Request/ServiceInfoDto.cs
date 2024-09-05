@@ -1,4 +1,4 @@
-﻿namespace MidProject.Models.Dto.Request
+namespace MidProject.Models.Dto.Request2
 {
     public class ServiceInfoDto
     {
@@ -8,6 +8,5 @@
         public string Contact { get; set; }
         public string Type { get; set; }
         public int ProviderId { get; set; }
-
     }
 }

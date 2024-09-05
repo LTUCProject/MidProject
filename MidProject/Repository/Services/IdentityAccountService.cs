@@ -93,14 +93,14 @@ namespace MidProject.Repository.Services
             }
             throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
-        public async Task<AccountDto> AccountAuthentication(string username, string password)
+        public async Task<AccountLoginDto> AccountAuthentication(string username, string password)
         {
             var account = await _accountManager.FindByNameAsync(username);
             if (account == null || !await _accountManager.CheckPasswordAsync(account, password))
             {
                 throw new Exception("Invalid username or password.");
             }
-            return new AccountDto
+            return new AccountLoginDto
             {
                 Id = account.Id,
                 UserName = account.UserName,
@@ -108,7 +108,7 @@ namespace MidProject.Repository.Services
                 Roles = await _accountManager.GetRolesAsync(account)
             };
         }
-        public async Task<AccountDto> LogOut(string username)
+        public async Task<AccountRegisterdResponseDto> LogOut(string username)
         {
             var account = await _accountManager.FindByNameAsync(username);
             if (account == null)
@@ -116,13 +116,14 @@ namespace MidProject.Repository.Services
                 throw new Exception("Account not found.");
             }
             await _signInManager.SignOutAsync();
-            return new AccountDto
+            return new AccountRegisterdResponseDto
             {
                 Id = account.Id,
-                UserName = account.UserName
+                UserName = account.UserName,
+                Roles = await _accountManager.GetRolesAsync(account)
             };
         }
-        public async Task<AccountDto> DeleteAccount(string username)
+        public async Task<AccountRegisterdResponseDto> DeleteAccount(string username)
         {
             var account = await _accountManager.FindByNameAsync(username);
             if (account == null)
@@ -130,26 +131,31 @@ namespace MidProject.Repository.Services
                 throw new Exception("Account not found.");
             }
             await _accountManager.DeleteAsync(account);
-            return new AccountDto
+            return new AccountRegisterdResponseDto
             {
                 Id = account.Id,
-                UserName = account.UserName
+                UserName = account.UserName,
+                Roles = await _accountManager.GetRolesAsync(account)
+
             };
         }
-        public async Task<AccountDto> GetTokens(ClaimsPrincipal claimsPrincipal)
+        public async Task<AccountRegisterdResponseDto> GetTokens(ClaimsPrincipal claimsPrincipal)
         {
             var user = await _accountManager.GetUserAsync(claimsPrincipal);
             if (user == null)
             {
                 throw new Exception("User not found.");
             }
-            return new AccountDto
+            return new AccountRegisterdResponseDto
             {
                 Id = user.Id,
                 UserName = user.UserName,
-                Token = await _jwtTokenService.GenerateToken(user, TimeSpan.FromMinutes(5))
+                Roles = await _accountManager.GetRolesAsync(user)
+
             };
         }
+
+        
     }
 }
 

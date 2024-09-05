@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MidProject.Models.Dto.Request;
 using System;
 
 public class ServicerService : IServicer
@@ -68,7 +67,7 @@ public class ServicerService : IServicer
         }
     }
 
-    public async Task CreateServiceAsync(ServiceInfoDtoRequest serviceDto)
+    public async Task CreateServiceAsync(ServiceInfoDto serviceDto)
     {
         try
         {
@@ -92,7 +91,7 @@ public class ServicerService : IServicer
         }
     }
 
-    public async Task UpdateServiceAsync(ServiceInfoDtoRequest serviceDto)
+    public async Task UpdateServiceAsync(ServiceInfoDto serviceDto)
     {
         try
         {
@@ -160,7 +159,7 @@ public class ServicerService : IServicer
         }
     }
 
-    public async Task AddServiceRequestAsync(ServiceRequestDtoRequest requestDto)
+    public async Task AddServiceRequestAsync(ServiceRequestDto requestDto)
     {
         try
         {

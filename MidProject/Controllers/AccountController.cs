@@ -53,7 +53,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<AccountDto>> Login(LoginDto loginDto)
+        public async Task<ActionResult<AccountRegisterdResponseDto>> Login(LoginDto loginDto)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("Logout")]
-        public async Task<ActionResult<AccountDto>> LogOut(string username)
+        public async Task<ActionResult<AccountRegisterdResponseDto>> LogOut(string username)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace MidProject.Controllers
 
         [Authorize]
         [HttpGet("Profile")]
-        public async Task<ActionResult<AccountDto>> Profile()
+        public async Task<ActionResult<AccountRegisterdResponseDto>> Profile()
         {
             try
             {

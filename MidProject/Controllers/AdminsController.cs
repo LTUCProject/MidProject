@@ -198,7 +198,7 @@ namespace MidProject.Controllers
 
         // POST: api/Admin/Clients/{clientId}/Notifications
         [HttpPost("Clients/{clientId}/Notifications")]
-        public async Task<IActionResult> AddNotification(int clientId, [FromBody] NotificationRequestDto notificationDto)
+        public async Task<IActionResult> AddNotification(int clientId, [FromBody] NotificationDto notificationDto)
         {
             if (clientId != notificationDto.ClientId)
             {
@@ -367,14 +367,16 @@ namespace MidProject.Controllers
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
+                    LocationId = l.LocationId, // Map LocationId here if needed
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
                     PaymentMethod = cs.PaymentMethod
-                })
-            });
+                }).ToList()
+            }).ToList();
             return Ok(locationDtos);
         }
+
 
         [HttpGet("Locations/{id}")]
         public async Task<IActionResult> GetLocationById(int id)
@@ -395,17 +397,19 @@ namespace MidProject.Controllers
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
+                    LocationId = location.LocationId, // Map LocationId here if needed
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
                     PaymentMethod = cs.PaymentMethod
-                })
+                }).ToList()
             };
             return Ok(locationDto);
         }
 
+
         [HttpPost("Locations")]
-        public async Task<IActionResult> CreateLocation([FromBody] LocationRequestDto locationDto)
+        public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDto)
         {
             if (!ModelState.IsValid)
             {
@@ -425,7 +429,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPut("Locations/{id}")]
-        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationRequestDto locationDto)
+        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDto)
         {
             if (!ModelState.IsValid)
             {

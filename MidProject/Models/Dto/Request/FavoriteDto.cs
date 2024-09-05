@@ -1,4 +1,4 @@
-﻿namespace MidProject.Models.Dto.Request
+﻿namespace MidProject.Models.Dto.Request2
 {
     public class FavoriteDto
     {
