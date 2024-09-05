@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MidProject.Models;
 using MidProject.Models.Dto.Request2;
+using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -108,11 +109,45 @@ namespace MidProject.Controllers
             return Ok(vehicle);
         }
 
-        [HttpPost("vehicles")]
-        public async Task<ActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
+        [HttpPost("vehicle")]
+        public async Task<IActionResult> AddVehicle(VehicleDto vehicleDto)
         {
-            await _context.AddVehicleAsync(vehicleDto);
-            return CreatedAtAction(nameof(GetVehicleById), new { vehicleId = vehicleDto.VehicleId }, vehicleDto);
+            if (vehicleDto == null)
+            {
+                return BadRequest("VehicleDto is null.");
+            }
+
+            try
+            {
+
+                var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
+
+                VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
+                {
+                    VehicleId = addedVehicle.VehicleId,           // Assuming AddVehicleAsync returns the entity
+                    LicensePlate = addedVehicle.LicensePlate,
+                    Model = addedVehicle.Model,
+                    Year = addedVehicle.Year,
+                    BatteryCapacity = addedVehicle.BatteryCapacity,
+                    ElectricType = addedVehicle.ElectricType,
+                    ClientId = addedVehicle.ClientId,
+                    ServiceInfoId = addedVehicle.ServiceInfoId
+                };
+
+
+
+                // Return CreatedAtAction with populated response
+                return CreatedAtAction(nameof(GetClientFavorites), new { clientId = vehicleDtoResponse.VehicleId }, vehicleDtoResponse);
+
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpDelete("vehicles/{vehicleId}")]
@@ -222,5 +257,7 @@ namespace MidProject.Controllers
                 return NotFound();
             return Ok(notification);
         }
+
+        
     }
 }

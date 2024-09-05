@@ -426,4 +426,18 @@ public class ServicerService : IServicer
             return Enumerable.Empty<FeedbackDtoResponse>();
         }
     }
+    public async Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto)
+    {
+        var serviceInfo = new ServiceInfo
+        {
+            Name = serviceInfoDto.Name,
+            Description = serviceInfoDto.Description,
+            Contact = serviceInfoDto.Contact,
+            Type = serviceInfoDto.Type,
+            ProviderId = serviceInfoDto.ProviderId
+        };
+
+        _context.ServiceInfos.Add(serviceInfo);
+        await _context.SaveChangesAsync();
+    }
 }

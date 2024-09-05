@@ -33,5 +33,8 @@ namespace MidProject.Repository.Interfaces
         //// Feedback management
         Task<IEnumerable<FeedbackDtoResponse>> GetFeedbacksAsync(int serviceId);
 
+        Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto);
+
+
     }
 }
