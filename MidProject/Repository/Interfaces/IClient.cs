@@ -24,7 +24,7 @@ namespace MidProject.Repository.Interfaces
         // Vehicle management
         Task<IEnumerable<Vehicle>> GetClientVehiclesAsync(int clientId);
         Task<Vehicle> GetVehicleByIdAsync(int vehicleId);
-        Task AddVehicleAsync(VehicleDto vehicleDto);
+        Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto);
         Task RemoveVehicleAsync(int vehicleId);
 
         // Booking management
@@ -47,6 +47,7 @@ namespace MidProject.Repository.Interfaces
         // Notifications management
         Task<IEnumerable<Notification>> GetClientNotificationsAsync(int clientId);
         Task<Notification> GetNotificationByIdAsync(int notificationId);
+      //  Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto);
 
 
     }

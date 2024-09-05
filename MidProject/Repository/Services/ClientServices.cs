@@ -135,7 +135,7 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(v => v.VehicleId == vehicleId);
         }
 
-        public async Task AddVehicleAsync(VehicleDto vehicleDto)
+        public async Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto)
         {
             var vehicle = new Vehicle
             {
@@ -144,12 +144,18 @@ namespace MidProject.Repository.Services
                 Year = vehicleDto.Year,
                 BatteryCapacity = vehicleDto.BatteryCapacity,
                 ElectricType = vehicleDto.ElectricType,
-                ClientId = vehicleDto.ClientId
+                ClientId = vehicleDto.ClientId,
+                ServiceInfoId = vehicleDto.ServiceInfoId
             };
 
-            await _context.Vehicles.AddAsync(vehicle);
+            // Add the vehicle to the database
+            _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
+
+            // Return the newly added vehicle
+            return vehicle;
         }
+
 
         public async Task RemoveVehicleAsync(int vehicleId)
         {
@@ -286,6 +292,19 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(n => n.NotificationId == notificationId);
         }
 
-        
+        //public async Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto)
+        //{
+        //    var serviceInfo = new ServiceInfo
+        //    {
+        //        Name = serviceInfoDto.Name,
+        //        Description = serviceInfoDto.Description,
+        //        Contact = serviceInfoDto.Contact,
+        //        Type = serviceInfoDto.Type,
+        //        ProviderId = serviceInfoDto.ProviderId
+        //    };
+
+        //    _context.ServiceInfos.Add(serviceInfo);
+        //    await _context.SaveChangesAsync();
+        //}
     }
 }

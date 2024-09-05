@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MidProject.Models;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
@@ -77,20 +79,19 @@ namespace MidProject.Controllers
         }
 
         // Create Service
-        [HttpPost("services")]
-        public async Task<IActionResult> CreateService([FromBody] ServiceInfoDto serviceDto)
+        [HttpPost("serviceinfo")]
+        public async Task<IActionResult> AddServiceInfo([FromBody] ServiceInfoDto serviceInfoDto)
         {
-            try
+            if (serviceInfoDto == null)
             {
-                await _servicerService.CreateServiceAsync(serviceDto);
-                return CreatedAtAction(nameof(GetServiceByIdAsync), new { serviceId = serviceDto.ServiceInfoId }, serviceDto);
+                return BadRequest("ServiceInfoDto is null.");
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error creating service: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+
+            // Validate the DTO here if needed
+
+            await _servicerService.AddServiceInfoAsync(serviceInfoDto);
+
+            return Ok("ServiceInfo created successfully.");
         }
 
         // Get Service by ID
@@ -248,7 +249,14 @@ namespace MidProject.Controllers
             try
             {
                 await _servicerService.AddVehicleAsync(vehicleDto);
-                return CreatedAtAction(nameof(GetVehicleByIdAsync), new { vehicleId = vehicleDto.VehicleId }, vehicleDto);
+                //  return CreatedAtAction(nameof(GetVehicleByIdAsync), new { vehicleId = vehicleDto.VehicleId }, vehicleDto);
+
+                var x = new Vehicle
+                {
+                    LicensePlate= vehicleDto.LicensePlate,
+
+                };
+                return Ok(x);
             }
             catch (Exception ex)
             {
