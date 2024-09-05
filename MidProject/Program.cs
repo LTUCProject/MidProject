@@ -51,8 +51,8 @@ namespace MidProject
             });
 
 
-            builder.Services.AddScoped<IAccountx, IdentityAccountService>();
-           builder.Services.AddScoped<IAdmin, AdminServices>();
+
+            builder.Services.AddScoped<IAdmin, AdminServices>();
             builder.Services.AddScoped<IClient, ClientServices>();
             builder.Services.AddScoped<IOwner, OwnerServices>();
             builder.Services.AddScoped<IServicer, ServicerService>();

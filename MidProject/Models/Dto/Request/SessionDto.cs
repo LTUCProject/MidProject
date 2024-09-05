@@ -1,4 +1,4 @@
-﻿namespace MidProject.Models.Dto.Request
+﻿namespace MidProject.Models.Dto.Request2
 {
     public class SessionDto
     {
@@ -8,6 +8,6 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int EnergyConsumed { get; set; }
-      
+
     }
 }

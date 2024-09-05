@@ -1,5 +1,5 @@
 ﻿using MidProject.Models;
-using MidProject.Models.Dto.Request;
+using MidProject.Models.Dto.Request2;
 
 namespace MidProject.Repository.Interfaces
 {

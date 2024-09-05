@@ -1,5 +1,4 @@
 using MidProject.Models;
-using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 
@@ -10,13 +9,13 @@ namespace MidProject.Repository.Interfaces
         // Service management
         Task<IEnumerable<ServiceInfoDtoResponse>> GetAllServicesAsync();
         Task<ServiceInfoDtoResponse> GetServiceByIdAsync(int serviceId);
-        Task CreateServiceAsync(ServiceInfoDtoRequest serviceDto);
-        Task UpdateServiceAsync(ServiceInfoDtoRequest serviceDto);
+        Task CreateServiceAsync(ServiceInfoDto serviceDto);
+        Task UpdateServiceAsync(ServiceInfoDto serviceDto);
         Task DeleteServiceAsync(int serviceId);
 
         // Service requests management
         Task<IEnumerable<ServiceRequestDtoResponse>> GetServiceRequestsAsync(int serviceId);
-        Task AddServiceRequestAsync(ServiceRequestDtoRequest requestDto);
+        Task AddServiceRequestAsync(ServiceRequestDto requestDto);
         Task RemoveServiceRequestAsync(int requestId);
 
         // Booking management

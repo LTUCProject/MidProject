@@ -27,7 +27,7 @@ namespace MidProject.Controllers
 
         // Charging Station Management
         [HttpGet("chargingstations")]
-        public async Task<ActionResult<IEnumerable<ChargingStationDtoResponse>>> GetAllChargingStations()
+        public async Task<ActionResult<IEnumerable<ChargingStationResponseDto>>> GetAllChargingStations()
         {
             try
             {
@@ -44,7 +44,7 @@ namespace MidProject.Controllers
         }
 
         [HttpGet("chargingstations/{id}")]
-        public async Task<ActionResult<ChargingStationDtoResponse>> GetChargingStationById(int id)
+        public async Task<ActionResult<ChargingStationResponseDto>> GetChargingStationById(int id)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("chargingstations")]
-        public async Task<IActionResult> CreateChargingStation([FromBody] ChargingStationDtoRequest stationDtoRequest)
+        public async Task<IActionResult> CreateChargingStation([FromBody] ChargingStationDto stationDtoRequest)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPut("chargingstations/{id}")]
-        public async Task<IActionResult> UpdateChargingStation(int id, [FromBody] ChargingStationDtoRequest stationDtoRequest)
+        public async Task<IActionResult> UpdateChargingStation(int id, [FromBody] ChargingStationDto stationDtoRequest)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace MidProject.Controllers
         }
 
         [HttpGet("stations/{stationId}/chargers")]
-        public async Task<ActionResult<IEnumerable<ChargerDtoResponse>>> GetChargers(int stationId)
+        public async Task<ActionResult<IEnumerable<ChargerResponseDto>>> GetChargers(int stationId)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace MidProject.Controllers
         }
 
         [HttpGet("chargers/{id}")]
-        public async Task<ActionResult<ChargerDtoResponse>> GetChargerById(int id)
+        public async Task<ActionResult<ChargerResponseDto>> GetChargerById(int id)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("chargers")]
-        public async Task<IActionResult> CreateCharger([FromBody] ChargerDtoRequest chargerDtoRequest)
+        public async Task<IActionResult> CreateCharger([FromBody] ChargerDto chargerDtoRequest)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPut("chargers/{id}")]
-        public async Task<IActionResult> UpdateCharger(int id, [FromBody] ChargerDtoRequest chargerDtoRequest)
+        public async Task<IActionResult> UpdateCharger(int id, [FromBody] ChargerDto chargerDtoRequest)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("maintenance")]
-        public async Task<IActionResult> AddMaintenanceLog([FromBody] MaintenanceLogDtoRequest logDtoRequest)
+        public async Task<IActionResult> AddMaintenanceLog([FromBody] MaintenanceLogDto logDtoRequest)
         {
             try
             {

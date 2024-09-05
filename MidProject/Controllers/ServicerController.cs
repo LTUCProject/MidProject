@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
@@ -23,7 +22,7 @@ namespace MidProject.Controllers
 
         // Add Service Request
         [HttpPost("servicerequests")]
-        public async Task<IActionResult> AddServiceRequest([FromBody] ServiceRequestDtoRequest requestDto)
+        public async Task<IActionResult> AddServiceRequest([FromBody] ServiceRequestDto requestDto)
         {
             try
             {
@@ -57,7 +56,7 @@ namespace MidProject.Controllers
 
         // Update Service
         [HttpPut("services/{serviceId}")]
-        public async Task<IActionResult> UpdateService(int serviceId, [FromBody] ServiceInfoDtoRequest serviceDto)
+        public async Task<IActionResult> UpdateService(int serviceId, [FromBody] ServiceInfoDto serviceDto)
         {
             try
             {
@@ -79,7 +78,7 @@ namespace MidProject.Controllers
 
         // Create Service
         [HttpPost("services")]
-        public async Task<IActionResult> CreateService([FromBody] ServiceInfoDtoRequest serviceDto)
+        public async Task<IActionResult> CreateService([FromBody] ServiceInfoDto serviceDto)
         {
             try
             {

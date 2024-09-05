@@ -1,6 +1,4 @@
-﻿using MidProject.Models;
-
-namespace MidProject.Models.Dto.Request
+﻿namespace MidProject.Models.Dto.Request2
 {
     public class FeedbackDto
     {

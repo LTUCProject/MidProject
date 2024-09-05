@@ -21,7 +21,7 @@ namespace MidProject.Repository.Services
         }
 
         // Charging Station Management
-        public async Task<IEnumerable<ChargingStationDtoResponse>> GetAllChargingStationsAsync(string accountId)
+        public async Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync(string accountId)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace MidProject.Repository.Services
                     throw new UnauthorizedAccessException("Owner not found");
                 }
 
-                var stationDtos = owner.ChargingStations.Select(cs => new ChargingStationDtoResponse
+                var stationDtos = owner.ChargingStations.Select(cs => new ChargingStationResponseDto
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
@@ -54,7 +54,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task<ChargingStationDtoResponse> GetChargingStationByIdAsync(int stationId)
+        public async Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int stationId)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace MidProject.Repository.Services
 
                 if (station == null) return null;
 
-                return new ChargingStationDtoResponse
+                return new ChargingStationResponseDto
                 {
                     ChargingStationId = station.ChargingStationId,
                     StationLocation = station.StationLocation,
@@ -82,7 +82,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task<ChargingStationDtoResponse> CreateChargingStationAsync(ChargingStationDtoRequest stationDtoRequest, string accountId)
+        public async Task<ChargingStationResponseDto> CreateChargingStationAsync(ChargingStationDto stationDtoRequest, string accountId)
         {
             try
             {
@@ -107,7 +107,7 @@ namespace MidProject.Repository.Services
                 await _context.ChargingStations.AddAsync(station);
                 await _context.SaveChangesAsync();
 
-                return new ChargingStationDtoResponse
+                return new ChargingStationResponseDto
                 {
                     ChargingStationId = station.ChargingStationId,
                     StationLocation = station.StationLocation,
@@ -125,7 +125,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task UpdateChargingStationAsync(int stationId, ChargingStationDtoRequest stationDtoRequest, string accountId)
+        public async Task UpdateChargingStationAsync(int stationId, ChargingStationDto stationDtoRequest, string accountId)
         {
             try
             {
@@ -177,7 +177,7 @@ namespace MidProject.Repository.Services
         }
 
         // Charger Management
-        public async Task<IEnumerable<ChargerDtoResponse>> GetChargersAsync(int stationId)
+        public async Task<IEnumerable<ChargerResponseDto>> GetChargersAsync(int stationId)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace MidProject.Repository.Services
                     .Where(c => c.ChargingStationId == stationId)
                     .ToListAsync();
 
-                return chargers.Select(c => new ChargerDtoResponse
+                return chargers.Select(c => new ChargerResponseDto
                 {
                     ChargerId = c.ChargerId,
                     Type = c.Type,
@@ -201,7 +201,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task<ChargerDtoResponse> GetChargerByIdAsync(int chargerId)
+        public async Task<ChargerResponseDto> GetChargerByIdAsync(int chargerId)
         {
             try
             {
@@ -210,7 +210,7 @@ namespace MidProject.Repository.Services
 
                 if (charger == null) return null;
 
-                return new ChargerDtoResponse
+                return new ChargerResponseDto
                 {
                     ChargerId = charger.ChargerId,
                     Type = charger.Type,
@@ -226,7 +226,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task CreateChargerAsync(ChargerDtoRequest chargerDtoRequest)
+        public async Task CreateChargerAsync(ChargerDto chargerDtoRequest)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task UpdateChargerAsync(int chargerId, ChargerDtoRequest chargerDtoRequest)
+        public async Task UpdateChargerAsync(int chargerId, ChargerDto chargerDtoRequest)
         {
             try
             {
@@ -316,7 +316,7 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task AddMaintenanceLogAsync(MaintenanceLogDtoRequest logDtoRequest)
+        public async Task AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest)
         {
             try
             {

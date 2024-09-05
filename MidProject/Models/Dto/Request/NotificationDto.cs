@@ -1,12 +1,10 @@
-﻿namespace MidProject.Models.Dto.Request
+namespace MidProject.Models.Dto.Request2
 {
     public class NotificationDto
     {
-        public int NotificationId { get; set; }
-        public int UserId { get; set; } // Foreign key
+        public int ClientId { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
         public DateTime Date { get; set; }
-        public bool IsRead { get; set; }
     }
 }

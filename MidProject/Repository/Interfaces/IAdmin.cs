@@ -29,7 +29,7 @@ namespace MidProject.Repository.Interfaces
 
         // Notifications management
         Task<IEnumerable<NotificationResponseDto>> GetClientNotificationsAsync(int clientId);
-        Task AddNotificationAsync(NotificationRequestDto notificationDto);
+        Task AddNotificationAsync(NotificationDto notificationDto);
 
         // Charging station management
         Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync();
