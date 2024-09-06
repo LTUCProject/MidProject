@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using MidProject.Models.Dto.Response;
 using MidProject.Models.Dto.Request2;
 using Microsoft.AspNetCore.Authorization;
+using MidProject.Models.Dto.Request;
 
 namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "AdminPolicy")]
+   // [Authorize(Policy = "AdminPolicy")]
     public class AdminsController : ControllerBase
     {
         private readonly MidprojectDbContext _context;
@@ -165,6 +166,29 @@ namespace MidProject.Controllers
             }
 
             return Ok(subscriptionPlan);
+        }
+        [HttpPost("SubscriptionPlans")]
+        public async Task<IActionResult> CreateSubscriptionPlan([FromBody] SubscriptionPlanDto newSubscriptionPlanDto)
+        {
+            if (newSubscriptionPlanDto == null)
+            {
+                return BadRequest("Invalid subscription plan data.");
+            }
+
+            
+                var createdPlan = await _adminService.CreateSubscriptionPlanAsync(newSubscriptionPlanDto);
+            //     return CreatedAtAction(nameof(GetSubscriptionPlanById), new { id = createdPlan.Id }, createdPlan);
+
+            SubscriptionPlanDtoResonse subscriptionPlanDtoResonse = new SubscriptionPlanDtoResonse()
+            {
+                SubscriptionPlanId= createdPlan.SubscriptionPlanId,
+                Name= createdPlan.Name,
+                Description= createdPlan.Description,
+                Price= createdPlan.Price,
+                DurationInDays= createdPlan.DurationInDays,
+            };
+            return Ok(subscriptionPlanDtoResonse);
+            
         }
 
         // DELETE: api/Admin/SubscriptionPlans/{id}
