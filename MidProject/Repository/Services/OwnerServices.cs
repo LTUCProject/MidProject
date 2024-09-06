@@ -226,10 +226,9 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task CreateChargerAsync(ChargerDto chargerDtoRequest)
+        public async Task<Charger> CreateChargerAsync(ChargerDto chargerDtoRequest)
         {
-            try
-            {
+            
                 var charger = new Charger
                 {
                     Type = chargerDtoRequest.Type,
@@ -240,12 +239,8 @@ namespace MidProject.Repository.Services
 
                 await _context.Chargers.AddAsync(charger);
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                // Log the error
-                throw new Exception("An error occurred while creating the charger.", ex);
-            }
+            return charger;
+            
         }
 
         public async Task UpdateChargerAsync(int chargerId, ChargerDto chargerDtoRequest)
@@ -316,10 +311,9 @@ namespace MidProject.Repository.Services
             }
         }
 
-        public async Task AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest)
+        public async Task<MaintenanceLog> AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest)
         {
-            try
-            {
+            
                 var log = new MaintenanceLog
                 {
                     ChargingStationId = logDtoRequest.ChargingStationId,
@@ -331,12 +325,8 @@ namespace MidProject.Repository.Services
 
                 await _context.MaintenanceLogs.AddAsync(log);
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                // Log the error
-                throw new Exception("An error occurred while adding a maintenance log.", ex);
-            }
+            return log;
+           
         }
 
         public async Task RemoveMaintenanceLogAsync(int logId)

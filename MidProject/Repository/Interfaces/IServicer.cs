@@ -21,7 +21,7 @@ namespace MidProject.Repository.Interfaces
         // Booking management
         Task<IEnumerable<BookingResponseDto>> GetBookingsAsync(int serviceId);
         Task<BookingResponseDto> GetBookingByIdAsync(int bookingId);
-        Task AddBookingAsync(BookingDto bookingDto);
+        Task<Booking> AddBookingAsync(BookingDto bookingDto);
         Task RemoveBookingAsync(int bookingId);
 
         // Vehicle management

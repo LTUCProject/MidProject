@@ -12,7 +12,7 @@ namespace MidProject.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "ServicerPolicy")]
+  //  [Authorize(Policy = "ServicerPolicy")]
     public class ServicerController : ControllerBase
     {
         private readonly IServicer _servicerService;
@@ -136,17 +136,22 @@ namespace MidProject.Controllers
         [HttpPost("bookings")]
         public async Task<IActionResult> AddBooking([FromBody] BookingDto bookingDto)
         {
-            try
+            var newBooking = await _servicerService.AddBookingAsync(bookingDto);
+            // return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
+
+            BookingResponseDto bookingResponseDto = new BookingResponseDto()
             {
-                await _servicerService.AddBookingAsync(bookingDto);
-                return CreatedAtAction(nameof(GetBookingByIdAsync), new { bookingId = bookingDto.BookingId }, bookingDto);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error adding booking: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+                BookingId = newBooking.BookingId,
+                ClientId = newBooking.ClientId,
+                ServiceInfoId = newBooking.ServiceInfoId,
+                VehicleId = newBooking.VehicleId,
+                StartTime = newBooking.StartTime,
+                EndTime = newBooking.EndTime,
+                Status = newBooking.Status,
+                Cost = newBooking.Cost
+
+            };
+            return Ok(bookingResponseDto);
         }
 
         // Get All Bookings for a Service

@@ -2,7 +2,7 @@
 {
     public class BookingDto
     {
-        public int BookingId { get; set; }
+       // public int BookingId { get; set; }
         public int ClientId { get; set; } // Foreign key
         public int ServiceInfoId { get; set; } // Foreign key
         public int VehicleId { get; set; } // Foreign key

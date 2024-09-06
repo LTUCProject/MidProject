@@ -1,8 +1,9 @@
-﻿namespace MidProject.Models.Dto.Request2
+﻿namespace MidProject.Models.Dto.Response
 {
-    public class PaymentTransactionDto
+    public class PaymentTransactionDtoResponse
     {
-       // public int PaymentTransactionId { get; set; }
+       public int PaymentTransactionId { get; set; }
+
         public int SessionId { get; set; } // Foreign key
         public int ClientId { get; set; } // Foreign key
         public int Amount { get; set; }

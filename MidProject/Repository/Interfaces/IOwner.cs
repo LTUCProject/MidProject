@@ -17,13 +17,13 @@ namespace MidProject.Repository.Interfaces
 
         Task<IEnumerable<ChargerResponseDto>> GetChargersAsync(int stationId);
         Task<ChargerResponseDto> GetChargerByIdAsync(int chargerId);
-        Task CreateChargerAsync(ChargerDto chargerDtoRequest);
+        Task<Charger> CreateChargerAsync(ChargerDto chargerDtoRequest);
         Task UpdateChargerAsync(int chargerId, ChargerDto chargerDtoRequest);
         Task DeleteChargerAsync(int chargerId);
 
         // Maintenance logs management
         Task<IEnumerable<MaintenanceLogDtoResponse>> GetMaintenanceLogsAsync(int stationId);
-        Task AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest);
+        Task<MaintenanceLog> AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest);
         Task RemoveMaintenanceLogAsync(int logId);
 
 
