@@ -13,7 +13,7 @@ namespace MidProject.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-   // [Authorize(Policy = "ServicerPolicy")]
+    // [Authorize(Policy = "ServicerPolicy")]
     public class ServicerController : ControllerBase
     {
         private readonly IServicer _servicerService;
@@ -176,8 +176,44 @@ namespace MidProject.Controllers
             }
             return NoContent();
         }
+
+        // Notification Management
+        [HttpPost("ServicerNotifications")]
+        public async Task<ActionResult<NotificationResponseDto>> CreateNotificationAsync([FromBody] NotificationDto notificationDto)
+        {
+            var notification = await _servicerService.CreateNotificationAsync(notificationDto);
+
+            // Use CreatedAtRoute instead of CreatedAtAction
+            return CreatedAtRoute(
+                "ServicerGetNotificationById", // Name the route
+                new { notificationId = notification.NotificationId },
+                notification
+            );
+        }
+
+        [HttpGet("ServicerNotifications/{notificationId}", Name = "ServicerGetNotificationById")]
+        public async Task<ActionResult<NotificationResponseDto>> GetNotificationByIdAsync(int notificationId)
+        {
+            var notification = await _servicerService.GetNotificationByIdAsync(notificationId);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+            return Ok(notification);
+        }
+
+
+
+        [HttpGet("ServicerNotifications/client/{clientId}")]
+        public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotificationsByClientIdAsync(int clientId)
+        {
+            var notifications = await _servicerService.GetNotificationsByClientIdAsync(clientId);
+            return Ok(notifications);
+        }
+
     }
 }
+
 //// Get Vehicles by ServiceInfoId
 //[HttpGet("services/{serviceId}/vehicles")]
 //public async Task<ActionResult<IEnumerable<VehicleDtoResponse>>> GetVehiclesAsync(int serviceId)

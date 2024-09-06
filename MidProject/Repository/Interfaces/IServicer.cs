@@ -28,15 +28,20 @@ namespace MidProject.Repository.Interfaces
         Task<IEnumerable<BookingResponseDto2>> GetBookingsByServiceInfoIdAsync(int serviceInfoId);
         Task<bool> UpdateBookingStatusAsync(int bookingId, string status);
         Task<bool> CancelBookingAsync(int bookingId);
+
+        // Notification management
+        Task<NotificationResponseDto> CreateNotificationAsync(NotificationDto notificationDto);
+        Task<NotificationResponseDto> GetNotificationByIdAsync(int notificationId);
+        Task<IEnumerable<NotificationResponseDto>> GetNotificationsByClientIdAsync(int clientId);
+
     }
 }
-        //// Vehicle management
-        //Task<IEnumerable<VehicleDtoResponse>> GetVehiclesAsync(int serviceId);
-        //Task<VehicleDtoResponse> GetVehicleByIdAsync(int vehicleId);
-        //Task AddVehicleAsync(VehicleDto vehicleDto);
-        //Task RemoveVehicleAsync(int vehicleId);
+//// Vehicle management
+//Task<IEnumerable<VehicleDtoResponse>> GetVehiclesAsync(int serviceId);
+//Task<VehicleDtoResponse> GetVehicleByIdAsync(int vehicleId);
+//Task AddVehicleAsync(VehicleDto vehicleDto);
+//Task RemoveVehicleAsync(int vehicleId);
 
-        ////// Feedback management
-        //Task<IEnumerable<FeedbackDtoResponse>> GetFeedbacksAsync(int serviceId);
+////// Feedback management
+//Task<IEnumerable<FeedbackDtoResponse>> GetFeedbacksAsync(int serviceId);
 
-       

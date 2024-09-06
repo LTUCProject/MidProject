@@ -8,6 +8,7 @@ using MidProject.Models.Dto.Response;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Request;
 using System;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace MidProject.Repository.Services
 {
@@ -27,6 +28,7 @@ namespace MidProject.Repository.Services
             {
                 var owner = await _context.Providers
                     .Include(p => p.ChargingStations)
+                    .ThenInclude(cs => cs.Chargers)
                     .FirstOrDefaultAsync(p => p.AccountId == accountId);
 
                 if (owner == null)
@@ -42,7 +44,15 @@ namespace MidProject.Repository.Services
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
+                    PaymentMethod = cs.PaymentMethod,
+                    Chargers = cs.Chargers.Select(c => new ChargerResponseDto
+                    {
+                        ChargerId = c.ChargerId,
+                        Type = c.Type,
+                        Power = c.Power,
+                        Speed = c.Speed,
+                        ChargingStationId = c.ChargingStationId
+                    }).ToList()
                 });
 
                 return stationDtos;
@@ -54,12 +64,14 @@ namespace MidProject.Repository.Services
             }
         }
 
+
+
         public async Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int stationId)
         {
             try
             {
                 var station = await _context.ChargingStations
-                    .Include(cs => cs.Provider)
+                    .Include(cs => cs.Chargers)
                     .FirstOrDefaultAsync(cs => cs.ChargingStationId == stationId);
 
                 if (station == null) return null;
@@ -72,7 +84,15 @@ namespace MidProject.Repository.Services
                     Name = station.Name,
                     HasParking = station.HasParking,
                     Status = station.Status,
-                    PaymentMethod = station.PaymentMethod
+                    PaymentMethod = station.PaymentMethod,
+                    Chargers = station.Chargers.Select(c => new ChargerResponseDto
+                    {
+                        ChargerId = c.ChargerId,
+                        Type = c.Type,
+                        Power = c.Power,
+                        Speed = c.Speed,
+                        ChargingStationId = c.ChargingStationId
+                    }).ToList()
                 };
             }
             catch (Exception ex)
@@ -81,6 +101,8 @@ namespace MidProject.Repository.Services
                 throw new Exception("An error occurred while retrieving the charging station by ID.", ex);
             }
         }
+
+
 
         public async Task<ChargingStationResponseDto> CreateChargingStationAsync(ChargingStationDto stationDtoRequest, string accountId)
         {
@@ -176,6 +198,7 @@ namespace MidProject.Repository.Services
             }
         }
 
+
         // Charger Management
         public async Task<IEnumerable<ChargerResponseDto>> GetChargersAsync(int stationId)
         {
@@ -228,19 +251,19 @@ namespace MidProject.Repository.Services
 
         public async Task<Charger> CreateChargerAsync(ChargerDto chargerDtoRequest)
         {
-            
-                var charger = new Charger
-                {
-                    Type = chargerDtoRequest.Type,
-                    Power = chargerDtoRequest.Power,
-                    Speed = chargerDtoRequest.Speed,
-                    ChargingStationId = chargerDtoRequest.ChargingStationId
-                };
 
-                await _context.Chargers.AddAsync(charger);
-                await _context.SaveChangesAsync();
+            var charger = new Charger
+            {
+                Type = chargerDtoRequest.Type,
+                Power = chargerDtoRequest.Power,
+                Speed = chargerDtoRequest.Speed,
+                ChargingStationId = chargerDtoRequest.ChargingStationId
+            };
+
+            await _context.Chargers.AddAsync(charger);
+            await _context.SaveChangesAsync();
             return charger;
-            
+
         }
 
         public async Task UpdateChargerAsync(int chargerId, ChargerDto chargerDtoRequest)
@@ -313,20 +336,20 @@ namespace MidProject.Repository.Services
 
         public async Task<MaintenanceLog> AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest)
         {
-            
-                var log = new MaintenanceLog
-                {
-                    ChargingStationId = logDtoRequest.ChargingStationId,
-                    MaintenanceDate = logDtoRequest.MaintenanceDate,
-                    PerformedBy = logDtoRequest.PerformedBy,
-                    Details = logDtoRequest.Details,
-                    Cost = logDtoRequest.Cost
-                };
 
-                await _context.MaintenanceLogs.AddAsync(log);
-                await _context.SaveChangesAsync();
+            var log = new MaintenanceLog
+            {
+                ChargingStationId = logDtoRequest.ChargingStationId,
+                MaintenanceDate = logDtoRequest.MaintenanceDate,
+                PerformedBy = logDtoRequest.PerformedBy,
+                Details = logDtoRequest.Details,
+                Cost = logDtoRequest.Cost
+            };
+
+            await _context.MaintenanceLogs.AddAsync(log);
+            await _context.SaveChangesAsync();
             return log;
-           
+
         }
 
         public async Task RemoveMaintenanceLogAsync(int logId)
@@ -348,7 +371,156 @@ namespace MidProject.Repository.Services
             }
         }
 
-        
 
+        //Notification
+
+        public async Task<NotificationResponseDto> CreateNotificationAsync(NotificationDto notificationDto)
+        {
+            var notification = new Notification
+            {
+                ClientId = notificationDto.ClientId, // Ensure this is correct and matches the Client entity type
+                Title = notificationDto.Title,
+                Message = notificationDto.Message,
+                Date = notificationDto.Date
+            };
+
+            await _context.Notifications.AddAsync(notification); // Add the notification to the context
+            await _context.SaveChangesAsync(); // Save changes to the database
+
+            // Return the created notification's details
+            return new NotificationResponseDto
+            {
+                NotificationId = notification.NotificationId, // ID generated by the database
+                ClientId = notification.ClientId,
+                Title = notification.Title,
+                Message = notification.Message,
+                Date = notification.Date
+            };
+        }
+
+
+        public async Task<NotificationResponseDto> GetNotificationByIdAsync(int notificationId)
+        {
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.NotificationId == notificationId);
+
+            if (notification == null)
+            {
+                return null;
+            }
+
+            return new NotificationResponseDto
+            {
+                NotificationId = notification.NotificationId,
+                ClientId = notification.ClientId,
+                Title = notification.Title,
+                Message = notification.Message,
+                Date = notification.Date
+            };
+        }
+
+        public async Task<IEnumerable<NotificationResponseDto>> GetNotificationsByClientIdAsync(int clientId)
+        {
+            var notifications = await _context.Notifications
+                .Where(n => n.ClientId == clientId)
+                .ToListAsync();
+
+            return notifications.Select(n => new NotificationResponseDto
+            {
+                NotificationId = n.NotificationId,
+                ClientId = n.ClientId,
+                Title = n.Title,
+                Message = n.Message,
+                Date = n.Date
+            });
+        }
+        //Location
+        public async Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync()
+        {
+            return await _context.Locations
+                .Select(loc => new LocationResponseDto
+                {
+                    LocationId = loc.LocationId,
+                    Name = loc.Name,
+                    Address = loc.Address,
+                    Latitude = loc.Latitude,
+                    Longitude = loc.Longitude,
+                    ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
+                    {
+                        ChargingStationId = cs.ChargingStationId,
+                        StationLocation = cs.StationLocation,
+                        LocationId = cs.LocationId,
+                        Name = cs.Name,
+                        HasParking = cs.HasParking,
+                        Status = cs.Status,
+                        PaymentMethod = cs.PaymentMethod
+                    })
+                }).ToListAsync();
+        }
+
+        public async Task<LocationResponseDto> GetLocationByIdAsync(int id)
+        {
+            return await _context.Locations
+                .Where(loc => loc.LocationId == id)
+                .Select(loc => new LocationResponseDto
+                {
+                    LocationId = loc.LocationId,
+                    Name = loc.Name,
+                    Address = loc.Address,
+                    Latitude = loc.Latitude,
+                    Longitude = loc.Longitude,
+                    ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
+                    {
+                        // Map ChargingStation properties here
+                    })
+                }).FirstOrDefaultAsync();
+        }
+
+        public async Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto)
+        {
+            var location = new Location
+            {
+                Name = locationDto.Name,
+                Address = locationDto.Address,
+                Latitude = locationDto.Latitude,
+                Longitude = locationDto.Longitude
+            };
+
+            _context.Locations.Add(location);
+            await _context.SaveChangesAsync();
+
+            return new LocationResponseDto
+            {
+                LocationId = location.LocationId,
+                Name = location.Name,
+                Address = location.Address,
+                Latitude = location.Latitude,
+                Longitude = location.Longitude
+            };
+        }
+
+        public async Task UpdateLocationAsync(int id, LocationDto locationDto)
+        {
+            var location = await _context.Locations.FindAsync(id);
+            if (location == null) throw new KeyNotFoundException("Location not found.");
+
+            location.Name = locationDto.Name;
+            location.Address = locationDto.Address;
+            location.Latitude = locationDto.Latitude;
+            location.Longitude = locationDto.Longitude;
+
+            _context.Locations.Update(location);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteLocationAsync(int id)
+        {
+            var location = await _context.Locations.FindAsync(id);
+            if (location == null) throw new KeyNotFoundException("Location not found.");
+
+            _context.Locations.Remove(location);
+            await _context.SaveChangesAsync();
+        }
     }
+
 }

@@ -5,6 +5,7 @@ using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
+using MidProject.Repository.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -305,6 +306,86 @@ namespace MidProject.Controllers
             return Ok(notification);
         }
 
+        // Post management
+        [HttpGet("posts")]
+        public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetAllPosts()
+        {
+            var posts = await _context.GetAllPostsAsync();
+            var postDtos = posts.Select(p => new PostResponseDto
+            {
+                PostId = p.PostId,
+                ClientId = p.ClientId,
+                ClientName = p.Client?.Name, // Assuming Client has a Name property
+                Title = p.Title,
+                Content = p.Content,
+                Date = p.Date,
+                Comments = p.Comments.Select(c => new CommentResponseDto
+                {
+                    CommentId = c.CommentId,
+                    ClientId = c.ClientId,
+                    PostId = c.PostId,
+                    Content = c.Content,
+                    Date = c.Date
+                })
+            });
 
+            return Ok(postDtos);
+        }
+
+        [HttpPost("posts")]
+        public async Task<ActionResult<Post>> AddPost([FromBody] PostDto postDto)
+        {
+            var post = await _context.AddPostAsync(postDto);
+            return CreatedAtAction(nameof(GetAllPosts), new { postId = post.PostId }, post);
+        }
+
+        [HttpDelete("posts/{postId}")]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            await _context.DeletePostAsync(postId);
+            return NoContent();
+        }
+
+        // Comment management
+        [HttpGet("comments")]
+        public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetAllComments()
+        {
+            var comments = await _context.GetAllCommentsAsync();
+            var commentDtos = comments.Select(c => new CommentResponseDto
+            {
+                CommentId = c.CommentId,
+                ClientId = c.ClientId,
+                PostId = c.PostId,
+                Content = c.Content,
+                Date = c.Date
+            });
+
+            return Ok(commentDtos);
+        }
+
+        [HttpPost("comments")]
+        public async Task<ActionResult<Comment>> AddComment([FromBody] CommentDto commentDto)
+        {
+            var comment = await _context.AddCommentAsync(commentDto);
+            //   return CreatedAtAction(nameof(GetAllComments), new { commentId = comment.CommentId }, comment);
+
+            CommentResponseDto commentResponseDto = new CommentResponseDto()
+            {
+                CommentId= comment.CommentId,
+                ClientId= comment.ClientId,
+                PostId = comment.PostId,
+                Content = comment.Content,
+                Date= comment.Date
+            };
+            return Ok(commentResponseDto);
+
+        }
+
+        [HttpDelete("comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int commentId)
+        {
+            await _context.DeleteCommentAsync(commentId);
+            return NoContent();
+        }
     }
 }

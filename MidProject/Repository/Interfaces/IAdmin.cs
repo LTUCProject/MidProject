@@ -60,5 +60,10 @@ namespace MidProject.Repository.Interfaces
         Task<IEnumerable<Post>> GetAllPostsAsync();
         Task<Post> GetPostByIdAsync(int postId);
         Task DeletePostAsync(int postId);
+
+        // Comment management
+        Task<IEnumerable<Comment>> GetAllCommentsAsync();
+        Task<Comment> GetCommentByIdAsync(int commentId);
+        Task DeleteCommentAsync(int commentId);
     }
 }
