@@ -16,7 +16,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "AdminPolicy")]
+   // [Authorize(Policy = "AdminPolicy")]
     public class AdminsController : ControllerBase
     {
         private readonly MidprojectDbContext _context;

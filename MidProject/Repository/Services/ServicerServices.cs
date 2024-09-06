@@ -256,10 +256,9 @@ public class ServicerService : IServicer
         }
     }
 
-    public async Task AddBookingAsync(BookingDto bookingDto)
+    public async Task<Booking> AddBookingAsync(BookingDto bookingDto)
     {
-        try
-        {
+        
             var booking = new Booking
             {
                 ClientId = bookingDto.ClientId,
@@ -271,15 +270,12 @@ public class ServicerService : IServicer
                 Cost = bookingDto.Cost
             };
 
+
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            // Log the exception
-            Console.WriteLine($"Error adding booking: {ex.Message}");
-            // Handle or rethrow as necessary
-        }
+            return booking;
+        
+        
     }
 
     public async Task RemoveBookingAsync(int bookingId)

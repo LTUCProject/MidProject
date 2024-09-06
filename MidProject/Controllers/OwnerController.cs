@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MidProject.Models;
 using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
@@ -13,7 +14,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "OwnerPolicy")]
+   // [Authorize(Policy = "OwnerPolicy")]
     public class OwnerController : ControllerBase
     {
         private readonly IOwner _ownerService;
@@ -143,15 +144,19 @@ namespace MidProject.Controllers
         [HttpPost("chargers")]
         public async Task<IActionResult> CreateCharger([FromBody] ChargerDto chargerDtoRequest)
         {
-            try
+            
+            var newCharger=    await _ownerService.CreateChargerAsync(chargerDtoRequest);
+            //  return CreatedAtAction(nameof(GetChargerById), new { id = chargerDtoRequest.ChargingStationId }, chargerDtoRequest);
+
+            ChargerResponseDto chargerResponseDto = new ChargerResponseDto()
             {
-                await _ownerService.CreateChargerAsync(chargerDtoRequest);
-                return CreatedAtAction(nameof(GetChargerById), new { id = chargerDtoRequest.ChargingStationId }, chargerDtoRequest);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                ChargerId = newCharger.ChargerId,
+                Type =newCharger.Type,
+                Power= newCharger.Power,
+                Speed =newCharger.Speed,
+                ChargingStationId=newCharger.ChargingStationId,
+            };
+            return Ok(chargerResponseDto);
         }
 
         [HttpPut("chargers/{id}")]
@@ -202,15 +207,21 @@ namespace MidProject.Controllers
         [HttpPost("maintenance")]
         public async Task<IActionResult> AddMaintenanceLog([FromBody] MaintenanceLogDto logDtoRequest)
         {
-            try
+            
+             var newLog=   await _ownerService.AddMaintenanceLogAsync(logDtoRequest);
+            // return CreatedAtAction(nameof(GetMaintenanceLogs), new { stationId = logDtoRequest.ChargingStationId }, logDtoRequest);
+
+            MaintenanceLogDtoResponse response = new MaintenanceLogDtoResponse()
             {
-                await _ownerService.AddMaintenanceLogAsync(logDtoRequest);
-                return CreatedAtAction(nameof(GetMaintenanceLogs), new { stationId = logDtoRequest.ChargingStationId }, logDtoRequest);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                MaintenanceLogId=newLog.MaintenanceLogId,
+                ChargingStationId=newLog.ChargingStationId,
+                MaintenanceDate=newLog.MaintenanceDate,
+                PerformedBy=newLog.PerformedBy,
+                Details=newLog.Details,
+                Cost=newLog.Cost
+            };
+            return Ok(response);
+            
         }
 
         [HttpDelete("maintenance/{id}")]

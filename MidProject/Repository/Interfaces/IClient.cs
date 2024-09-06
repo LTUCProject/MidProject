@@ -8,17 +8,17 @@ namespace MidProject.Repository.Interfaces
         // Session management
         Task<IEnumerable<Session>> GetClientSessionsAsync(int clientId);
         Task<Session> GetSessionByIdAsync(int sessionId);
-        Task StartSessionAsync(SessionDto sessionDto);
+        Task<Session> StartSessionAsync(SessionDto sessionDto);
         Task EndSessionAsync(int sessionId);
 
         // Payment transactions management
         Task<IEnumerable<PaymentTransaction>> GetClientPaymentsAsync(int sessionId);
-        Task AddPaymentAsync(PaymentTransactionDto paymentDto);
+        Task<PaymentTransaction> AddPaymentAsync(PaymentTransactionDto paymentDto);
         Task RemovePaymentAsync(int paymentId);
 
         // Favorites management
         Task<IEnumerable<Favorite>> GetClientFavoritesAsync(int clientId);
-        Task AddFavoriteAsync(FavoriteDto favoriteDto);
+        Task<Favorite> AddFavoriteAsync(FavoriteDto favoriteDto);
         Task RemoveFavoriteAsync(int favoriteId);
 
         // Vehicle management
@@ -30,18 +30,18 @@ namespace MidProject.Repository.Interfaces
         // Booking management
         Task<IEnumerable<Booking>> GetClientBookingsAsync(int clientId);
         Task<Booking> GetBookingByIdAsync(int bookingId);
-        Task AddBookingAsync(BookingDto bookingDto);
+        Task<Booking> AddBookingAsync(BookingDto bookingDto);
         Task RemoveBookingAsync(int bookingId);
 
         // Service request management
         Task<IEnumerable<ServiceRequest>> GetClientServiceRequestsAsync(int clientId);
         Task<ServiceRequest> GetServiceRequestByIdAsync(int requestId);
-        Task CreateServiceRequestAsync(ServiceRequestDto requestDto);
+        Task<ServiceRequest> CreateServiceRequestAsync(ServiceRequestDto requestDto);
         Task DeleteServiceRequestAsync(int requestId);
 
         // Feedback management
         Task<IEnumerable<Feedback>> GetClientFeedbacksAsync(int clientId);
-        Task AddFeedbackAsync(FeedbackDto feedbackDto);
+        Task<Feedback> AddFeedbackAsync(FeedbackDto feedbackDto);
         Task RemoveFeedbackAsync(int feedbackId);
 
         // Notifications management

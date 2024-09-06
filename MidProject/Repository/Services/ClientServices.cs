@@ -30,7 +30,7 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(s => s.SessionId == sessionId);
         }
 
-        public async Task StartSessionAsync(SessionDto sessionDto)
+        public async Task<Session> StartSessionAsync(SessionDto sessionDto)
         {
             var session = new Session
             {
@@ -43,6 +43,7 @@ namespace MidProject.Repository.Services
 
             await _context.Sessions.AddAsync(session);
             await _context.SaveChangesAsync();
+            return session;
         }
 
         public async Task EndSessionAsync(int sessionId)
@@ -64,7 +65,7 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-        public async Task AddPaymentAsync(PaymentTransactionDto paymentDto)
+        public async Task<PaymentTransaction> AddPaymentAsync(PaymentTransactionDto paymentDto)
         {
             var payment = new PaymentTransaction
             {
@@ -78,6 +79,8 @@ namespace MidProject.Repository.Services
 
             await _context.PaymentTransactions.AddAsync(payment);
             await _context.SaveChangesAsync();
+
+            return payment;
         }
 
         public async Task RemovePaymentAsync(int paymentId)
@@ -98,7 +101,7 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-        public async Task AddFavoriteAsync(FavoriteDto favoriteDto)
+        public async Task<Favorite> AddFavoriteAsync(FavoriteDto favoriteDto)
         {
             var favorite = new Favorite
             {
@@ -109,6 +112,7 @@ namespace MidProject.Repository.Services
 
             await _context.Favorites.AddAsync(favorite);
             await _context.SaveChangesAsync();
+            return favorite;
         }
 
         public async Task RemoveFavoriteAsync(int favoriteId)
@@ -180,7 +184,7 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
         }
 
-        public async Task AddBookingAsync(BookingDto bookingDto)
+        public async Task<Booking> AddBookingAsync(BookingDto bookingDto)
         {
             var booking = new Booking
             {
@@ -195,6 +199,8 @@ namespace MidProject.Repository.Services
 
             await _context.Bookings.AddAsync(booking);
             await _context.SaveChangesAsync();
+
+            return booking;
         }
 
         public async Task RemoveBookingAsync(int bookingId)
@@ -221,7 +227,7 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(sr => sr.ServiceRequestId == requestId);
         }
 
-        public async Task CreateServiceRequestAsync(ServiceRequestDto requestDto)
+        public async Task<ServiceRequest> CreateServiceRequestAsync(ServiceRequestDto requestDto)
         {
             var serviceRequest = new ServiceRequest
             {
@@ -233,6 +239,7 @@ namespace MidProject.Repository.Services
 
             await _context.ServiceRequests.AddAsync(serviceRequest);
             await _context.SaveChangesAsync();
+            return serviceRequest;
         }
 
         public async Task DeleteServiceRequestAsync(int requestId)
@@ -253,7 +260,7 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-        public async Task AddFeedbackAsync(FeedbackDto feedbackDto)
+        public async Task<Feedback> AddFeedbackAsync(FeedbackDto feedbackDto)
         {
             var feedback = new Feedback
             {
@@ -266,6 +273,7 @@ namespace MidProject.Repository.Services
 
             await _context.Feedbacks.AddAsync(feedback);
             await _context.SaveChangesAsync();
+            return feedback;
         }
 
         public async Task RemoveFeedbackAsync(int feedbackId)

@@ -11,7 +11,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "ClientPolicy")] 
+    //[Authorize(Policy = "ClientPolicy")] 
     public class ClientsController : ControllerBase
     {
         private readonly IClient _context;
@@ -39,8 +39,19 @@ namespace MidProject.Controllers
         [HttpPost("sessions")]
         public async Task<ActionResult> StartSession([FromBody] SessionDto sessionDto)
         {
-            await _context.StartSessionAsync(sessionDto);
-            return CreatedAtAction(nameof(GetSessionsById), new { sessionId = sessionDto.SessionId }, sessionDto);
+           var startedSession=  await _context.StartSessionAsync(sessionDto);
+            //  return CreatedAtAction(nameof(GetSessionsById), new { sessionId = sessionDto.SessionId }, sessionDto);
+            SessionDtoResponse response = new SessionDtoResponse()
+            {
+               SessionId= startedSession.SessionId,
+                ClientId = startedSession.ClientId,
+                ChargingStationId= startedSession.ChargingStationId,    
+                StartTime= startedSession.StartTime,
+                EndTime=startedSession.EndTime,
+                EnergyConsumed=startedSession.EnergyConsumed,
+            };
+            return Ok(response);
+
         }
 
         [HttpPut("sessions/{sessionId}")]
@@ -61,8 +72,19 @@ namespace MidProject.Controllers
         [HttpPost("PaymentTransaction")]
         public async Task<ActionResult> AddPayment([FromBody] PaymentTransactionDto paymentDto)
         {
-            await _context.AddPaymentAsync(paymentDto);
-            return CreatedAtAction(nameof(GetClientPayment), new { sessionId = paymentDto.SessionId }, paymentDto);
+         var addedPatment=   await _context.AddPaymentAsync(paymentDto);
+            //  return CreatedAtAction(nameof(GetClientPayment), new { sessionId = paymentDto.SessionId }, paymentDto);
+            PaymentTransactionDtoResponse paymentTransactionDtoResponse = new PaymentTransactionDtoResponse()
+            {
+                PaymentTransactionId= addedPatment.PaymentTransactionId,
+                SessionId= addedPatment.SessionId,
+                ClientId= addedPatment.ClientId,
+                Amount= addedPatment.Amount,
+                PaymentDate= addedPatment.PaymentDate,
+                PaymentMethod= addedPatment.PaymentMethod,
+                Status= addedPatment.Status,
+            };
+            return Ok(paymentTransactionDtoResponse);
         }
 
         [HttpDelete("PaymentTransaction/{paymentId}")]
@@ -83,8 +105,17 @@ namespace MidProject.Controllers
         [HttpPost("Favorite")]
         public async Task<ActionResult> AddFavorite([FromBody] FavoriteDto favoriteDto)
         {
-            await _context.AddFavoriteAsync(favoriteDto);
-            return CreatedAtAction(nameof(GetClientFavorites), new { clientId = favoriteDto.ClientId }, favoriteDto);
+           var newFavorite= await _context.AddFavoriteAsync(favoriteDto);
+            //  return CreatedAtAction(nameof(GetClientFavorites), new { clientId = favoriteDto.ClientId }, favoriteDto);
+            FavoriteDtoResonse favoriteDtoResonse = new FavoriteDtoResonse()
+            {
+                FavoriteId= newFavorite.FavoriteId,
+                ServiceInfoId= newFavorite.ServiceInfoId,
+                ChargingStationId= newFavorite.ChargingStationId,
+                ClientId=newFavorite.ClientId
+
+            };
+            return Ok(favoriteDtoResonse);
         }
 
         [HttpDelete("Favorite/{favoriteId}")]
@@ -112,13 +143,7 @@ namespace MidProject.Controllers
         [HttpPost("vehicle")]
         public async Task<IActionResult> AddVehicle(VehicleDto vehicleDto)
         {
-            if (vehicleDto == null)
-            {
-                return BadRequest("VehicleDto is null.");
-            }
-
-            try
-            {
+           
 
                 var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
 
@@ -133,21 +158,8 @@ namespace MidProject.Controllers
                     ClientId = addedVehicle.ClientId,
                     ServiceInfoId = addedVehicle.ServiceInfoId
                 };
-
-
-
-                // Return CreatedAtAction with populated response
-                return CreatedAtAction(nameof(GetClientFavorites), new { clientId = vehicleDtoResponse.VehicleId }, vehicleDtoResponse);
-
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return Ok(vehicleDtoResponse);
+               
         }
 
         [HttpDelete("vehicles/{vehicleId}")]
@@ -177,8 +189,22 @@ namespace MidProject.Controllers
         [HttpPost("bookings")]
         public async Task<ActionResult> AddBooking([FromBody] BookingDto bookingDto)
         {
-            await _context.AddBookingAsync(bookingDto);
-            return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
+          var newBooking=  await _context.AddBookingAsync(bookingDto);
+            // return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
+
+            BookingResponseDto bookingResponseDto = new BookingResponseDto()
+            {
+                BookingId= newBooking.BookingId,
+                ClientId=newBooking.ClientId,
+                ServiceInfoId=newBooking.ServiceInfoId,
+                VehicleId=newBooking.VehicleId,
+                StartTime=newBooking.StartTime,
+                EndTime=newBooking.EndTime,
+                Status=newBooking.Status,
+                Cost=newBooking.Cost
+
+            };
+            return Ok(bookingResponseDto);
         }
 
         [HttpDelete("bookings/{bookingId}")]
@@ -208,8 +234,17 @@ namespace MidProject.Controllers
         [HttpPost("service-requests")]
         public async Task<ActionResult> CreateServiceRequest([FromBody] ServiceRequestDto requestDto)
         {
-            await _context.CreateServiceRequestAsync(requestDto);
-            return CreatedAtAction(nameof(GetServiceRequestById), new { requestId = requestDto.ServiceRequestId }, requestDto);
+         var newServiceReq=   await _context.CreateServiceRequestAsync(requestDto);
+            //  return CreatedAtAction(nameof(GetServiceRequestById), new { requestId = requestDto.ServiceRequestId }, requestDto);
+            ServiceRequestDtoResponse serviceRequestDtoResponse = new ServiceRequestDtoResponse()
+            {
+                ServiceRequestId = newServiceReq.ServiceRequestId,
+                ServiceInfoId = newServiceReq.ServiceInfoId,
+                ClientId = newServiceReq.ClientId,
+                ProviderId = newServiceReq.ProviderId,
+                Status  = newServiceReq.Status,
+            };
+            return Ok(serviceRequestDtoResponse);
         }
 
         [HttpDelete("service-requests/{requestId}")]
@@ -230,8 +265,19 @@ namespace MidProject.Controllers
         [HttpPost("feedbacks")]
         public async Task<ActionResult> AddFeedback([FromBody] FeedbackDto feedbackDto)
         {
-            await _context.AddFeedbackAsync(feedbackDto);
-            return CreatedAtAction(nameof(GetClientFeedbacks), new { clientId = feedbackDto.ClientId }, feedbackDto);
+          var newFeedback = await _context.AddFeedbackAsync(feedbackDto);
+            // return CreatedAtAction(nameof(GetClientFeedbacks), new { clientId = feedbackDto.ClientId }, feedbackDto);
+
+            FeedbackDtoResponse feedbackDtoResponse = new FeedbackDtoResponse()
+            {
+                FeedbackId= newFeedback.FeedbackId,
+                ClientId= newFeedback.ClientId,
+                ServiceInfoId= newFeedback.ServiceInfoId,
+                Rating= newFeedback.Rating,
+                Comments= newFeedback.Comments,
+                Date    = newFeedback.Date,
+            };
+            return Ok(feedbackDtoResponse);
         }
 
         [HttpDelete("feedbacks/{feedbackId}")]

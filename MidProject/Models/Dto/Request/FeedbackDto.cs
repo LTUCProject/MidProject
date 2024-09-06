@@ -2,7 +2,7 @@
 {
     public class FeedbackDto
     {
-        public int FeedbackId { get; set; }
+      //  public int FeedbackId { get; set; }
         public int ClientId { get; set; } // Foreign key
         public int ServiceInfoId { get; set; } // Foreign key
         public int Rating { get; set; }
