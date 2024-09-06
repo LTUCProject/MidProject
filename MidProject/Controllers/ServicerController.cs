@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
@@ -12,7 +13,7 @@ namespace MidProject.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-  //  [Authorize(Policy = "ServicerPolicy")]
+    [Authorize(Policy = "ServicerPolicy")]
     public class ServicerController : ControllerBase
     {
         private readonly IServicer _servicerService;
@@ -22,287 +23,253 @@ namespace MidProject.Controllers
             _servicerService = servicerService;
         }
 
-        // Add Service Request
-        [HttpPost("servicerequests")]
-        public async Task<IActionResult> AddServiceRequest([FromBody] ServiceRequestDto requestDto)
-        {
-            try
-            {
-                await _servicerService.AddServiceRequestAsync(requestDto);
-                return CreatedAtAction(nameof(GetServiceRequestsAsync), new { serviceId = requestDto.ServiceInfoId }, requestDto);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error adding service request: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+        // ServiceInfo Endpoints
 
-        // Get Service Requests
-        [HttpGet("services/{serviceId}/servicerequests")]
-        public async Task<ActionResult<IEnumerable<ServiceRequestDtoResponse>>> GetServiceRequestsAsync(int serviceId)
-        {
-            try
-            {
-                var requests = await _servicerService.GetServiceRequestsAsync(serviceId);
-                return Ok(requests);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching service requests: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        // Update Service
-        [HttpPut("services/{serviceId}")]
-        public async Task<IActionResult> UpdateService(int serviceId, [FromBody] ServiceInfoDto serviceDto)
-        {
-            try
-            {
-                if (serviceDto.ServiceInfoId != serviceId)
-                {
-                    return BadRequest("Service ID mismatch");
-                }
-
-                await _servicerService.UpdateServiceAsync(serviceDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error updating service: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        // Create Service
         [HttpPost("serviceinfo")]
-        public async Task<IActionResult> AddServiceInfo([FromBody] ServiceInfoDto serviceInfoDto)
+        public async Task<IActionResult> CreateServiceInfo(ServiceInfoRequestDto serviceInfoDto)
         {
-            if (serviceInfoDto == null)
-            {
-                return BadRequest("ServiceInfoDto is null.");
-            }
-
-            // Validate the DTO here if needed
-
-            await _servicerService.AddServiceInfoAsync(serviceInfoDto);
-
-            return Ok("ServiceInfo created successfully.");
+            var serviceInfoId = await _servicerService.CreateServiceInfoAsync(serviceInfoDto);
+            return CreatedAtAction(nameof(GetServiceInfoById), new { id = serviceInfoId }, serviceInfoId);
         }
 
-        // Get Service by ID
-        [HttpGet("services/{serviceId}")]
-        public async Task<ActionResult<ServiceInfoDtoResponse>> GetServiceByIdAsync(int serviceId)
+        [HttpGet("serviceinfo/{id}")]
+        public async Task<IActionResult> GetServiceInfoById(int id)
         {
-            try
+            var serviceInfo = await _servicerService.GetServiceInfoByIdAsync(id);
+            if (serviceInfo == null)
             {
-                var service = await _servicerService.GetServiceByIdAsync(serviceId);
-                if (service == null)
-                {
-                    return NotFound();
-                }
-                return Ok(service);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching service by ID: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return Ok(serviceInfo);
         }
 
-        // Delete Service
-        [HttpDelete("services/{serviceId}")]
-        public async Task<IActionResult> DeleteService(int serviceId)
+        [HttpGet("serviceinfos")]
+        public async Task<IActionResult> GetAllServiceInfos()
         {
-            try
-            {
-                await _servicerService.DeleteServiceAsync(serviceId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error deleting service: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var serviceInfos = await _servicerService.GetAllServiceInfosAsync();
+            return Ok(serviceInfos);
         }
 
-        // Add Booking
-        [HttpPost("bookings")]
-        public async Task<IActionResult> AddBooking([FromBody] BookingDto bookingDto)
+        [HttpPut("serviceinfo/{id}")]
+        public async Task<IActionResult> UpdateServiceInfo(int id, ServiceInfoRequestDto serviceInfoDto)
         {
-            var newBooking = await _servicerService.AddBookingAsync(bookingDto);
-            // return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
-
-            BookingResponseDto bookingResponseDto = new BookingResponseDto()
+            var result = await _servicerService.UpdateServiceInfoAsync(id, serviceInfoDto);
+            if (!result)
             {
-                BookingId = newBooking.BookingId,
-                ClientId = newBooking.ClientId,
-                ServiceInfoId = newBooking.ServiceInfoId,
-                VehicleId = newBooking.VehicleId,
-                StartTime = newBooking.StartTime,
-                EndTime = newBooking.EndTime,
-                Status = newBooking.Status,
-                Cost = newBooking.Cost
-
-            };
-            return Ok(bookingResponseDto);
+                return NotFound();
+            }
+            return NoContent();
         }
 
-        // Get All Bookings for a Service
-        [HttpGet("services/{serviceId}/bookings")]
-        public async Task<ActionResult<IEnumerable<BookingResponseDto>>> GetBookingsAsync(int serviceId)
+        [HttpDelete("serviceinfo/{id}")]
+        public async Task<IActionResult> DeleteServiceInfo(int id)
         {
-            try
+            var result = await _servicerService.DeleteServiceInfoAsync(id);
+            if (!result)
             {
-                var bookings = await _servicerService.GetBookingsAsync(serviceId);
-                return Ok(bookings);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching bookings: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return NoContent();
         }
 
-        // Get Booking by ID
-        [HttpGet("bookings/{bookingId}")]
-        public async Task<ActionResult<BookingResponseDto>> GetBookingByIdAsync(int bookingId)
+        // ServiceRequest Endpoints
+
+        [HttpPost("servicerequest")]
+        public async Task<IActionResult> CreateServiceRequest(ServiceRequestDto serviceRequestDto)
         {
-            try
-            {
-                var booking = await _servicerService.GetBookingByIdAsync(bookingId);
-                if (booking == null)
-                {
-                    return NotFound();
-                }
-                return Ok(booking);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching booking by ID: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var serviceRequestId = await _servicerService.CreateServiceRequestAsync(serviceRequestDto);
+            return CreatedAtAction(nameof(GetServiceRequestById), new { id = serviceRequestId }, serviceRequestId);
         }
 
-        // Remove Booking
-        [HttpDelete("bookings/{bookingId}")]
-        public async Task<IActionResult> RemoveBooking(int bookingId)
+        [HttpGet("servicerequest/{id}")]
+        public async Task<IActionResult> GetServiceRequestById(int id)
         {
-            try
+            var serviceRequest = await _servicerService.GetServiceRequestByIdAsync(id);
+            if (serviceRequest == null)
             {
-                await _servicerService.RemoveBookingAsync(bookingId);
-                return NoContent();
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error removing booking: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return Ok(serviceRequest);
         }
 
-        // Get Vehicles by ServiceInfoId
-        [HttpGet("services/{serviceId}/vehicles")]
-        public async Task<ActionResult<IEnumerable<VehicleDtoResponse>>> GetVehiclesAsync(int serviceId)
+        [HttpGet("servicerequests/serviceinfo/{serviceInfoId}")]
+        public async Task<IActionResult> GetServiceRequestsByServiceInfoId(int serviceInfoId)
         {
-            try
-            {
-                var vehicles = await _servicerService.GetVehiclesAsync(serviceId);
-                return Ok(vehicles);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching vehicles: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var serviceRequests = await _servicerService.GetServiceRequestsByServiceInfoIdAsync(serviceInfoId);
+            return Ok(serviceRequests);
         }
 
-        // Get Vehicle by ID
-        [HttpGet("vehicles/{vehicleId}")]
-        public async Task<ActionResult<VehicleDtoResponse>> GetVehicleByIdAsync(int vehicleId)
+        [HttpPut("servicerequest/{id}/status")]
+        public async Task<IActionResult> UpdateServiceRequestStatus(int id, [FromBody] string status)
         {
-            try
+            var result = await _servicerService.UpdateServiceRequestStatusAsync(id, status);
+            if (!result)
             {
-                var vehicle = await _servicerService.GetVehicleByIdAsync(vehicleId);
-                if (vehicle == null)
-                {
-                    return NotFound();
-                }
-                return Ok(vehicle);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error fetching vehicle by ID: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return NoContent();
         }
 
-        // Add Vehicle
-        [HttpPost("vehicles")]
-        public async Task<IActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
+        [HttpDelete("servicerequest/{id}")]
+        public async Task<IActionResult> DeleteServiceRequest(int id)
         {
-            try
+            var result = await _servicerService.DeleteServiceRequestAsync(id);
+            if (!result)
             {
-                await _servicerService.AddVehicleAsync(vehicleDto);
-                //  return CreatedAtAction(nameof(GetVehicleByIdAsync), new { vehicleId = vehicleDto.VehicleId }, vehicleDto);
-
-                var x = new Vehicle
-                {
-                    LicensePlate= vehicleDto.LicensePlate,
-
-                };
-                return Ok(x);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error adding vehicle: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return NoContent();
         }
 
-        // Remove Vehicle
-        [HttpDelete("vehicles/{vehicleId}")]
-        public async Task<IActionResult> RemoveVehicle(int vehicleId)
+        // Booking Endpoints
+
+        [HttpPost("booking")]
+        public async Task<IActionResult> CreateBooking(BookingRequestDto bookingRequestDto)
         {
-            try
-            {
-                await _servicerService.RemoveVehicleAsync(vehicleId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error removing vehicle: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var bookingId = await _servicerService.CreateBookingAsync(bookingRequestDto);
+            return CreatedAtAction(nameof(GetBookingById), new { id = bookingId }, bookingId);
         }
 
-        // Get Feedbacks by ServiceInfoId
-        [HttpGet("services/{serviceId}/feedbacks")]
-        public async Task<ActionResult<IEnumerable<FeedbackDtoResponse>>> GetFeedbacksAsync(int serviceId)
+        [HttpGet("booking/{id}")]
+        public async Task<IActionResult> GetBookingById(int id)
         {
-            try
+            var booking = await _servicerService.GetBookingByIdAsync(id);
+            if (booking == null)
             {
-                var feedbacks = await _servicerService.GetFeedbacksAsync(serviceId);
-                return Ok(feedbacks);
+                return NotFound();
             }
-            catch (Exception ex)
+            return Ok(booking);
+        }
+
+        [HttpGet("bookings/client/{clientId}")]
+        public async Task<IActionResult> GetBookingsByClientId(int clientId)
+        {
+            var bookings = await _servicerService.GetBookingsByClientIdAsync(clientId);
+            return Ok(bookings);
+        }
+
+        [HttpGet("bookings/serviceinfo/{serviceInfoId}")]
+        public async Task<IActionResult> GetBookingsByServiceInfoId(int serviceInfoId)
+        {
+            var bookings = await _servicerService.GetBookingsByServiceInfoIdAsync(serviceInfoId);
+            return Ok(bookings);
+        }
+
+        [HttpPut("booking/{id}/status")]
+        public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] string status)
+        {
+            var result = await _servicerService.UpdateBookingStatusAsync(id, status);
+            if (!result)
             {
-                // Log the exception
-                Console.WriteLine($"Error fetching feedbacks: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return NotFound();
             }
+            return NoContent();
+        }
+
+        [HttpDelete("booking/{id}")]
+        public async Task<IActionResult> CancelBooking(int id)
+        {
+            var result = await _servicerService.CancelBookingAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
     }
 }
+//// Get Vehicles by ServiceInfoId
+//[HttpGet("services/{serviceId}/vehicles")]
+//public async Task<ActionResult<IEnumerable<VehicleDtoResponse>>> GetVehiclesAsync(int serviceId)
+//{
+//    try
+//    {
+//        var vehicles = await _servicerService.GetVehiclesAsync(serviceId);
+//        return Ok(vehicles);
+//    }
+//    catch (Exception ex)
+//    {
+//        // Log the exception
+//        Console.WriteLine($"Error fetching vehicles: {ex.Message}");
+//        return StatusCode(500, "Internal server error");
+//    }
+//}
+
+//// Get Vehicle by ID
+//[HttpGet("vehicles/{vehicleId}")]
+//public async Task<ActionResult<VehicleDtoResponse>> GetVehicleByIdAsync(int vehicleId)
+//{
+//    try
+//    {
+//        var vehicle = await _servicerService.GetVehicleByIdAsync(vehicleId);
+//        if (vehicle == null)
+//        {
+//            return NotFound();
+//        }
+//        return Ok(vehicle);
+//    }
+//    catch (Exception ex)
+//    {
+//        // Log the exception
+//        Console.WriteLine($"Error fetching vehicle by ID: {ex.Message}");
+//        return StatusCode(500, "Internal server error");
+//    }
+//}
+
+//// Add Vehicle
+//[HttpPost("vehicles")]
+//public async Task<IActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
+//{
+//    try
+//    {
+//        await _servicerService.AddVehicleAsync(vehicleDto);
+//        //  return CreatedAtAction(nameof(GetVehicleByIdAsync), new { vehicleId = vehicleDto.VehicleId }, vehicleDto);
+
+//        var x = new Vehicle
+//        {
+//            LicensePlate= vehicleDto.LicensePlate,
+
+//        };
+//        return Ok(x);
+//    }
+//    catch (Exception ex)
+//    {
+//        // Log the exception
+//        Console.WriteLine($"Error adding vehicle: {ex.Message}");
+//        return StatusCode(500, "Internal server error");
+//    }
+//}
+
+//// Remove Vehicle
+//[HttpDelete("vehicles/{vehicleId}")]
+//public async Task<IActionResult> RemoveVehicle(int vehicleId)
+//{
+//    try
+//    {
+//        await _servicerService.RemoveVehicleAsync(vehicleId);
+//        return NoContent();
+//    }
+//    catch (Exception ex)
+//    {
+//        // Log the exception
+//        Console.WriteLine($"Error removing vehicle: {ex.Message}");
+//        return StatusCode(500, "Internal server error");
+//    }
+//}
+
+//// Get Feedbacks by ServiceInfoId
+//[HttpGet("services/{serviceId}/feedbacks")]
+//public async Task<ActionResult<IEnumerable<FeedbackDtoResponse>>> GetFeedbacksAsync(int serviceId)
+//{
+//    try
+//    {
+//        var feedbacks = await _servicerService.GetFeedbacksAsync(serviceId);
+//        return Ok(feedbacks);
+//    }
+//    catch (Exception ex)
+//    {
+//        // Log the exception
+//        Console.WriteLine($"Error fetching feedbacks: {ex.Message}");
+//        return StatusCode(500, "Internal server error");
+//    }
+//}

@@ -1,6 +1,6 @@
-namespace MidProject.Models.Dto.Request2
+﻿namespace MidProject.Models.Dto.Response
 {
-    public class ServiceInfoDto
+    public class ClientServiceInfoDtoResponse
     {
         public int ServiceInfoId { get; set; }
         public string Name { get; set; }
