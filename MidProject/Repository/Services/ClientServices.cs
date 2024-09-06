@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MidProject.Data;
 using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Repository.Interfaces;
 
@@ -227,7 +228,7 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(sr => sr.ServiceRequestId == requestId);
         }
 
-        public async Task<ServiceRequest> CreateServiceRequestAsync(ServiceRequestDto requestDto)
+        public async Task<ServiceRequest> CreateServiceRequestAsync(ClientServiceRequestDto requestDto)
         {
             var serviceRequest = new ServiceRequest
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
@@ -39,16 +40,16 @@ namespace MidProject.Controllers
         [HttpPost("sessions")]
         public async Task<ActionResult> StartSession([FromBody] SessionDto sessionDto)
         {
-           var startedSession=  await _context.StartSessionAsync(sessionDto);
+            var startedSession = await _context.StartSessionAsync(sessionDto);
             //  return CreatedAtAction(nameof(GetSessionsById), new { sessionId = sessionDto.SessionId }, sessionDto);
             SessionDtoResponse response = new SessionDtoResponse()
             {
-               SessionId= startedSession.SessionId,
+                SessionId = startedSession.SessionId,
                 ClientId = startedSession.ClientId,
-                ChargingStationId= startedSession.ChargingStationId,    
-                StartTime= startedSession.StartTime,
-                EndTime=startedSession.EndTime,
-                EnergyConsumed=startedSession.EnergyConsumed,
+                ChargingStationId = startedSession.ChargingStationId,
+                StartTime = startedSession.StartTime,
+                EndTime = startedSession.EndTime,
+                EnergyConsumed = startedSession.EnergyConsumed,
             };
             return Ok(response);
 
@@ -72,17 +73,17 @@ namespace MidProject.Controllers
         [HttpPost("PaymentTransaction")]
         public async Task<ActionResult> AddPayment([FromBody] PaymentTransactionDto paymentDto)
         {
-         var addedPatment=   await _context.AddPaymentAsync(paymentDto);
+            var addedPatment = await _context.AddPaymentAsync(paymentDto);
             //  return CreatedAtAction(nameof(GetClientPayment), new { sessionId = paymentDto.SessionId }, paymentDto);
             PaymentTransactionDtoResponse paymentTransactionDtoResponse = new PaymentTransactionDtoResponse()
             {
-                PaymentTransactionId= addedPatment.PaymentTransactionId,
-                SessionId= addedPatment.SessionId,
-                ClientId= addedPatment.ClientId,
-                Amount= addedPatment.Amount,
-                PaymentDate= addedPatment.PaymentDate,
-                PaymentMethod= addedPatment.PaymentMethod,
-                Status= addedPatment.Status,
+                PaymentTransactionId = addedPatment.PaymentTransactionId,
+                SessionId = addedPatment.SessionId,
+                ClientId = addedPatment.ClientId,
+                Amount = addedPatment.Amount,
+                PaymentDate = addedPatment.PaymentDate,
+                PaymentMethod = addedPatment.PaymentMethod,
+                Status = addedPatment.Status,
             };
             return Ok(paymentTransactionDtoResponse);
         }
@@ -105,14 +106,14 @@ namespace MidProject.Controllers
         [HttpPost("Favorite")]
         public async Task<ActionResult> AddFavorite([FromBody] FavoriteDto favoriteDto)
         {
-           var newFavorite= await _context.AddFavoriteAsync(favoriteDto);
+            var newFavorite = await _context.AddFavoriteAsync(favoriteDto);
             //  return CreatedAtAction(nameof(GetClientFavorites), new { clientId = favoriteDto.ClientId }, favoriteDto);
             FavoriteDtoResonse favoriteDtoResonse = new FavoriteDtoResonse()
             {
-                FavoriteId= newFavorite.FavoriteId,
-                ServiceInfoId= newFavorite.ServiceInfoId,
-                ChargingStationId= newFavorite.ChargingStationId,
-                ClientId=newFavorite.ClientId
+                FavoriteId = newFavorite.FavoriteId,
+                ServiceInfoId = newFavorite.ServiceInfoId,
+                ChargingStationId = newFavorite.ChargingStationId,
+                ClientId = newFavorite.ClientId
 
             };
             return Ok(favoriteDtoResonse);
@@ -143,23 +144,23 @@ namespace MidProject.Controllers
         [HttpPost("vehicle")]
         public async Task<IActionResult> AddVehicle(VehicleDto vehicleDto)
         {
-           
 
-                var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
 
-                VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
-                {
-                    VehicleId = addedVehicle.VehicleId,           // Assuming AddVehicleAsync returns the entity
-                    LicensePlate = addedVehicle.LicensePlate,
-                    Model = addedVehicle.Model,
-                    Year = addedVehicle.Year,
-                    BatteryCapacity = addedVehicle.BatteryCapacity,
-                    ElectricType = addedVehicle.ElectricType,
-                    ClientId = addedVehicle.ClientId,
-                    ServiceInfoId = addedVehicle.ServiceInfoId
-                };
+            var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
+
+            VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
+            {
+                VehicleId = addedVehicle.VehicleId,           // Assuming AddVehicleAsync returns the entity
+                LicensePlate = addedVehicle.LicensePlate,
+                Model = addedVehicle.Model,
+                Year = addedVehicle.Year,
+                BatteryCapacity = addedVehicle.BatteryCapacity,
+                ElectricType = addedVehicle.ElectricType,
+                ClientId = addedVehicle.ClientId,
+                ServiceInfoId = addedVehicle.ServiceInfoId
+            };
             return Ok(vehicleDtoResponse);
-               
+
         }
 
         [HttpDelete("vehicles/{vehicleId}")]
@@ -189,19 +190,19 @@ namespace MidProject.Controllers
         [HttpPost("bookings")]
         public async Task<ActionResult> AddBooking([FromBody] BookingDto bookingDto)
         {
-          var newBooking=  await _context.AddBookingAsync(bookingDto);
+            var newBooking = await _context.AddBookingAsync(bookingDto);
             // return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
 
             BookingResponseDto bookingResponseDto = new BookingResponseDto()
             {
-                BookingId= newBooking.BookingId,
-                ClientId=newBooking.ClientId,
-                ServiceInfoId=newBooking.ServiceInfoId,
-                VehicleId=newBooking.VehicleId,
-                StartTime=newBooking.StartTime,
-                EndTime=newBooking.EndTime,
-                Status=newBooking.Status,
-                Cost=newBooking.Cost
+                BookingId = newBooking.BookingId,
+                ClientId = newBooking.ClientId,
+                ServiceInfoId = newBooking.ServiceInfoId,
+                VehicleId = newBooking.VehicleId,
+                StartTime = newBooking.StartTime,
+                EndTime = newBooking.EndTime,
+                Status = newBooking.Status,
+                Cost = newBooking.Cost
 
             };
             return Ok(bookingResponseDto);
@@ -232,9 +233,9 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("service-requests")]
-        public async Task<ActionResult> CreateServiceRequest([FromBody] ServiceRequestDto requestDto)
+        public async Task<ActionResult> CreateServiceRequest([FromBody] ClientServiceRequestDto requestDto)
         {
-         var newServiceReq=   await _context.CreateServiceRequestAsync(requestDto);
+            var newServiceReq = await _context.CreateServiceRequestAsync(requestDto);
             //  return CreatedAtAction(nameof(GetServiceRequestById), new { requestId = requestDto.ServiceRequestId }, requestDto);
             ServiceRequestDtoResponse serviceRequestDtoResponse = new ServiceRequestDtoResponse()
             {
@@ -242,7 +243,7 @@ namespace MidProject.Controllers
                 ServiceInfoId = newServiceReq.ServiceInfoId,
                 ClientId = newServiceReq.ClientId,
                 ProviderId = newServiceReq.ProviderId,
-                Status  = newServiceReq.Status,
+                Status = newServiceReq.Status,
             };
             return Ok(serviceRequestDtoResponse);
         }
@@ -265,17 +266,17 @@ namespace MidProject.Controllers
         [HttpPost("feedbacks")]
         public async Task<ActionResult> AddFeedback([FromBody] FeedbackDto feedbackDto)
         {
-          var newFeedback = await _context.AddFeedbackAsync(feedbackDto);
+            var newFeedback = await _context.AddFeedbackAsync(feedbackDto);
             // return CreatedAtAction(nameof(GetClientFeedbacks), new { clientId = feedbackDto.ClientId }, feedbackDto);
 
             FeedbackDtoResponse feedbackDtoResponse = new FeedbackDtoResponse()
             {
-                FeedbackId= newFeedback.FeedbackId,
-                ClientId= newFeedback.ClientId,
-                ServiceInfoId= newFeedback.ServiceInfoId,
-                Rating= newFeedback.Rating,
-                Comments= newFeedback.Comments,
-                Date    = newFeedback.Date,
+                FeedbackId = newFeedback.FeedbackId,
+                ClientId = newFeedback.ClientId,
+                ServiceInfoId = newFeedback.ServiceInfoId,
+                Rating = newFeedback.Rating,
+                Comments = newFeedback.Comments,
+                Date = newFeedback.Date,
             };
             return Ok(feedbackDtoResponse);
         }
@@ -304,6 +305,6 @@ namespace MidProject.Controllers
             return Ok(notification);
         }
 
-        
+
     }
 }

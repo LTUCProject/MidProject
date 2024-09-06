@@ -1,4 +1,5 @@
 ﻿using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 
 namespace MidProject.Repository.Interfaces
@@ -36,7 +37,7 @@ namespace MidProject.Repository.Interfaces
         // Service request management
         Task<IEnumerable<ServiceRequest>> GetClientServiceRequestsAsync(int clientId);
         Task<ServiceRequest> GetServiceRequestByIdAsync(int requestId);
-        Task<ServiceRequest> CreateServiceRequestAsync(ServiceRequestDto requestDto);
+        Task<ServiceRequest> CreateServiceRequestAsync(ClientServiceRequestDto requestDto);
         Task DeleteServiceRequestAsync(int requestId);
 
         // Feedback management
@@ -47,7 +48,7 @@ namespace MidProject.Repository.Interfaces
         // Notifications management
         Task<IEnumerable<Notification>> GetClientNotificationsAsync(int clientId);
         Task<Notification> GetNotificationByIdAsync(int notificationId);
-      //  Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto);
+        //  Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto);
 
 
     }
