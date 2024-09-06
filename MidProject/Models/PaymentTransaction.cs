@@ -25,7 +25,5 @@ namespace MidProject.Models
         [MaxLength(50)]
         public string Status { get; set; }
 
-
-
     }
 }

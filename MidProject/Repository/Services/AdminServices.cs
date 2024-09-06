@@ -5,6 +5,8 @@ using MidProject.Data;
 using Microsoft.AspNetCore.Identity;
 using MidProject.Models.Dto.Response;
 using MidProject.Models.Dto.Request2;
+using MidProject.Models.Dto.Request;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace MidProject.Repository.Services
 {
@@ -160,6 +162,27 @@ namespace MidProject.Repository.Services
                 Price = sp.Price,
                 DurationInDays = sp.DurationInDays
             }).ToList();
+        }
+
+        // Create a new subscription plan
+        public async Task<SubscriptionPlan> CreateSubscriptionPlanAsync(SubscriptionPlanDto newSubscriptionPlanDto)
+        {
+            // Create a new SubscriptionPlan entity from the DTO
+            var subscriptionPlan = new SubscriptionPlan
+            {
+                Name = newSubscriptionPlanDto.Name,
+                Description = newSubscriptionPlanDto.Description,
+                Price = newSubscriptionPlanDto.Price,
+                DurationInDays = newSubscriptionPlanDto.DurationInDays
+            };
+
+            // Add to the context and save
+            await _context.SubscriptionPlans.AddAsync(subscriptionPlan);
+            await _context.SaveChangesAsync();
+
+            return subscriptionPlan;
+
+
         }
 
         public async Task<SubscriptionPlanResponseDto> GetSubscriptionPlanByIdAsync(int subscriptionPlanId)

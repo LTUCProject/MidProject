@@ -1,4 +1,5 @@
 using MidProject.Models;
+using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 
@@ -26,6 +27,8 @@ namespace MidProject.Repository.Interfaces
         Task<IEnumerable<SubscriptionPlanResponseDto>> GetAllSubscriptionPlansAsync();
         Task<SubscriptionPlanResponseDto> GetSubscriptionPlanByIdAsync(int subscriptionPlanId);
         Task DeleteSubscriptionPlanAsync(int subscriptionPlanId);
+        Task<SubscriptionPlan> CreateSubscriptionPlanAsync(SubscriptionPlanDto newSubscriptionPlanDto);
+
 
         // Notifications management
         Task<IEnumerable<NotificationResponseDto>> GetClientNotificationsAsync(int clientId);
