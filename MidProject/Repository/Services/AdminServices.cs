@@ -423,6 +423,29 @@ namespace MidProject.Repository.Services
             // Optionally, handle cases where the post is not found
         }
         // End Post management ================================================================================================
+        public async Task<IEnumerable<Comment>> GetAllCommentsAsync()
+        {
+            return await _context.Comments
+                .Include(c => c.Post)  // Optionally include related Post if needed
+                .ToListAsync();
+        }
 
+        public async Task<Comment> GetCommentByIdAsync(int commentId)
+        {
+            return await _context.Comments
+                .Include(c => c.Post)  // Optionally include related Post if needed
+                .FirstOrDefaultAsync(c => c.CommentId == commentId);
+        }
+
+        public async Task DeleteCommentAsync(int commentId)
+        {
+            var comment = await _context.Comments.FindAsync(commentId);
+
+            if (comment != null)
+            {
+                _context.Comments.Remove(comment);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

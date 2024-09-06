@@ -9,5 +9,6 @@ namespace MidProject.Models.Dto.Response
         public bool HasParking { get; set; }
         public string Status { get; set; }
         public string PaymentMethod { get; set; }
+        public ICollection<ChargerResponseDto> Chargers { get; set; } // Change to ICollection<ChargerResponseDto>
     }
 }

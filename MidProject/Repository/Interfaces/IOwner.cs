@@ -2,6 +2,7 @@ using MidProject.Models;
 using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
+using System.Threading.Tasks;
 
 namespace MidProject.Repository.Interfaces
 {
@@ -26,15 +27,24 @@ namespace MidProject.Repository.Interfaces
         Task<MaintenanceLog> AddMaintenanceLogAsync(MaintenanceLogDto logDtoRequest);
         Task RemoveMaintenanceLogAsync(int logId);
 
+        // Notification management
+        Task<NotificationResponseDto> CreateNotificationAsync(NotificationDto notificationDto);
+        Task<NotificationResponseDto> GetNotificationByIdAsync(int notificationId);
+        Task<IEnumerable<NotificationResponseDto>> GetNotificationsByClientIdAsync(int clientId);
 
-
-        //// Location management
-        //Task<IEnumerable<LocationDtoResponse>> GetAllLocationsAsync();
-        //Task<LocationDtoResponse> GetLocationByIdAsync(int locationId);
-        //Task AddLocationAsync(LocationDtoRequest locationDtoRequest);
-        //Task RemoveLocationAsync(int locationId);
+        // Location management
+        Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync();
+        Task<LocationResponseDto> GetLocationByIdAsync(int id);
+        Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto);
+        Task UpdateLocationAsync(int id, LocationDto locationDto);
+        Task DeleteLocationAsync(int id);
 
 
     }
 
 }
+//// Location management
+//Task<IEnumerable<LocationDtoResponse>> GetAllLocationsAsync();
+//Task<LocationDtoResponse> GetLocationByIdAsync(int locationId);
+//Task AddLocationAsync(LocationDtoRequest locationDtoRequest);
+//Task RemoveLocationAsync(int locationId);

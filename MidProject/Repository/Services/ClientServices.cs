@@ -301,19 +301,73 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(n => n.NotificationId == notificationId);
         }
 
-        //public async Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto)
-        //{
-        //    var serviceInfo = new ServiceInfo
-        //    {
-        //        Name = serviceInfoDto.Name,
-        //        Description = serviceInfoDto.Description,
-        //        Contact = serviceInfoDto.Contact,
-        //        Type = serviceInfoDto.Type,
-        //        ProviderId = serviceInfoDto.ProviderId
-        //    };
+        public async Task<IEnumerable<Post>> GetAllPostsAsync()
+        {
+            return await _context.Posts
+                .Include(p => p.Comments) // Include comments if needed
+                .ToListAsync();
+        }
 
-        //    _context.ServiceInfos.Add(serviceInfo);
-        //    await _context.SaveChangesAsync();
-        //}
+        public async Task<Post> AddPostAsync(PostDto postDto)
+        {
+            var post = new Post
+            {
+                ClientId = postDto.ClientId,
+                Title = postDto.Title,
+                Content = postDto.Content,
+                Date = postDto.Date
+            };
+
+            await _context.Posts.AddAsync(post);
+            await _context.SaveChangesAsync();
+
+            return post;
+        }
+
+        public async Task DeletePostAsync(int postId)
+        {
+            var post = await _context.Posts
+                .Include(p => p.Comments) // Include comments to handle related data
+                .FirstOrDefaultAsync(p => p.PostId == postId);
+
+            if (post != null)
+            {
+                _context.Comments.RemoveRange(post.Comments); // Remove related comments
+                _context.Posts.Remove(post);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Comment>> GetAllCommentsAsync()
+        {
+            return await _context.Comments
+                .ToListAsync();
+        }
+
+        public async Task<Comment> AddCommentAsync(CommentDto commentDto)
+        {
+            var comment = new Comment
+            {
+                ClientId = commentDto.ClientId,
+                PostId = commentDto.PostId,
+                Content = commentDto.Content,
+                Date = commentDto.Date
+            };
+
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
+            return comment;
+        }
+
+        public async Task DeleteCommentAsync(int commentId)
+        {
+            var comment = await _context.Comments.FindAsync(commentId);
+            if (comment != null)
+            {
+                _context.Comments.Remove(comment);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(Policy = "OwnerPolicy")]
+    // [Authorize(Policy = "OwnerPolicy")]
     public class OwnerController : ControllerBase
     {
         private readonly IOwner _ownerService;
@@ -144,17 +144,17 @@ namespace MidProject.Controllers
         [HttpPost("chargers")]
         public async Task<IActionResult> CreateCharger([FromBody] ChargerDto chargerDtoRequest)
         {
-            
-            var newCharger=    await _ownerService.CreateChargerAsync(chargerDtoRequest);
+
+            var newCharger = await _ownerService.CreateChargerAsync(chargerDtoRequest);
             //  return CreatedAtAction(nameof(GetChargerById), new { id = chargerDtoRequest.ChargingStationId }, chargerDtoRequest);
 
             ChargerResponseDto chargerResponseDto = new ChargerResponseDto()
             {
                 ChargerId = newCharger.ChargerId,
-                Type =newCharger.Type,
-                Power= newCharger.Power,
-                Speed =newCharger.Speed,
-                ChargingStationId=newCharger.ChargingStationId,
+                Type = newCharger.Type,
+                Power = newCharger.Power,
+                Speed = newCharger.Speed,
+                ChargingStationId = newCharger.ChargingStationId,
             };
             return Ok(chargerResponseDto);
         }
@@ -207,21 +207,21 @@ namespace MidProject.Controllers
         [HttpPost("maintenance")]
         public async Task<IActionResult> AddMaintenanceLog([FromBody] MaintenanceLogDto logDtoRequest)
         {
-            
-             var newLog=   await _ownerService.AddMaintenanceLogAsync(logDtoRequest);
+
+            var newLog = await _ownerService.AddMaintenanceLogAsync(logDtoRequest);
             // return CreatedAtAction(nameof(GetMaintenanceLogs), new { stationId = logDtoRequest.ChargingStationId }, logDtoRequest);
 
             MaintenanceLogDtoResponse response = new MaintenanceLogDtoResponse()
             {
-                MaintenanceLogId=newLog.MaintenanceLogId,
-                ChargingStationId=newLog.ChargingStationId,
-                MaintenanceDate=newLog.MaintenanceDate,
-                PerformedBy=newLog.PerformedBy,
-                Details=newLog.Details,
-                Cost=newLog.Cost
+                MaintenanceLogId = newLog.MaintenanceLogId,
+                ChargingStationId = newLog.ChargingStationId,
+                MaintenanceDate = newLog.MaintenanceDate,
+                PerformedBy = newLog.PerformedBy,
+                Details = newLog.Details,
+                Cost = newLog.Cost
             };
             return Ok(response);
-            
+
         }
 
         [HttpDelete("maintenance/{id}")]
@@ -237,40 +237,120 @@ namespace MidProject.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        // Notification Management
+        [HttpPost("OwnerNotifications")]
+        public async Task<ActionResult<NotificationResponseDto>> CreateNotificationAsync([FromBody] NotificationDto notificationDto)
+        {
+            var notification = await _ownerService.CreateNotificationAsync(notificationDto);
+
+            // Use CreatedAtRoute instead of CreatedAtAction
+            return CreatedAtRoute(
+                "OwnerGetNotificationById", // Name the route
+                new { notificationId = notification.NotificationId },
+                notification
+            );
+        }
+
+        [HttpGet("OwnerNotifications/{notificationId}", Name = "OwnerGetNotificationById")]
+        public async Task<ActionResult<NotificationResponseDto>> GetNotificationByIdAsync(int notificationId)
+        {
+            var notification = await _ownerService.GetNotificationByIdAsync(notificationId);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+            return Ok(notification);
+        }
+
+
+
+        [HttpGet("OwnerNotifications/client/{clientId}")]
+        public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotificationsByClientIdAsync(int clientId)
+        {
+            var notifications = await _ownerService.GetNotificationsByClientIdAsync(clientId);
+            return Ok(notifications);
+        }
+
+        // GET: api/location
+        [HttpGet("locations")]
+        public async Task<ActionResult<IEnumerable<LocationResponseDto>>> GetAllLocations()
+        {
+            try
+            {
+                var locations = await _ownerService.GetAllLocationsAsync();
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // GET: api/location/{id}
+        [HttpGet("locations/{id}")]
+        public async Task<ActionResult<LocationResponseDto>> GetLocationById(int id)
+        {
+            try
+            {
+                var locationDto = await _ownerService.GetLocationByIdAsync(id);
+                if (locationDto == null) return NotFound();
+                return Ok(locationDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // POST: api/location
+        [HttpPost("locations")]
+        public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDtoRequest)
+        {
+            try
+            {
+                var createdLocation = await _ownerService.CreateLocationAsync(locationDtoRequest);
+                return CreatedAtAction(nameof(GetLocationById), new { id = createdLocation.LocationId }, createdLocation);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // PUT: api/location/{id}
+        [HttpPut("locations/{id}")]
+        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDtoRequest)
+        {
+            try
+            {
+                if (id <= 0) return BadRequest("Invalid ID.");
+
+                await _ownerService.UpdateLocationAsync(id, locationDtoRequest);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // DELETE: api/location/{id}
+        [HttpDelete("locations/{id}")]
+        public async Task<IActionResult> DeleteLocation(int id)
+        {
+            try
+            {
+                await _ownerService.DeleteLocationAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
     }
+
 }
-
-
-//// Location Management
-//[HttpGet("locations")]
-//public async Task<ActionResult<IEnumerable<LocationDtoResponse>>> GetAllLocations()
-//{
-//    var locations = await _ownerService.GetAllLocationsAsync();
-//    return Ok(locations);
-//}
-
-//[HttpGet("locations/{id}")]
-//[Authorize(Policy = "OwnerPolicy")]
-//public async Task<ActionResult<LocationDtoResponse>> GetLocationById(int id)
-//{
-//    var location = await _ownerService.GetLocationByIdAsync(id);
-//    if (location == null) return NotFound();
-//    return Ok(location);
-//}
-
-//[HttpPost("locations")]
-//[Authorize(Policy = "OwnerPolicy")]
-//public async Task<IActionResult> AddLocation([FromBody] LocationDtoRequest locationDtoRequest)
-//{
-//    await _ownerService.AddLocationAsync(locationDtoRequest);
-//    // Assuming you want to return a 201 Created response
-//    return CreatedAtAction(nameof(GetLocationById), new { id = locationDtoRequest.LocationId }, locationDtoRequest);
-//}
-
-//[HttpDelete("locations/{id}")]
-//[Authorize(Policy = "OwnerPolicy")]
-//public async Task<IActionResult> RemoveLocation(int id)
-//{
-//    await _ownerService.RemoveLocationAsync(id);
-//    return NoContent();
-//}

@@ -48,8 +48,15 @@ namespace MidProject.Repository.Interfaces
         // Notifications management
         Task<IEnumerable<Notification>> GetClientNotificationsAsync(int clientId);
         Task<Notification> GetNotificationByIdAsync(int notificationId);
-        //  Task AddServiceInfoAsync(ServiceInfoDto serviceInfoDto);
 
+        // Post management
+        Task<IEnumerable<Post>> GetAllPostsAsync();
+        Task<Post> AddPostAsync(PostDto postDto);
+        Task DeletePostAsync(int postId);
 
+        // Comment management
+        Task<IEnumerable<Comment>> GetAllCommentsAsync();
+        Task<Comment> AddCommentAsync(CommentDto commentDto);
+        Task DeleteCommentAsync(int commentId);
     }
 }

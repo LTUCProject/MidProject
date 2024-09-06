@@ -562,5 +562,63 @@ namespace MidProject.Controllers
         {
             return (_context.Admins?.Any(e => e.AdminId == id)).GetValueOrDefault();
         }
+
+        [HttpGet("Comments")]
+        public async Task<IActionResult> GetAllComments()
+        {
+            var comments = await _adminService.GetAllCommentsAsync();
+            var commentDtos = comments.Select(c => new CommentResponseDto
+            {
+                CommentId = c.CommentId,
+                PostId = c.PostId,
+                Content = c.Content,
+                Date = c.Date,
+                
+            }).ToList();
+
+            return Ok(commentDtos);
+        }
+
+        // GET: api/Admins/Comments/5
+        [HttpGet("Comments/{id}")]
+        public async Task<IActionResult> GetCommentById(int id)
+        {
+            var comment = await _adminService.GetCommentByIdAsync(id);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            var commentDto = new CommentResponseDto
+            {
+                CommentId = comment.CommentId,
+                PostId = comment.PostId,
+                Content = comment.Content,
+                Date = comment.Date,
+                
+            };
+
+            return Ok(commentDto);
+        }
+
+        // DELETE: api/Admins/Comments/5
+        [HttpDelete("Comments/{id}")]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var comment = await _adminService.GetCommentByIdAsync(id);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            await _adminService.DeleteCommentAsync(id);
+            return NoContent();
+        }
+        // End Comment management ================================================================================================
+
+        // Existing methods...
+
+        
     }
 }
+
