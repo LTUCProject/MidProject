@@ -52,28 +52,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "47f5fc9c-ec1f-4918-82bc-4889edd77b1c",
+                            ConcurrencyStamp = "164355ab-0f97-487e-9c89-6cabe8d619d2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "a9551ebb-e230-4183-8514-3d3f62462e19",
+                            ConcurrencyStamp = "8b0fcee6-33b0-434a-a837-c5d99f95b674",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "44876518-54e8-4ea4-8eef-3bab7f016bf3",
+                            ConcurrencyStamp = "db4a93c2-da8f-4a75-a8bf-a6e99e13af7d",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "d1d66685-7248-43fb-9f03-c3665454e0c6",
+                            ConcurrencyStamp = "60d8df0b-e057-44e2-b171-8763e7ed0c74",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });

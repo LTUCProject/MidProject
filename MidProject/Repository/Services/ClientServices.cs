@@ -104,13 +104,14 @@ namespace MidProject.Repository.Services
                 .Include(f => f.ChargingStation) // Include the related ChargingStation entity
                 .Select(f => new FavoriteChargingStationResponseDto
                 {
-                    FavoriteId = f.ChargingStationFavoriteId, // Assuming the primary key is Id
+                    FavoriteId = f.ChargingStationFavoriteId,
                     ChargingStationId = f.ChargingStationId,
                     ClientId = f.ClientId,
-                    ChargingStation = new List<ChargingStation> // Creating a collection with the relevant ChargingStation
-                    {
-                        f.ChargingStation
-                    }
+                    ChargingStationName = f.ChargingStation.Name, // Select only needed properties
+                    StationLocation = f.ChargingStation.StationLocation,
+                    HasParking = f.ChargingStation.HasParking,
+                    Status = f.ChargingStation.Status,
+                    PaymentMethod = f.ChargingStation.PaymentMethod
                 })
                 .ToListAsync();
         }
@@ -123,13 +124,13 @@ namespace MidProject.Repository.Services
                 .Include(f => f.ServiceInfo) // Include the related ServiceInfo entity
                 .Select(f => new FavoriteServiceInfoResponseDto
                 {
-                    FavoriteId = f.ServiceInfoFavoriteId, // Assuming the primary key is Id
+                    FavoriteId = f.ServiceInfoFavoriteId,
                     ServiceInfoId = f.ServiceInfoId,
                     ClientId = f.ClientId,
-                    ServiceInfo = new List<ServiceInfo> // Creating a collection with the relevant ServiceInfo
-                    {
-                        f.ServiceInfo
-                    }
+                    ServiceInfoName = f.ServiceInfo.Name, // Select only needed properties
+                    Description = f.ServiceInfo.Description,
+                    Contact = f.ServiceInfo.Contact,
+                    Type = f.ServiceInfo.Type
                 })
                 .ToListAsync();
         }
@@ -146,18 +147,22 @@ namespace MidProject.Repository.Services
             _context.ChargingStationFavorites.Add(favorite);
             await _context.SaveChangesAsync();
 
-            var chargingStation = await _context.ChargingStations.FindAsync(favoriteDto.ChargingStationId);
-
-            return new FavoriteChargingStationResponseDto
-            {
-                FavoriteId = favorite.ChargingStationFavoriteId, // Assuming the primary key is Id
-                ChargingStationId = favorite.ChargingStationId,
-                ClientId = favorite.ClientId,
-                ChargingStation = new List<ChargingStation> // Creating a collection with the relevant ChargingStation
+            var chargingStation = await _context.ChargingStations
+                .Where(cs => cs.ChargingStationId == favoriteDto.ChargingStationId)
+                .Select(cs => new FavoriteChargingStationResponseDto
                 {
-                    chargingStation
-                }
-            };
+                    FavoriteId = favorite.ChargingStationFavoriteId,
+                    ChargingStationId = cs.ChargingStationId,
+                    ClientId = favorite.ClientId,
+                    ChargingStationName = cs.Name, // Select only needed properties
+                    StationLocation = cs.StationLocation,
+                    HasParking = cs.HasParking,
+                    Status = cs.Status,
+                    PaymentMethod = cs.PaymentMethod
+                })
+                .FirstOrDefaultAsync();
+
+            return chargingStation;
         }
 
         // Add a new service info favorite
@@ -172,18 +177,21 @@ namespace MidProject.Repository.Services
             _context.ServiceInfoFavorites.Add(favorite);
             await _context.SaveChangesAsync();
 
-            var serviceInfo = await _context.ServiceInfos.FindAsync(favoriteDto.ServiceInfoId);
-
-            return new FavoriteServiceInfoResponseDto
-            {
-                FavoriteId = favorite.ServiceInfoFavoriteId, // Assuming the primary key is Id
-                ServiceInfoId = favorite.ServiceInfoId,
-                ClientId = favorite.ClientId,
-                ServiceInfo = new List<ServiceInfo> // Creating a collection with the relevant ServiceInfo
+            var serviceInfo = await _context.ServiceInfos
+                .Where(si => si.ServiceInfoId == favoriteDto.ServiceInfoId)
+                .Select(si => new FavoriteServiceInfoResponseDto
                 {
-                    serviceInfo
-                }
-            };
+                    FavoriteId = favorite.ServiceInfoFavoriteId,
+                    ServiceInfoId = si.ServiceInfoId,
+                    ClientId = favorite.ClientId,
+                    ServiceInfoName = si.Name, // Select only needed properties
+                    Description = si.Description,
+                    Contact = si.Contact,
+                    Type = si.Type
+                })
+                .FirstOrDefaultAsync();
+
+            return serviceInfo;
         }
 
         // Remove a charging station favorite
