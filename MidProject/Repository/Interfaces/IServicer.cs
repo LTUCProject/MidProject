@@ -34,6 +34,18 @@ namespace MidProject.Repository.Interfaces
         Task<NotificationResponseDto> GetNotificationByIdAsync(int notificationId);
         Task<IEnumerable<NotificationResponseDto>> GetNotificationsByClientIdAsync(int clientId);
 
+        // Post management
+        Task<IEnumerable<Post>> GetAllPostsAsync();
+        Task<PostResponseDto> AddPostAsync(PostDto postDto);
+        Task<PostResponseDto> UpdatePostByIdAsync(int postId, PostDto postDto);
+
+        Task DeletePostAsync(int postId);
+
+        // Comment management
+        Task<IEnumerable<CommentResponseDto>> GetAllCommentsAsync();
+        Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
+        Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
+        Task DeleteCommentAsync(int commentId);
     }
 }
 //// Vehicle management

@@ -39,7 +39,22 @@ namespace MidProject.Repository.Interfaces
         Task UpdateLocationAsync(int id, LocationDto locationDto);
         Task DeleteLocationAsync(int id);
 
+
+        // Post management
+        Task<IEnumerable<Post>> GetAllPostsAsync();
+        Task<PostResponseDto> AddPostAsync(PostDto postDto);
+        Task<PostResponseDto> UpdatePostByIdAsync(int postId, PostDto postDto);
+
+        Task DeletePostAsync(int postId);
+
+        // Comment management
+        Task<IEnumerable<CommentResponseDto>> GetAllCommentsAsync();
+        Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
+        Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
+        Task DeleteCommentAsync(int commentId);
+        // for session
         Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId, string accountId); // New Method
+
 
     }
 

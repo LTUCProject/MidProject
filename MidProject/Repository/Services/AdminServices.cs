@@ -436,18 +436,99 @@ namespace MidProject.Repository.Services
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
             return await _context.Posts
-                .Include(p => p.Client)
-                .Include(p => p.Comments)
+                .Include(p => p.Account)  // Include Account to fetch UserName
+                .Include(p => p.Comments) // Include Comments if needed
                 .ToListAsync();
         }
+
 
         public async Task<Post> GetPostByIdAsync(int postId)
         {
             return await _context.Posts
-                .Include(p => p.Client)
-                .Include(p => p.Comments)
+                .Include(p => p.Account) // Include the Account to access UserName
+                .Include(p => p.Comments) // Include Comments
+                    .ThenInclude(c => c.Account) // Include Account for each Comment to access UserName
                 .FirstOrDefaultAsync(p => p.PostId == postId);
         }
+
+
+        public async Task<PostResponseDto> AddPostAsync(PostDto postDto)
+        {
+            // Create a new Post instance from the provided PostDto
+            var post = new Post
+            {
+                AccountId = postDto.AccountId, // Set AccountId instead of ClientId
+                Title = postDto.Title,
+                Content = postDto.Content,
+                Date = postDto.Date
+            };
+
+            // Add the post to the context and save changes
+            await _context.Posts.AddAsync(post);
+            await _context.SaveChangesAsync();
+
+            // Fetch the user information to populate AccountId and UserName in PostResponseDto
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == post.AccountId); // Fetch the user by Id
+
+            // Return the PostResponseDto
+            return new PostResponseDto
+            {
+                PostId = post.PostId,
+                AccountId = post.AccountId, // Use AccountId
+                UserName = user != null ? user.UserName : "Unknown", // Use UserName from IdentityUser
+                Title = post.Title,
+                Content = post.Content,
+                Date = post.Date,
+                Comments = new List<CommentResponseDto>() // Initialize empty list
+            };
+        }
+
+        public async Task<PostResponseDto> UpdatePostByIdAsync(int postId, PostDto postDto)
+        {
+            var post = await _context.Posts
+                .Include(p => p.Comments) // Include Comments to avoid null references
+                .FirstOrDefaultAsync(p => p.PostId == postId);
+
+            if (post == null)
+            {
+                return null; // Handle post not found
+            }
+
+            // Update post fields
+            post.Title = postDto.Title;
+            post.Content = postDto.Content;
+            post.Date = postDto.Date;
+
+            await _context.SaveChangesAsync();
+
+            // Fetch updated UserName from Account
+            var userName = await _context.Users
+                .Where(u => u.Id == post.AccountId)
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
+
+            return new PostResponseDto
+            {
+                PostId = post.PostId,
+                AccountId = post.AccountId,
+                UserName = userName ?? "Unknown",
+                Title = post.Title,
+                Content = post.Content,
+                Date = post.Date,
+                Comments = post.Comments?.Select(comment => new CommentResponseDto
+                {
+                    CommentId = comment.CommentId,
+                    AccountId = comment.AccountId,
+                    PostId = comment.PostId,
+                    Content = comment.Content,
+                    Date = comment.Date,
+                    UserName = comment.Account != null ? comment.Account.UserName : "Unknown"
+                }).ToList() ?? new List<CommentResponseDto>() // Handle null Comments collection
+            };
+        }
+
+
 
         public async Task DeletePostAsync(int postId)
         {
@@ -464,15 +545,82 @@ namespace MidProject.Repository.Services
         public async Task<IEnumerable<Comment>> GetAllCommentsAsync()
         {
             return await _context.Comments
-                .Include(c => c.Post)  // Optionally include related Post if needed
+                .Include(c => c.Post)    // Optionally include related Post
+                .Include(c => c.Account) // Include the Account related to the Comment
                 .ToListAsync();
         }
 
         public async Task<Comment> GetCommentByIdAsync(int commentId)
         {
             return await _context.Comments
-                .Include(c => c.Post)  // Optionally include related Post if needed
+                .Include(c => c.Post)    // Optionally include related Post
+                .Include(c => c.Account) // Include the Account related to the Comment
                 .FirstOrDefaultAsync(c => c.CommentId == commentId);
+        }
+
+
+        public async Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto)
+        {
+            // Create and save the comment
+            var comment = new Comment
+            {
+                AccountId = commentDto.AccountId,
+                PostId = commentDto.PostId,
+                Content = commentDto.Content,
+                Date = commentDto.Date
+            };
+
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
+            // Fetch the UserName from the AccountId
+            var userName = await _context.Users
+                .Where(u => u.Id == comment.AccountId)
+                .Select(u => u.UserName) // Fetch UserName directly
+                .FirstOrDefaultAsync();
+
+            // Return the CommentResponseDto with UserName
+            return new CommentResponseDto
+            {
+                CommentId = comment.CommentId,
+                AccountId = comment.AccountId,
+                PostId = comment.PostId,
+                Content = comment.Content,
+                Date = comment.Date,
+                UserName = userName ?? "Unknown" // Use UserName or "Unknown" if null
+            };
+        }
+
+        public async Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto)
+        {
+            var comment = await _context.Comments.FindAsync(commentId);
+
+            if (comment == null)
+            {
+                return null; // Handle comment not found
+            }
+
+            // Update comment fields
+            comment.Content = commentDto.Content;
+            comment.Date = commentDto.Date;
+
+            await _context.SaveChangesAsync();
+
+            // Fetch updated UserName from Account
+            var userName = await _context.Users
+                .Where(u => u.Id == comment.AccountId)
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
+
+            return new CommentResponseDto
+            {
+                CommentId = comment.CommentId,
+                AccountId = comment.AccountId,
+                PostId = comment.PostId,
+                Content = comment.Content,
+                Date = comment.Date,
+                UserName = userName ?? "Unknown"
+            };
         }
 
         public async Task DeleteCommentAsync(int commentId)

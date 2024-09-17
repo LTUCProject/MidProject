@@ -55,12 +55,15 @@ namespace MidProject.Repository.Interfaces
 
         // Post management
         Task<IEnumerable<Post>> GetAllPostsAsync();
-        Task<Post> AddPostAsync(PostDto postDto);
+        Task<PostResponseDto> AddPostAsync(PostDto postDto);
+        Task<PostResponseDto> UpdatePostByIdAsync(int postId, PostDto postDto);
         Task DeletePostAsync(int postId);
 
         // Comment management
-        Task<IEnumerable<Comment>> GetAllCommentsAsync();
-        Task<Comment> AddCommentAsync(CommentDto commentDto);
+        Task<IEnumerable<CommentResponseDto>> GetAllCommentsAsync();
+        Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
+        Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
+
         Task DeleteCommentAsync(int commentId);
     }
 }

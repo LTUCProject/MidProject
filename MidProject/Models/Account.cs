@@ -8,5 +8,7 @@ namespace MidProject.Models
         public Admin Admin { get; set; }
         public Client Client { get; set; }
         public Provider Provider { get; set; }
+        public ICollection<Comment> Comments { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }

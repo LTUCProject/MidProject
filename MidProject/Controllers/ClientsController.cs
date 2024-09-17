@@ -341,34 +341,57 @@ namespace MidProject.Controllers
         [HttpGet("posts")]
         public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetAllPosts()
         {
+            // Retrieve all posts from the database
             var posts = await _context.GetAllPostsAsync();
+
+            // Map posts to PostResponseDto
             var postDtos = posts.Select(p => new PostResponseDto
             {
                 PostId = p.PostId,
-                ClientId = p.ClientId,
-                ClientName = p.Client?.Name, // Assuming Client has a Name property
+                AccountId = p.AccountId, // Use AccountId
+                UserName = p.Account != null ? p.Account.UserName : "Unknown", // Use UserName from Account
                 Title = p.Title,
                 Content = p.Content,
                 Date = p.Date,
                 Comments = p.Comments.Select(c => new CommentResponseDto
                 {
                     CommentId = c.CommentId,
-                    ClientId = c.ClientId,
+                    AccountId = c.AccountId, // Use AccountId
                     PostId = c.PostId,
                     Content = c.Content,
-                    Date = c.Date
-                })
-            });
+                    Date = c.Date,
+                    UserName = c.Account != null ? c.Account.UserName : "Unknown" // Map UserName if needed
+                }).ToList() // Ensure comments collection is materialized
+            }).ToList(); // Materialize the posts collection with ToList
 
             return Ok(postDtos);
         }
 
+
+
+
+
         [HttpPost("posts")]
-        public async Task<ActionResult<Post>> AddPost([FromBody] PostDto postDto)
+        public async Task<ActionResult<PostResponseDto>> AddPost([FromBody] PostDto postDto)
         {
-            var post = await _context.AddPostAsync(postDto);
-            return CreatedAtAction(nameof(GetAllPosts), new { postId = post.PostId }, post);
+            var postResponse = await _context.AddPostAsync(postDto);
+            return CreatedAtAction(nameof(GetAllPosts), new { postId = postResponse.PostId }, postResponse);
         }
+
+        // UpdatePostById Controller Method
+        [HttpPut("Posts/{id}")]
+        public async Task<IActionResult> UpdatePostById(int id, [FromBody] PostDto postDto)
+        {
+            var updatedPost = await _context.UpdatePostByIdAsync(id, postDto);
+
+            if (updatedPost == null)
+            {
+                return NotFound(); // Handle case where post is not found
+            }
+
+            return Ok(updatedPost);
+        }
+
 
         [HttpDelete("posts/{postId}")]
         public async Task<IActionResult> DeletePost(int postId)
@@ -381,35 +404,33 @@ namespace MidProject.Controllers
         [HttpGet("comments")]
         public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetAllComments()
         {
-            var comments = await _context.GetAllCommentsAsync();
-            var commentDtos = comments.Select(c => new CommentResponseDto
-            {
-                CommentId = c.CommentId,
-                ClientId = c.ClientId,
-                PostId = c.PostId,
-                Content = c.Content,
-                Date = c.Date
-            });
-
+            var commentDtos = await _context.GetAllCommentsAsync();
             return Ok(commentDtos);
         }
 
+
+
         [HttpPost("comments")]
-        public async Task<ActionResult<Comment>> AddComment([FromBody] CommentDto commentDto)
+        public async Task<ActionResult<CommentResponseDto>> AddComment([FromBody] CommentDto commentDto)
         {
-            var comment = await _context.AddCommentAsync(commentDto);
-            //   return CreatedAtAction(nameof(GetAllComments), new { commentId = comment.CommentId }, comment);
+            // Call the service method to add the comment and get the response DTO
+            CommentResponseDto commentResponseDto = await _context.AddCommentAsync(commentDto);
 
-            CommentResponseDto commentResponseDto = new CommentResponseDto()
-            {
-                CommentId= comment.CommentId,
-                ClientId= comment.ClientId,
-                PostId = comment.PostId,
-                Content = comment.Content,
-                Date= comment.Date
-            };
+            // Return the response DTO with UserName populated
             return Ok(commentResponseDto);
+        }
 
+        [HttpPut("Comments/{id}")]
+        public async Task<IActionResult> UpdateCommentById(int id, [FromBody] CommentDto commentDto)
+        {
+            var updatedComment = await _context.UpdateCommentByIdAsync(id, commentDto);
+
+            if (updatedComment == null)
+            {
+                return NotFound(); // Handle case where comment is not found
+            }
+
+            return Ok(updatedComment);
         }
 
         [HttpDelete("comments/{commentId}")]
