@@ -233,6 +233,28 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    PostId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.PostId);
+                    table.ForeignKey(
+                        name: "FK_Posts_AspNetUsers_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Providers",
                 columns: table => new
                 {
@@ -306,28 +328,6 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Posts",
-                columns: table => new
-                {
-                    PostId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Posts", x => x.PostId);
-                    table.ForeignKey(
-                        name: "FK_Posts_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Vehicles",
                 columns: table => new
                 {
@@ -349,6 +349,34 @@ namespace MidProject.Migrations
                         principalTable: "Clients",
                         principalColumn: "ClientId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Comments_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "PostId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -412,34 +440,6 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comments",
-                columns: table => new
-                {
-                    CommentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Comments", x => x.CommentId);
-                    table.ForeignKey(
-                        name: "FK_Comments_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Comments_Posts_PostId",
-                        column: x => x.PostId,
-                        principalTable: "Posts",
-                        principalColumn: "PostId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Chargers",
                 columns: table => new
                 {
@@ -459,6 +459,32 @@ namespace MidProject.Migrations
                         principalTable: "ChargingStations",
                         principalColumn: "ChargingStationId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChargingStationFavorites",
+                columns: table => new
+                {
+                    ChargingStationFavoriteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ChargingStationId = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChargingStationFavorites", x => x.ChargingStationFavoriteId);
+                    table.ForeignKey(
+                        name: "FK_ChargingStationFavorites_ChargingStations_ChargingStationId",
+                        column: x => x.ChargingStationId,
+                        principalTable: "ChargingStations",
+                        principalColumn: "ChargingStationId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ChargingStationFavorites_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -500,7 +526,8 @@ namespace MidProject.Migrations
                     ChargingStationId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EnergyConsumed = table.Column<int>(type: "int", nullable: false)
+                    EnergyConsumed = table.Column<int>(type: "int", nullable: false),
+                    ProviderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -516,6 +543,12 @@ namespace MidProject.Migrations
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Providers_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Providers",
+                        principalColumn: "ProviderId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -557,39 +590,6 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Favorites",
-                columns: table => new
-                {
-                    FavoriteId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceInfoId = table.Column<int>(type: "int", nullable: false),
-                    ChargingStationId = table.Column<int>(type: "int", nullable: false),
-                    ClientId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Favorites", x => x.FavoriteId);
-                    table.ForeignKey(
-                        name: "FK_Favorites_ChargingStations_ChargingStationId",
-                        column: x => x.ChargingStationId,
-                        principalTable: "ChargingStations",
-                        principalColumn: "ChargingStationId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Favorites_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Favorites_ServiceInfos_ServiceInfoId",
-                        column: x => x.ServiceInfoId,
-                        principalTable: "ServiceInfos",
-                        principalColumn: "ServiceInfoId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -612,6 +612,32 @@ namespace MidProject.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Feedbacks_ServiceInfos_ServiceInfoId",
+                        column: x => x.ServiceInfoId,
+                        principalTable: "ServiceInfos",
+                        principalColumn: "ServiceInfoId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServiceInfoFavorites",
+                columns: table => new
+                {
+                    ServiceInfoFavoriteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceInfoId = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceInfoFavorites", x => x.ServiceInfoFavoriteId);
+                    table.ForeignKey(
+                        name: "FK_ServiceInfoFavorites_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceInfoFavorites_ServiceInfos_ServiceInfoId",
                         column: x => x.ServiceInfoId,
                         principalTable: "ServiceInfos",
                         principalColumn: "ServiceInfoId",
@@ -694,10 +720,10 @@ namespace MidProject.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "admin_role_id", "5568d46d-1622-45b1-a452-33237cb5ba23", "Admin", "ADMIN" },
-                    { "client_role_id", "e6e757f7-9942-48dc-932f-574b93c827ec", "Client", "CLIENT" },
-                    { "owner_role_id", "6adb9808-27b2-411e-8ec4-7d6be6418bb0", "Owner", "OWNER" },
-                    { "servicer_role_id", "1d2caef0-5fd4-4c00-979d-95e6d48361f0", "Servicer", "SERVICER" }
+                    { "admin_role_id", "164355ab-0f97-487e-9c89-6cabe8d619d2", "Admin", "ADMIN" },
+                    { "client_role_id", "8b0fcee6-33b0-434a-a837-c5d99f95b674", "Client", "CLIENT" },
+                    { "owner_role_id", "db4a93c2-da8f-4a75-a8bf-a6e99e13af7d", "Owner", "OWNER" },
+                    { "servicer_role_id", "60d8df0b-e057-44e2-b171-8763e7ed0c74", "Servicer", "SERVICER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -766,6 +792,16 @@ namespace MidProject.Migrations
                 column: "ChargingStationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChargingStationFavorites_ChargingStationId",
+                table: "ChargingStationFavorites",
+                column: "ChargingStationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChargingStationFavorites_ClientId",
+                table: "ChargingStationFavorites",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ChargingStations_AdminId",
                 table: "ChargingStations",
                 column: "AdminId");
@@ -797,29 +833,14 @@ namespace MidProject.Migrations
                 column: "SubscriptionPlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_ClientId",
+                name: "IX_Comments_AccountId",
                 table: "Comments",
-                column: "ClientId");
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
                 table: "Comments",
                 column: "PostId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Favorites_ChargingStationId",
-                table: "Favorites",
-                column: "ChargingStationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Favorites_ClientId",
-                table: "Favorites",
-                column: "ClientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Favorites_ServiceInfoId",
-                table: "Favorites",
-                column: "ServiceInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_ClientId",
@@ -857,15 +878,25 @@ namespace MidProject.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_ClientId",
+                name: "IX_Posts_AccountId",
                 table: "Posts",
-                column: "ClientId");
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Providers_AccountId",
                 table: "Providers",
                 column: "AccountId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceInfoFavorites_ClientId",
+                table: "ServiceInfoFavorites",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceInfoFavorites_ServiceInfoId",
+                table: "ServiceInfoFavorites",
+                column: "ServiceInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceInfos_ProviderId",
@@ -903,6 +934,11 @@ namespace MidProject.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Sessions_ProviderId",
+                table: "Sessions",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_ClientId",
                 table: "Vehicles",
                 column: "ClientId");
@@ -933,13 +969,13 @@ namespace MidProject.Migrations
                 name: "Chargers");
 
             migrationBuilder.DropTable(
+                name: "ChargingStationFavorites");
+
+            migrationBuilder.DropTable(
                 name: "ClientSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "Comments");
-
-            migrationBuilder.DropTable(
-                name: "Favorites");
 
             migrationBuilder.DropTable(
                 name: "Feedbacks");
@@ -952,6 +988,9 @@ namespace MidProject.Migrations
 
             migrationBuilder.DropTable(
                 name: "PaymentTransactions");
+
+            migrationBuilder.DropTable(
+                name: "ServiceInfoFavorites");
 
             migrationBuilder.DropTable(
                 name: "ServiceRequests");
