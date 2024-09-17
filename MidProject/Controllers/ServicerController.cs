@@ -13,7 +13,7 @@ namespace MidProject.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    // [Authorize(Policy = "ServicerPolicy")]
+    [Authorize(Policy = "ServicerPolicy")]
     public class ServicerController : ControllerBase
     {
         private readonly IServicer _servicerService;

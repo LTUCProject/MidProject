@@ -9,6 +9,6 @@
         public int BatteryCapacity { get; set; }
         public string ElectricType { get; set; }
         public int ClientId { get; set; }
-        public int ServiceInfoId { get; set; } // Added
+
     }
 }

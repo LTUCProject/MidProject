@@ -17,7 +17,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "AdminPolicy")]
     public class AdminsController : ControllerBase
     {
         private readonly MidprojectDbContext _context;
@@ -74,7 +74,6 @@ namespace MidProject.Controllers
             var providerDtos = providers.Select(p => new ProviderResponseDto
             {
                 ProviderId = p.ProviderId,
-                AccountId = p.AccountId,
                 Name = p.Name,
                 Email = p.Email,
                 Type = p.Type
@@ -97,7 +96,6 @@ namespace MidProject.Controllers
             var providerDto = new ProviderResponseDto
             {
                 ProviderId = provider.ProviderId,
-                AccountId = provider.AccountId,
                 Name = provider.Name,
                 Email = provider.Email,
                 Type = provider.Type

@@ -14,7 +14,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(Policy = "OwnerPolicy")]
+    [Authorize(Policy = "OwnerPolicy")]
     public class OwnerController : ControllerBase
     {
         private readonly IOwner _ownerService;

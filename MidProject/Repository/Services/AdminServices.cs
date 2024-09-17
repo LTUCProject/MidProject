@@ -252,10 +252,12 @@ namespace MidProject.Repository.Services
         // End Notifications management ================================================================================================
 
         // Start Charging station management ================================================================================================
-        public async Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync()
+        public async Task<IEnumerable<ChargingStationResponseAdminDto>> GetAllChargingStationsAsync()
         {
             return await _context.ChargingStations
-                .Select(cs => new ChargingStationResponseDto
+                .Include(cs => cs.Chargers)  // Include chargers
+                .Include(cs => cs.Provider)  // Include provider
+                .Select(cs => new ChargingStationResponseAdminDto
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
@@ -263,16 +265,35 @@ namespace MidProject.Repository.Services
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
+                    PaymentMethod = cs.PaymentMethod,
+                    Chargers = cs.Chargers.Select(c => new ChargerResponseDto
+                    {
+                        ChargerId = c.ChargerId,
+                        Type = c.Type,
+                        Power = c.Power,
+                        Speed = c.Speed,
+                        ChargingStationId = c.ChargingStationId
+                    }).ToList(),
+                    Provider = new ProviderResponseDto
+                    {
+                        ProviderId = cs.Provider.ProviderId,
+                        Name = cs.Provider.Name,
+                        Email = cs.Provider.Email,
+                        Type = cs.Provider.Type
+                    }
                 })
                 .ToListAsync();
         }
 
-        public async Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int chargingStationId)
+
+
+        public async Task<ChargingStationResponseAdminDto> GetChargingStationByIdAsync(int chargingStationId)
         {
             var chargingStation = await _context.ChargingStations
+                .Include(cs => cs.Chargers)  // Include chargers
+                .Include(cs => cs.Provider)  // Include provider
                 .Where(cs => cs.ChargingStationId == chargingStationId)
-                .Select(cs => new ChargingStationResponseDto
+                .Select(cs => new ChargingStationResponseAdminDto
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
@@ -280,12 +301,29 @@ namespace MidProject.Repository.Services
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
+                    PaymentMethod = cs.PaymentMethod,
+                    Chargers = cs.Chargers.Select(c => new ChargerResponseDto
+                    {
+                        ChargerId = c.ChargerId,
+                        Type = c.Type,
+                        Power = c.Power,
+                        Speed = c.Speed,
+                        ChargingStationId = c.ChargingStationId
+                    }).ToList(),
+                    Provider = new ProviderResponseDto
+                    {
+                        ProviderId = cs.Provider.ProviderId,
+                        Name = cs.Provider.Name,
+                        Email = cs.Provider.Email,
+                        Type = cs.Provider.Type
+                    }
                 })
                 .FirstOrDefaultAsync();
 
             return chargingStation;
         }
+
+
 
         public async Task DeleteChargingStationAsync(int chargingStationId)
         {

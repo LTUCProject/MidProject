@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace MidProject.Models
 {
-    public class Favorite
+    public class ChargingStationFavorite
     {
-        public int FavoriteId { get; set; }
-        public int ServiceInfoId { get; set; }
-        public ServiceInfo ServiceInfo { get; set; }
+        public int ChargingStationFavoriteId { get; set; }
+
+        [Required]
         public int ChargingStationId { get; set; }
         public ChargingStation ChargingStation { get; set; }
 
         [Required]
-        public int ClientId { get; set; } // Changed to string to match IdentityUser key type
+        public int ClientId { get; set; }
         public Client Client { get; set; }
     }
 }
