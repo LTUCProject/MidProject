@@ -23,7 +23,35 @@ namespace MidProject.Controllers
         {
             _ownerService = ownerService;
         }
+        [HttpGet("sessions/{stationId}")]
+        [Authorize(Policy = "OwnerPolicy")]
+        public async Task<IActionResult> GetSessionsByChargingStationAsync(int stationId)
+        {
+            // Extract the account ID from the claims (assuming it's stored in the claims)
+            var accountId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            if (string.IsNullOrEmpty(accountId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            try
+            {
+                var sessions = await _ownerService.GetSessionsByChargingStationAsync(stationId, accountId);
+
+                if (sessions == null)
+                {
+                    return NotFound("Charging station or sessions not found.");
+                }
+
+                return Ok(sessions);
+            }
+            catch (Exception ex)
+            {
+                // Log exception details (ex) here as needed
+                return StatusCode(500, "Internal server error.");
+            }
+        }
         private string GetAccountId() => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         // Charging Station Management

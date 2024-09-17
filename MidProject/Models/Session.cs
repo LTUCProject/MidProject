@@ -19,6 +19,8 @@ namespace MidProject.Models
         [Required]
         public DateTime EndTime { get; set; }
         public int EnergyConsumed { get; set; }
+        public int ProviderId { get; set; }
+        public Provider Provider { get; set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; set; }
     }
 }
