@@ -22,7 +22,7 @@ namespace MidProject.Models
         public ICollection<ChargingStation> ChargingStations { get; set; } // New collection for ownership
 
 
-
+        public ICollection<Session> session { get; set; }
 
 
 

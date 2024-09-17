@@ -39,12 +39,8 @@ namespace MidProject.Repository.Interfaces
         Task UpdateLocationAsync(int id, LocationDto locationDto);
         Task DeleteLocationAsync(int id);
 
+        Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId, string accountId); // New Method
 
     }
 
 }
-//// Location management
-//Task<IEnumerable<LocationDtoResponse>> GetAllLocationsAsync();
-//Task<LocationDtoResponse> GetLocationByIdAsync(int locationId);
-//Task AddLocationAsync(LocationDtoRequest locationDtoRequest);
-//Task RemoveLocationAsync(int locationId);

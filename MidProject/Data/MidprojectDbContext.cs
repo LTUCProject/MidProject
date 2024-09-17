@@ -36,7 +36,13 @@ namespace MidProject.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
+            modelBuilder.Entity<Session>()
+              .HasOne(s => s.Provider)
+              .WithMany(c => c.session)
+              .HasForeignKey(s => s.ProviderId)
+              .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Admin>()
                 .HasOne(a => a.Account)
                 .WithOne(a => a.Admin)

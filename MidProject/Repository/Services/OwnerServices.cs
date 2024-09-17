@@ -20,7 +20,35 @@ namespace MidProject.Repository.Services
         {
             _context = context;
         }
+        public async Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId, string accountId)
+        {
 
+            var chargingStation = await _context.ChargingStations
+                .Include(cs => cs.Provider)
+                .FirstOrDefaultAsync(cs => cs.ChargingStationId == stationId && cs.Provider.AccountId == accountId);
+
+            if (chargingStation == null)
+            {
+                return new List<SessionDtoResponse>();
+            }
+
+            var sessions = await _context.Sessions
+                .Where(s => s.ChargingStationId == stationId)
+                .Select(s => new SessionDtoResponse
+                {
+                    SessionId = s.SessionId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    EnergyConsumed = s.EnergyConsumed,
+                    ClientId = s.ClientId,
+                    ChargingStationId = s.ChargingStationId,
+                    ProviderId = s.ProviderId,
+
+                })
+                .ToListAsync();
+
+            return sessions;
+        }
         // Charging Station Management
         public async Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync(string accountId)
         {
