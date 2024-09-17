@@ -493,7 +493,7 @@ namespace MidProject.Controllers
         {
             var posts = await _adminService.GetAllPostsAsync();
 
-            if (posts == null)
+            if (posts == null || !posts.Any())
             {
                 return NotFound();
             }
@@ -501,22 +501,26 @@ namespace MidProject.Controllers
             var postResponseDtos = posts.Select(post => new PostResponseDto
             {
                 PostId = post.PostId,
-                ClientId = post.Client.ClientId,
-                ClientName = post.Client.Name,
+                AccountId = post.AccountId, // Use AccountId
+                UserName = post.Account != null ? post.Account.UserName : "N/A", // Get UserName from Account, if available
                 Title = post.Title,
                 Content = post.Content,
                 Date = post.Date,
                 Comments = post.Comments.Select(comment => new CommentResponseDto
                 {
                     CommentId = comment.CommentId,
+                    AccountId = comment.AccountId, // Include AccountId if needed
                     PostId = comment.PostId,
                     Content = comment.Content,
-                    Date = comment.Date
+                    Date = comment.Date,
+                    UserName = comment.Account != null ? comment.Account.UserName : "N/A" // Get UserName from Account in Comment, if available
                 }).ToList()
             });
 
             return Ok(postResponseDtos);
         }
+
+
 
         [HttpGet("Posts/{id}")]
         public async Task<IActionResult> GetPostById(int id)
@@ -531,21 +535,44 @@ namespace MidProject.Controllers
             var postResponseDto = new PostResponseDto
             {
                 PostId = post.PostId,
-                ClientId = post.Client.ClientId,
-                ClientName = post.Client.Name,
+                AccountId = post.AccountId, // Use AccountId
+                UserName = post.Account != null ? post.Account.UserName : "N/A", // Get UserName from Account, if available
                 Title = post.Title,
                 Content = post.Content,
                 Date = post.Date,
                 Comments = post.Comments.Select(comment => new CommentResponseDto
                 {
                     CommentId = comment.CommentId,
+                    AccountId = comment.AccountId, // Include AccountId if needed
                     PostId = comment.PostId,
                     Content = comment.Content,
-                    Date = comment.Date
+                    Date = comment.Date,
+                    UserName = comment.Account != null ? comment.Account.UserName : "N/A" // Get UserName from Account in Comment, if available
                 }).ToList()
             };
 
             return Ok(postResponseDto);
+        }
+
+        [HttpPost("posts")]
+        public async Task<ActionResult<PostResponseDto>> AddPost([FromBody] PostDto postDto)
+        {
+            var postResponse = await _adminService.AddPostAsync(postDto);
+            return CreatedAtAction(nameof(GetAllPosts), new { postId = postResponse.PostId }, postResponse);
+        }
+
+        // UpdatePostById Controller Method
+        [HttpPut("Posts/{id}")]
+        public async Task<IActionResult> UpdatePostById(int id, [FromBody] PostDto postDto)
+        {
+            var updatedPost = await _adminService.UpdatePostByIdAsync(id, postDto);
+
+            if (updatedPost == null)
+            {
+                return NotFound(); // Handle case where post is not found
+            }
+
+            return Ok(updatedPost);
         }
 
         [HttpDelete("Posts/{id}")]
@@ -568,10 +595,11 @@ namespace MidProject.Controllers
             var commentDtos = comments.Select(c => new CommentResponseDto
             {
                 CommentId = c.CommentId,
+                AccountId = c.AccountId,
+                UserName = c.Account?.UserName ?? "Unknown", // Include UserName from Account
                 PostId = c.PostId,
                 Content = c.Content,
                 Date = c.Date,
-                
             }).ToList();
 
             return Ok(commentDtos);
@@ -590,13 +618,37 @@ namespace MidProject.Controllers
             var commentDto = new CommentResponseDto
             {
                 CommentId = comment.CommentId,
+                AccountId = comment.AccountId,
+                UserName = comment.Account?.UserName ?? "Unknown", // Include UserName from Account
                 PostId = comment.PostId,
                 Content = comment.Content,
                 Date = comment.Date,
-                
             };
 
             return Ok(commentDto);
+        }
+
+        [HttpPost("comments")]
+        public async Task<ActionResult<CommentResponseDto>> AddComment([FromBody] CommentDto commentDto)
+        {
+            // Call the service method to add the comment and get the response DTO
+            CommentResponseDto commentResponseDto = await _adminService.AddCommentAsync(commentDto);
+
+            // Return the response DTO with UserName populated
+            return Ok(commentResponseDto);
+        }
+
+        [HttpPut("Comments/{id}")]
+        public async Task<IActionResult> UpdateCommentById(int id, [FromBody] CommentDto commentDto)
+        {
+            var updatedComment = await _adminService.UpdateCommentByIdAsync(id, commentDto);
+
+            if (updatedComment == null)
+            {
+                return NotFound(); // Handle case where comment is not found
+            }
+
+            return Ok(updatedComment);
         }
 
         // DELETE: api/Admins/Comments/5
@@ -616,7 +668,7 @@ namespace MidProject.Controllers
 
         // Existing methods...
 
-        
+
     }
 }
 

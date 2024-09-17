@@ -7,8 +7,8 @@ namespace MidProject.Models
         public int PostId { get; set; }
 
         [Required]
-        public int ClientId { get; set; } // Changed to string to match IdentityUser key type
-        public Client Client { get; set; }
+        public string AccountId { get; set; } // Changed to string to match IdentityUser key type
+        public Account Account { get; set; }
 
         [Required]
         [MaxLength(100)]

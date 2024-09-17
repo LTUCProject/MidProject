@@ -4,7 +4,7 @@ namespace MidProject.Models.Dto.Request
 {
     public class CommentDto
     {
-        public int ClientId { get; set; } 
+        public string AccountId { get; set; } 
         public int PostId { get; set; }
         public string Content { get; set; }
         public DateTime Date { get; set; }

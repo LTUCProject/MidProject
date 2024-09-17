@@ -98,9 +98,9 @@ namespace MidProject.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Client)
+                .HasOne(c => c.Account)
                 .WithMany(cl => cl.Comments)
-                .HasForeignKey(c => c.ClientId)
+                .HasForeignKey(c => c.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Comment>()
@@ -170,9 +170,9 @@ namespace MidProject.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Post>()
-                .HasOne(p => p.Client)
+                .HasOne(p => p.Account)
                 .WithMany(c => c.Posts)
-                .HasForeignKey(p => p.ClientId)
+                .HasForeignKey(p => p.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ServiceInfo>()

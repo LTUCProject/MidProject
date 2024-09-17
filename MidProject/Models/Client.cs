@@ -26,8 +26,6 @@ namespace MidProject.Models
         public ICollection<Notification> Notifications { get; set; }
         public ICollection<ClientSubscription> ClientSubscriptions { get; set; }
         public ICollection<ServiceRequest> ServiceRequests { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<Post> Posts { get; set; }
         public ICollection<ServiceInfoFavorite> ServiceInfoFavorites { get; set; }
         public ICollection<ChargingStationFavorite> ChargingStationFavorites { get; set; }
 
