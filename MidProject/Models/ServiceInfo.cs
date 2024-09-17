@@ -18,11 +18,10 @@ namespace MidProject.Models
         [Required]
         public int ProviderId { get; set; }
         public Provider Provider { get; set; }
+
         public ICollection<Feedback> Feedbacks { get; set; }
         public ICollection<ServiceRequest> ServiceRequests { get; set; }
         public ICollection<Booking> Bookings { get; set; }
-        public ICollection<Favorite> Favorites { get; set; }
-        public ICollection<Vehicle> Vehicles { get; set; } 
-
+        public ICollection<ServiceInfoFavorite> ServiceInfoFavorites { get; set; }
     }
 }

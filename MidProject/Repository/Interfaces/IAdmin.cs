@@ -35,8 +35,8 @@ namespace MidProject.Repository.Interfaces
         Task AddNotificationAsync(NotificationDto notificationDto);
 
         // Charging station management
-        Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync();
-        Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int chargingStationId);
+        Task<IEnumerable<ChargingStationResponseAdminDto>> GetAllChargingStationsAsync();
+        Task<ChargingStationResponseAdminDto> GetChargingStationByIdAsync(int chargingStationId);
         Task DeleteChargingStationAsync(int chargingStationId);
 
         // Vehicle management

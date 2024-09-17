@@ -17,12 +17,11 @@ namespace MidProject.Models
         public string ElectricType { get; set; }
 
         [Required]
-        public int ClientId { get; set; } // Changed to string to match IdentityUser key type
+        public int ClientId { get; set; }
         public Client Client { get; set; }
 
-        [Required]
-        public int ServiceInfoId { get; set; } 
-        public ServiceInfo ServiceInfo { get; set; } 
         public ICollection<Booking> Bookings { get; set; }
+
+        public ICollection<ServiceRequest> ServiceRequests { get; set; }
     }
 }

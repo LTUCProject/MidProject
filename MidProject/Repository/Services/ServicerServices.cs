@@ -184,6 +184,7 @@ public class ServicerService : IServicer
             .Include(sr => sr.ServiceInfo)
             .Include(sr => sr.Client)
             .Include(sr => sr.Provider)
+            .Include(sr => sr.Vehicle) // Ensure Vehicle is included
             .Select(serviceRequest => new ServiceRequestDto
             {
                 ServiceRequestId = serviceRequest.ServiceRequestId,
@@ -191,6 +192,8 @@ public class ServicerService : IServicer
                 ClientId = serviceRequest.ClientId,
                 ProviderId = serviceRequest.ProviderId,
                 Status = serviceRequest.Status,
+
+                // Mapping ServiceInfo
                 ServiceInfo = new ServiceInfoResponseDto
                 {
                     ServiceInfoId = serviceRequest.ServiceInfo.ServiceInfoId,
@@ -199,21 +202,37 @@ public class ServicerService : IServicer
                     Contact = serviceRequest.ServiceInfo.Contact,
                     Type = serviceRequest.ServiceInfo.Type
                 },
+
+                // Mapping Client
                 Client = new ClientDto
                 {
                     ClientId = serviceRequest.Client.ClientId,
                     Name = serviceRequest.Client.Name,
                     Email = serviceRequest.Client.Email,
-
                 },
+
+                // Mapping Provider
                 Provider = new ProviderDto
                 {
                     ProviderId = serviceRequest.Provider.ProviderId,
                     Name = serviceRequest.Provider.Name,
+                },
 
+                // Mapping Vehicle
+                Vehicle = new VehicleDto
+                {
+                    VehicleId = serviceRequest.Vehicle.VehicleId,
+                    LicensePlate = serviceRequest.Vehicle.LicensePlate,
+                    Model = serviceRequest.Vehicle.Model,
+                    Year = serviceRequest.Vehicle.Year,
+                    BatteryCapacity = serviceRequest.Vehicle.BatteryCapacity,
+                    ElectricType = serviceRequest.Vehicle.ElectricType
                 }
-            }).ToListAsync();
+            })
+            .ToListAsync();
     }
+
+
 
     public async Task<bool> UpdateServiceRequestStatusAsync(int serviceRequestId, string status)
     {

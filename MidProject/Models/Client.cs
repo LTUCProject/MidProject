@@ -7,7 +7,6 @@ namespace MidProject.Models
         public int ClientId { get; set; }
 
         [Required]
-        [MaxLength(256)]
         public string AccountId { get; set; } // Foreign key
 
         [Required]
@@ -29,6 +28,8 @@ namespace MidProject.Models
         public ICollection<ServiceRequest> ServiceRequests { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<Post> Posts { get; set; }
-        public ICollection<Favorite> Favorites { get; set; }
+        public ICollection<ServiceInfoFavorite> ServiceInfoFavorites { get; set; }
+        public ICollection<ChargingStationFavorite> ChargingStationFavorites { get; set; }
+
     }
 }

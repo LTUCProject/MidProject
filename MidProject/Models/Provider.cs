@@ -7,7 +7,6 @@ namespace MidProject.Models
         public int ProviderId { get; set; }
 
         [Required]
-        [MaxLength(256)]
         public string AccountId { get; set; } // Foreign key
 
         [Required]

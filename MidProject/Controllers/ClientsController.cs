@@ -13,7 +13,7 @@ namespace MidProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Policy = "ClientPolicy")] 
+    [Authorize(Policy = "ClientPolicy")]
     public class ClientsController : ControllerBase
     {
         private readonly IClient _context;
@@ -97,33 +97,51 @@ namespace MidProject.Controllers
         }
 
         // Favorites management
-        [HttpGet("Favorite/{clientId}")]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetClientFavorites(int clientId)
+        // Retrieve all charging station favorites for a client
+        [HttpGet("ChargingStationsFavorites/{clientId}")]
+        public async Task<ActionResult<IEnumerable<FavoriteChargingStationResponseDto>>> GetClientChargingStationFavorites(int clientId)
         {
-            var result = await _context.GetClientFavoritesAsync(clientId);
+            var result = await _context.GetClientChargingStationFavoritesAsync(clientId);
             return Ok(result);
         }
 
-        [HttpPost("Favorite")]
-        public async Task<ActionResult> AddFavorite([FromBody] FavoriteDto favoriteDto)
+        // Retrieve all service info favorites for a client
+        [HttpGet("ServiceInfosFavorites/{clientId}")]
+        public async Task<ActionResult<IEnumerable<FavoriteServiceInfoResponseDto>>> GetClientServiceInfoFavorites(int clientId)
         {
-            var newFavorite = await _context.AddFavoriteAsync(favoriteDto);
-            //  return CreatedAtAction(nameof(GetClientFavorites), new { clientId = favoriteDto.ClientId }, favoriteDto);
-            FavoriteDtoResonse favoriteDtoResonse = new FavoriteDtoResonse()
-            {
-                FavoriteId = newFavorite.FavoriteId,
-                ServiceInfoId = newFavorite.ServiceInfoId,
-                ChargingStationId = newFavorite.ChargingStationId,
-                ClientId = newFavorite.ClientId
-
-            };
-            return Ok(favoriteDtoResonse);
+            var result = await _context.GetClientServiceInfoFavoritesAsync(clientId);
+            return Ok(result);
         }
 
-        [HttpDelete("Favorite/{favoriteId}")]
-        public async Task<ActionResult> RemoveFavorite(int favoriteId)
+        // Add a new charging station favorite
+        [HttpPost("ChargingStationFavorites")]
+        public async Task<ActionResult<FavoriteChargingStationResponseDto>> AddChargingStationFavorite([FromBody] FavoriteChargingStationDto favoriteDto)
         {
-            await _context.RemoveFavoriteAsync(favoriteId);
+            var newFavorite = await _context.AddChargingStationFavoriteAsync(favoriteDto);
+            return CreatedAtAction(nameof(GetClientChargingStationFavorites), new { clientId = favoriteDto.ClientId }, newFavorite);
+        }
+
+        // Add a new service info favorite
+        [HttpPost("ServiceInfoFavorites")]
+        public async Task<ActionResult<FavoriteServiceInfoResponseDto>> AddServiceInfoFavorite([FromBody] FavoriteServiceInfoDto favoriteDto)
+        {
+            var newFavorite = await _context.AddServiceInfoFavoriteAsync(favoriteDto);
+            return CreatedAtAction(nameof(GetClientServiceInfoFavorites), new { clientId = favoriteDto.ClientId }, newFavorite);
+        }
+
+        // Remove a charging station favorite
+        [HttpDelete("ChargingStationFavorites/{favoriteId}")]
+        public async Task<IActionResult> RemoveChargingStationFavorite(int favoriteId)
+        {
+            await _context.RemoveChargingStationFavoriteAsync(favoriteId);
+            return NoContent();
+        }
+
+        // Remove a service info favorite
+        [HttpDelete("ServiceInfoFavorites/{favoriteId}")]
+        public async Task<IActionResult> RemoveServiceInfoFavorite(int favoriteId)
+        {
+            await _context.RemoveServiceInfoFavoriteAsync(favoriteId);
             return NoContent();
         }
 
@@ -143,25 +161,35 @@ namespace MidProject.Controllers
         }
 
         [HttpPost("vehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleDto vehicleDto)
+        public async Task<IActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
         {
-
-
-            var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
-
-            VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
+            try
             {
-                VehicleId = addedVehicle.VehicleId,           // Assuming AddVehicleAsync returns the entity
-                LicensePlate = addedVehicle.LicensePlate,
-                Model = addedVehicle.Model,
-                Year = addedVehicle.Year,
-                BatteryCapacity = addedVehicle.BatteryCapacity,
-                ElectricType = addedVehicle.ElectricType,
-                ClientId = addedVehicle.ClientId,
-                ServiceInfoId = addedVehicle.ServiceInfoId
-            };
-            return Ok(vehicleDtoResponse);
+                if (vehicleDto == null)
+                {
+                    return BadRequest("Vehicle data is required.");
+                }
 
+                var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
+
+                VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
+                {
+                    VehicleId = addedVehicle.VehicleId,
+                    LicensePlate = addedVehicle.LicensePlate,
+                    Model = addedVehicle.Model,
+                    Year = addedVehicle.Year,
+                    BatteryCapacity = addedVehicle.BatteryCapacity,
+                    ElectricType = addedVehicle.ElectricType,
+                    ClientId = addedVehicle.ClientId
+                   
+                };
+
+                return Ok(vehicleDtoResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding the vehicle: {ex.Message}");
+            }
         }
 
         [HttpDelete("vehicles/{vehicleId}")]
@@ -170,6 +198,7 @@ namespace MidProject.Controllers
             await _context.RemoveVehicleAsync(vehicleId);
             return NoContent();
         }
+
 
         // Booking management
         [HttpGet("bookings/{clientId}")]
@@ -237,13 +266,14 @@ namespace MidProject.Controllers
         public async Task<ActionResult> CreateServiceRequest([FromBody] ClientServiceRequestDto requestDto)
         {
             var newServiceReq = await _context.CreateServiceRequestAsync(requestDto);
-            //  return CreatedAtAction(nameof(GetServiceRequestById), new { requestId = requestDto.ServiceRequestId }, requestDto);
+
             ServiceRequestDtoResponse serviceRequestDtoResponse = new ServiceRequestDtoResponse()
             {
                 ServiceRequestId = newServiceReq.ServiceRequestId,
                 ServiceInfoId = newServiceReq.ServiceInfoId,
                 ClientId = newServiceReq.ClientId,
                 ProviderId = newServiceReq.ProviderId,
+                VehicleId = newServiceReq.VehicleId, // Added vehicle information to the response
                 Status = newServiceReq.Status,
             };
             return Ok(serviceRequestDtoResponse);
@@ -255,6 +285,7 @@ namespace MidProject.Controllers
             await _context.DeleteServiceRequestAsync(requestId);
             return NoContent();
         }
+
 
         // Feedback management
         [HttpGet("feedbacks/{clientId}")]

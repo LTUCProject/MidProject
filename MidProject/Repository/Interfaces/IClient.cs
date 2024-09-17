@@ -1,6 +1,7 @@
 ﻿using MidProject.Models;
 using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
+using MidProject.Models.Dto.Response;
 
 namespace MidProject.Repository.Interfaces
 {
@@ -18,9 +19,12 @@ namespace MidProject.Repository.Interfaces
         Task RemovePaymentAsync(int paymentId);
 
         // Favorites management
-        Task<IEnumerable<Favorite>> GetClientFavoritesAsync(int clientId);
-        Task<Favorite> AddFavoriteAsync(FavoriteDto favoriteDto);
-        Task RemoveFavoriteAsync(int favoriteId);
+        Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync(int clientId);
+        Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync(int clientId);
+        Task<FavoriteChargingStationResponseDto> AddChargingStationFavoriteAsync(FavoriteChargingStationDto favoriteDto);
+        Task<FavoriteServiceInfoResponseDto> AddServiceInfoFavoriteAsync(FavoriteServiceInfoDto favoriteDto);
+        Task RemoveChargingStationFavoriteAsync(int favoriteId);
+        Task RemoveServiceInfoFavoriteAsync(int favoriteId);
 
         // Vehicle management
         Task<IEnumerable<Vehicle>> GetClientVehiclesAsync(int clientId);

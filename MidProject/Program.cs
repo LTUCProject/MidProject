@@ -120,14 +120,14 @@ namespace MidProject
                 (
                 options =>
                 {
-                    options.SwaggerEndpoint("/api/v1/swagger.json", "ibrahim nemer");
+                    options.SwaggerEndpoint("/api/v1/swagger.json", "EV");
                     options.RoutePrefix = "";
                 }
                 );
 
             //==================================
             app.MapControllers();
-            app.MapGet("/", () => "Hello World!");
+
             //run
             app.Run();
         }

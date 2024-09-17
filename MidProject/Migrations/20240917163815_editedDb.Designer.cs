@@ -12,8 +12,8 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    [Migration("20240904185709_CreatingDb")]
-    partial class CreatingDb
+    [Migration("20240917163815_editedDb")]
+    partial class editedDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,28 +55,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "e1da6bef-d87c-4685-b2d9-b84848de3a96",
+                            ConcurrencyStamp = "e006589a-cc71-4d5b-846c-7450aa5a495a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "d86ef880-9967-4aac-9bf3-dc15dbb27b2e",
+                            ConcurrencyStamp = "bf0d2004-6ba8-443e-b24c-71de388ad88a",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "cde6b16c-b6d1-440c-b496-b11c3df0630e",
+                            ConcurrencyStamp = "85099c52-f178-4c3a-896c-46d00ef878ce",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "5a560be7-ee53-4daf-a430-31602ce33dc8",
+                            ConcurrencyStamp = "3c626d9d-2ec1-4b36-b853-9148a60cbf26",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -271,7 +271,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("AdminId");
 
@@ -306,7 +307,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -370,7 +372,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -398,6 +401,29 @@ namespace MidProject.Migrations
                     b.ToTable("ChargingStations");
                 });
 
+            modelBuilder.Entity("MidProject.Models.ChargingStationFavorite", b =>
+                {
+                    b.Property<int>("ChargingStationFavoriteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChargingStationFavoriteId"));
+
+                    b.Property<int>("ChargingStationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ChargingStationFavoriteId");
+
+                    b.HasIndex("ChargingStationId");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("ChargingStationFavorites");
+                });
+
             modelBuilder.Entity("MidProject.Models.Client", b =>
                 {
                     b.Property<int>("ClientId")
@@ -416,7 +442,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("ClientId");
 
@@ -472,7 +499,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -487,34 +515,6 @@ namespace MidProject.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("MidProject.Models.Favorite", b =>
-                {
-                    b.Property<int>("FavoriteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteId"));
-
-                    b.Property<int>("ChargingStationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServiceInfoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FavoriteId");
-
-                    b.HasIndex("ChargingStationId");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("ServiceInfoId");
-
-                    b.ToTable("Favorites");
                 });
 
             modelBuilder.Entity("MidProject.Models.Feedback", b =>
@@ -560,7 +560,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
@@ -596,7 +597,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Details")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("MaintenanceDate")
                         .HasColumnType("datetime2");
@@ -630,11 +632,13 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("NotificationId");
 
@@ -662,14 +666,16 @@ namespace MidProject.Migrations
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("PaymentTransactionId");
 
@@ -693,14 +699,16 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("PostId");
 
@@ -727,7 +735,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -755,11 +764,13 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("ProviderId")
                         .HasColumnType("int");
@@ -773,6 +784,29 @@ namespace MidProject.Migrations
                     b.HasIndex("ProviderId");
 
                     b.ToTable("ServiceInfos");
+                });
+
+            modelBuilder.Entity("MidProject.Models.ServiceInfoFavorite", b =>
+                {
+                    b.Property<int>("ServiceInfoFavoriteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceInfoFavoriteId"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceInfoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ServiceInfoFavoriteId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ServiceInfoId");
+
+                    b.ToTable("ServiceInfoFavorites");
                 });
 
             modelBuilder.Entity("MidProject.Models.ServiceRequest", b =>
@@ -796,6 +830,9 @@ namespace MidProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
                     b.HasKey("ServiceRequestId");
 
                     b.HasIndex("ClientId");
@@ -803,6 +840,8 @@ namespace MidProject.Migrations
                     b.HasIndex("ProviderId");
 
                     b.HasIndex("ServiceInfoId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("ServiceRequests");
                 });
@@ -856,7 +895,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -890,10 +930,8 @@ namespace MidProject.Migrations
 
                     b.Property<string>("Model")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ServiceInfoId")
-                        .HasColumnType("int");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -901,8 +939,6 @@ namespace MidProject.Migrations
                     b.HasKey("VehicleId");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("ServiceInfoId");
 
                     b.ToTable("Vehicles");
                 });
@@ -1030,6 +1066,25 @@ namespace MidProject.Migrations
                     b.Navigation("Provider");
                 });
 
+            modelBuilder.Entity("MidProject.Models.ChargingStationFavorite", b =>
+                {
+                    b.HasOne("MidProject.Models.ChargingStation", "ChargingStation")
+                        .WithMany("ChargingStationFavorites")
+                        .HasForeignKey("ChargingStationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MidProject.Models.Client", "Client")
+                        .WithMany("ChargingStationFavorites")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChargingStation");
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("MidProject.Models.Client", b =>
                 {
                     b.HasOne("MidProject.Models.Account", "Account")
@@ -1077,33 +1132,6 @@ namespace MidProject.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("MidProject.Models.Favorite", b =>
-                {
-                    b.HasOne("MidProject.Models.ChargingStation", "ChargingStation")
-                        .WithMany("Favorites")
-                        .HasForeignKey("ChargingStationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MidProject.Models.Client", "Client")
-                        .WithMany("Favorites")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MidProject.Models.ServiceInfo", "ServiceInfo")
-                        .WithMany("Favorites")
-                        .HasForeignKey("ServiceInfoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ChargingStation");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("ServiceInfo");
                 });
 
             modelBuilder.Entity("MidProject.Models.Feedback", b =>
@@ -1203,6 +1231,25 @@ namespace MidProject.Migrations
                     b.Navigation("Provider");
                 });
 
+            modelBuilder.Entity("MidProject.Models.ServiceInfoFavorite", b =>
+                {
+                    b.HasOne("MidProject.Models.Client", "Client")
+                        .WithMany("ServiceInfoFavorites")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MidProject.Models.ServiceInfo", "ServiceInfo")
+                        .WithMany("ServiceInfoFavorites")
+                        .HasForeignKey("ServiceInfoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("ServiceInfo");
+                });
+
             modelBuilder.Entity("MidProject.Models.ServiceRequest", b =>
                 {
                     b.HasOne("MidProject.Models.Client", "Client")
@@ -1223,11 +1270,19 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MidProject.Models.Vehicle", "Vehicle")
+                        .WithMany("ServiceRequests")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Client");
 
                     b.Navigation("Provider");
 
                     b.Navigation("ServiceInfo");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("MidProject.Models.Session", b =>
@@ -1257,15 +1312,7 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MidProject.Models.ServiceInfo", "ServiceInfo")
-                        .WithMany("Vehicles")
-                        .HasForeignKey("ServiceInfoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Client");
-
-                    b.Navigation("ServiceInfo");
                 });
 
             modelBuilder.Entity("MidProject.Models.Account", b =>
@@ -1291,7 +1338,7 @@ namespace MidProject.Migrations
                 {
                     b.Navigation("Chargers");
 
-                    b.Navigation("Favorites");
+                    b.Navigation("ChargingStationFavorites");
 
                     b.Navigation("MaintenanceLogs");
 
@@ -1302,11 +1349,11 @@ namespace MidProject.Migrations
                 {
                     b.Navigation("Bookings");
 
+                    b.Navigation("ChargingStationFavorites");
+
                     b.Navigation("ClientSubscriptions");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("Favorites");
 
                     b.Navigation("Feedbacks");
 
@@ -1315,6 +1362,8 @@ namespace MidProject.Migrations
                     b.Navigation("PaymentTransactions");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("ServiceInfoFavorites");
 
                     b.Navigation("ServiceRequests");
 
@@ -1346,13 +1395,11 @@ namespace MidProject.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Favorites");
-
                     b.Navigation("Feedbacks");
 
-                    b.Navigation("ServiceRequests");
+                    b.Navigation("ServiceInfoFavorites");
 
-                    b.Navigation("Vehicles");
+                    b.Navigation("ServiceRequests");
                 });
 
             modelBuilder.Entity("MidProject.Models.Session", b =>
@@ -1368,6 +1415,8 @@ namespace MidProject.Migrations
             modelBuilder.Entity("MidProject.Models.Vehicle", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("ServiceRequests");
                 });
 #pragma warning restore 612, 618
         }
