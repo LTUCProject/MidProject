@@ -15,7 +15,7 @@ namespace MidProject.Repository.Interfaces
         Task<bool> DeleteServiceInfoAsync(int serviceInfoId);
 
         // Service requests management
-        Task<ServiceRequestDto> CreateServiceRequestAsync(ServiceRequestDto serviceRequestDto);
+        //Task<ServiceRequestDto> CreateServiceRequestAsync(ServiceRequestDto serviceRequestDto);
         Task<ServiceRequestDto> GetServiceRequestByIdAsync(int serviceRequestId);
         Task<IEnumerable<ServiceRequestDto>> GetServiceRequestsByServiceInfoIdAsync(int serviceInfoId);
         Task<bool> UpdateServiceRequestStatusAsync(int serviceRequestId, string status);

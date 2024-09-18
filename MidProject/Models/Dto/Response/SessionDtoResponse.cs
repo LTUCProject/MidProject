@@ -3,7 +3,6 @@
     public class SessionDtoResponse
     {
         public int SessionId { get; set; }
-
         public int ClientId { get; set; } // Foreign key
         public int ChargingStationId { get; set; } // Foreign key
         public DateTime StartTime { get; set; }

@@ -459,7 +459,7 @@ namespace MidProject.Controllers
         //Booking
         // Get all bookings for a specific charging station
         [HttpGet("station/{stationId}")]
-        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetBookingsByChargingStation(int stationId)
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByChargingStation(int stationId)
         {
             var bookings = await _ownerService.GetBookingsByChargingStationAsync(stationId);
             if (bookings == null || !bookings.Any())
@@ -469,7 +469,7 @@ namespace MidProject.Controllers
 
         // Get a booking by its ID
         [HttpGet("{bookingId}")]
-        public async Task<ActionResult<BookingAdminDto>> GetBookingById(int bookingId)
+        public async Task<ActionResult<BookingDto>> GetBookingById(int bookingId)
         {
             var booking = await _ownerService.GetBookingByIdAsync(bookingId);
             if (booking == null)
@@ -479,7 +479,7 @@ namespace MidProject.Controllers
 
         // Get bookings by date range for a specific charging station
         [HttpGet("station/{stationId}/range")]
-        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetBookingsByDateRange(int stationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByDateRange(int stationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             var bookings = await _ownerService.GetBookingsByDateRangeAsync(stationId, startDate, endDate);
             if (bookings == null || !bookings.Any())
@@ -489,7 +489,7 @@ namespace MidProject.Controllers
 
         // Get pending bookings for a specific charging station
         [HttpGet("station/{stationId}/pending")]
-        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetPendingBookingsByChargingStation(int stationId)
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetPendingBookingsByChargingStation(int stationId)
         {
             var bookings = await _ownerService.GetPendingBookingsByChargingStationAsync(stationId);
             if (bookings == null || !bookings.Any())

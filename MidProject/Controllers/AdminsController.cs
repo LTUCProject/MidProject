@@ -177,7 +177,7 @@ namespace MidProject.Controllers
                 var createdPlan = await _adminService.CreateSubscriptionPlanAsync(newSubscriptionPlanDto);
             //     return CreatedAtAction(nameof(GetSubscriptionPlanById), new { id = createdPlan.Id }, createdPlan);
 
-            SubscriptionPlanDtoResonse subscriptionPlanDtoResonse = new SubscriptionPlanDtoResonse()
+            SubscriptionPlanResponseDto subscriptionPlanDtoResonse = new SubscriptionPlanResponseDto()
             {
                 SubscriptionPlanId= createdPlan.SubscriptionPlanId,
                 Name= createdPlan.Name,
