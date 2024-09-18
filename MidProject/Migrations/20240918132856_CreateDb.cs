@@ -440,6 +440,43 @@ namespace MidProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    BookingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    ChargingStationId = table.Column<int>(type: "int", nullable: false),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Cost = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_Bookings_ChargingStations_ChargingStationId",
+                        column: x => x.ChargingStationId,
+                        principalTable: "ChargingStations",
+                        principalColumn: "ChargingStationId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Chargers",
                 columns: table => new
                 {
@@ -549,43 +586,6 @@ namespace MidProject.Migrations
                         column: x => x.ProviderId,
                         principalTable: "Providers",
                         principalColumn: "ProviderId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    BookingId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    ServiceInfoId = table.Column<int>(type: "int", nullable: false),
-                    VehicleId = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Cost = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_ServiceInfos_ServiceInfoId",
-                        column: x => x.ServiceInfoId,
-                        principalTable: "ServiceInfos",
-                        principalColumn: "ServiceInfoId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Vehicles_VehicleId",
-                        column: x => x.VehicleId,
-                        principalTable: "Vehicles",
-                        principalColumn: "VehicleId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -720,10 +720,10 @@ namespace MidProject.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "admin_role_id", "164355ab-0f97-487e-9c89-6cabe8d619d2", "Admin", "ADMIN" },
-                    { "client_role_id", "8b0fcee6-33b0-434a-a837-c5d99f95b674", "Client", "CLIENT" },
-                    { "owner_role_id", "db4a93c2-da8f-4a75-a8bf-a6e99e13af7d", "Owner", "OWNER" },
-                    { "servicer_role_id", "60d8df0b-e057-44e2-b171-8763e7ed0c74", "Servicer", "SERVICER" }
+                    { "admin_role_id", "2da02577-8fd3-4d21-bb2d-5ac251b3b0b6", "Admin", "ADMIN" },
+                    { "client_role_id", "f9fb523e-f1b5-42a9-beaf-bb289759dbf8", "Client", "CLIENT" },
+                    { "owner_role_id", "4a585e46-376a-4a12-9fc2-bb2987760312", "Owner", "OWNER" },
+                    { "servicer_role_id", "2692969a-097c-4b4d-b889-be359eb6fa05", "Servicer", "SERVICER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -772,14 +772,14 @@ namespace MidProject.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_ChargingStationId",
+                table: "Bookings",
+                column: "ChargingStationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_ClientId",
                 table: "Bookings",
                 column: "ClientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Bookings_ServiceInfoId",
-                table: "Bookings",
-                column: "ServiceInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_VehicleId",

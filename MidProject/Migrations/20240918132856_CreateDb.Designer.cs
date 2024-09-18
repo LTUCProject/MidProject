@@ -12,7 +12,7 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    [Migration("20240917213617_CreateDb")]
+    [Migration("20240918132856_CreateDb")]
     partial class CreateDb
     {
         /// <inheritdoc />
@@ -55,28 +55,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "164355ab-0f97-487e-9c89-6cabe8d619d2",
+                            ConcurrencyStamp = "2da02577-8fd3-4d21-bb2d-5ac251b3b0b6",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "8b0fcee6-33b0-434a-a837-c5d99f95b674",
+                            ConcurrencyStamp = "f9fb523e-f1b5-42a9-beaf-bb289759dbf8",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "db4a93c2-da8f-4a75-a8bf-a6e99e13af7d",
+                            ConcurrencyStamp = "4a585e46-376a-4a12-9fc2-bb2987760312",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "60d8df0b-e057-44e2-b171-8763e7ed0c74",
+                            ConcurrencyStamp = "2692969a-097c-4b4d-b889-be359eb6fa05",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -290,6 +290,9 @@ namespace MidProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"));
 
+                    b.Property<int>("ChargingStationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
@@ -298,9 +301,6 @@ namespace MidProject.Migrations
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ServiceInfoId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -315,9 +315,9 @@ namespace MidProject.Migrations
 
                     b.HasKey("BookingId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ChargingStationId");
 
-                    b.HasIndex("ServiceInfoId");
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("VehicleId");
 
@@ -1014,15 +1014,15 @@ namespace MidProject.Migrations
 
             modelBuilder.Entity("MidProject.Models.Booking", b =>
                 {
-                    b.HasOne("MidProject.Models.Client", "Client")
+                    b.HasOne("MidProject.Models.ChargingStation", "ChargingStation")
                         .WithMany("Bookings")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("ChargingStationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MidProject.Models.ServiceInfo", "ServiceInfo")
+                    b.HasOne("MidProject.Models.Client", "Client")
                         .WithMany("Bookings")
-                        .HasForeignKey("ServiceInfoId")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1032,9 +1032,9 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Client");
+                    b.Navigation("ChargingStation");
 
-                    b.Navigation("ServiceInfo");
+                    b.Navigation("Client");
 
                     b.Navigation("Vehicle");
                 });
@@ -1307,7 +1307,7 @@ namespace MidProject.Migrations
                         .IsRequired();
 
                     b.HasOne("MidProject.Models.Provider", "Provider")
-                        .WithMany("session")
+                        .WithMany("Sessions")
                         .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1355,6 +1355,8 @@ namespace MidProject.Migrations
 
             modelBuilder.Entity("MidProject.Models.ChargingStation", b =>
                 {
+                    b.Navigation("Bookings");
+
                     b.Navigation("Chargers");
 
                     b.Navigation("ChargingStationFavorites");
@@ -1405,13 +1407,11 @@ namespace MidProject.Migrations
 
                     b.Navigation("Services");
 
-                    b.Navigation("session");
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("MidProject.Models.ServiceInfo", b =>
                 {
-                    b.Navigation("Bookings");
-
                     b.Navigation("Feedbacks");
 
                     b.Navigation("ServiceInfoFavorites");

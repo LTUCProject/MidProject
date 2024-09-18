@@ -40,7 +40,8 @@ namespace MidProject.Repository.Services
                 ChargingStationId = sessionDto.ChargingStationId,
                 StartTime = sessionDto.StartTime,
                 EndTime = sessionDto.EndTime,
-                EnergyConsumed = sessionDto.EnergyConsumed
+                EnergyConsumed = sessionDto.EnergyConsumed,
+                Cost=sessionDto.Cost
             };
 
             await _context.Sessions.AddAsync(session);
@@ -56,6 +57,11 @@ namespace MidProject.Repository.Services
                 session.EndTime = DateTime.UtcNow;
                 _context.Sessions.Update(session);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Handle the case where the session is not found
+                throw new KeyNotFoundException("Session not found.");
             }
         }
 
@@ -92,6 +98,11 @@ namespace MidProject.Repository.Services
             {
                 _context.PaymentTransactions.Remove(payment);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Handle the case where the payment is not found
+                throw new KeyNotFoundException("Payment transaction not found.");
             }
         }
 
@@ -260,46 +271,86 @@ namespace MidProject.Repository.Services
         }
 
         //Booking
-        public async Task<IEnumerable<Booking>> GetClientBookingsAsync(int clientId)
+        // Retrieves all bookings for a specific client
+        // Retrieves client bookings without cyclic references
+        public async Task<IEnumerable<BookingDto>> GetClientBookingsAsync(int clientId)
         {
             return await _context.Bookings
-                .Where(b => b.ClientId == clientId)
-                .ToListAsync();
+                                 .Where(b => b.ClientId == clientId)
+                                 .Select(b => new BookingDto
+                                 {
+                                     BookingId = b.BookingId,
+                                     ClientId = b.ClientId,
+                                     ChargingStationId = b.ChargingStationId,
+                                     VehicleId = b.VehicleId,
+                                     StartTime = b.StartTime,
+                                     EndTime = b.EndTime,
+                                     Status = b.Status,
+                                     Cost = b.Cost
+                                 })
+                                 .ToListAsync();
         }
 
-        public async Task<Booking> GetBookingByIdAsync(int bookingId)
+        // Retrieves a booking by its ID without cyclic references
+        public async Task<BookingDto> GetBookingByIdAsync(int bookingId)
         {
-            return await _context.Bookings
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            var booking = await _context.Bookings
+                                        .Where(b => b.BookingId == bookingId)
+                                        .Select(b => new BookingDto
+                                        {
+                                            BookingId = b.BookingId,
+                                            ClientId = b.ClientId,
+                                            ChargingStationId = b.ChargingStationId,
+                                            VehicleId = b.VehicleId,
+                                            StartTime = b.StartTime,
+                                            EndTime = b.EndTime,
+                                            Status = b.Status,
+                                            Cost = b.Cost
+                                        })
+                                        .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Booking not found.");
+            }
+
+            return booking;
         }
 
+
+        // Adds a new booking using the provided DTO
         public async Task<Booking> AddBookingAsync(BookingDto bookingDto)
         {
+            // Map the DTO to the Booking entity
             var booking = new Booking
             {
                 ClientId = bookingDto.ClientId,
-                ServiceInfoId = bookingDto.ServiceInfoId,
+                ChargingStationId = bookingDto.ChargingStationId,
                 VehicleId = bookingDto.VehicleId,
                 StartTime = bookingDto.StartTime,
                 EndTime = bookingDto.EndTime,
-                Status = bookingDto.Status,
-                Cost = bookingDto.Cost
+                Status = bookingDto.Status,  // Status is set from DTO; defaults to "Pending"
+                Cost = bookingDto.Cost       // Cost is set from DTO; defaults to 0
             };
 
-            await _context.Bookings.AddAsync(booking);
+            _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
             return booking;
         }
 
+        // Removes a booking by its ID
         public async Task RemoveBookingAsync(int bookingId)
         {
             var booking = await _context.Bookings.FindAsync(bookingId);
-            if (booking != null)
+
+            if (booking == null)
             {
-                _context.Bookings.Remove(booking);
-                await _context.SaveChangesAsync();
+                throw new KeyNotFoundException("Booking not found.");
             }
+
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
         }
 
         // Service request management

@@ -18,6 +18,7 @@ namespace MidProject.Repository.Interfaces
         Task<PaymentTransaction> AddPaymentAsync(PaymentTransactionDto paymentDto);
         Task RemovePaymentAsync(int paymentId);
 
+
         // Favorites management
         Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync(int clientId);
         Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync(int clientId);
@@ -33,8 +34,8 @@ namespace MidProject.Repository.Interfaces
         Task RemoveVehicleAsync(int vehicleId);
 
         // Booking management
-        Task<IEnumerable<Booking>> GetClientBookingsAsync(int clientId);
-        Task<Booking> GetBookingByIdAsync(int bookingId);
+        Task<IEnumerable<BookingDto>> GetClientBookingsAsync(int clientId);
+        Task<BookingDto> GetBookingByIdAsync(int bookingId);
         Task<Booking> AddBookingAsync(BookingDto bookingDto);
         Task RemoveBookingAsync(int bookingId);
 
@@ -46,7 +47,7 @@ namespace MidProject.Repository.Interfaces
 
         // Feedback management
         Task<IEnumerable<Feedback>> GetClientFeedbacksAsync(int clientId);
-        Task<Feedback> AddFeedbackAsync(FeedbackDto feedbackDto);
+        Task<Feedback>AddFeedbackAsync(FeedbackDto feedbackDto);
         Task RemoveFeedbackAsync(int feedbackId);
 
         // Notifications management
@@ -63,7 +64,6 @@ namespace MidProject.Repository.Interfaces
         Task<IEnumerable<CommentResponseDto>> GetAllCommentsAsync();
         Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
         Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
-
         Task DeleteCommentAsync(int commentId);
     }
 }

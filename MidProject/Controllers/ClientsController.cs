@@ -35,66 +35,72 @@ namespace MidProject.Controllers
         public async Task<ActionResult<Session>> GetSessionsById(int sessionId)
         {
             var result = await _context.GetSessionByIdAsync(sessionId);
+            if (result == null)
+            {
+                return NotFound();
+            }
             return Ok(result);
         }
 
         [HttpPost("sessions")]
-        public async Task<ActionResult> StartSession([FromBody] SessionDto sessionDto)
+        public async Task<ActionResult<SessionDtoResponse>> StartSession([FromBody] SessionDto sessionDto)
         {
             var startedSession = await _context.StartSessionAsync(sessionDto);
-            //  return CreatedAtAction(nameof(GetSessionsById), new { sessionId = sessionDto.SessionId }, sessionDto);
-            SessionDtoResponse response = new SessionDtoResponse()
+
+            var response = new SessionDtoResponse
             {
                 SessionId = startedSession.SessionId,
                 ClientId = startedSession.ClientId,
                 ChargingStationId = startedSession.ChargingStationId,
                 StartTime = startedSession.StartTime,
                 EndTime = startedSession.EndTime,
-                EnergyConsumed = startedSession.EnergyConsumed,
+                EnergyConsumed = startedSession.EnergyConsumed
             };
-            return Ok(response);
 
+            return CreatedAtAction(nameof(GetSessionsById), new { sessionId = startedSession.SessionId }, response);
         }
 
         [HttpPut("sessions/{sessionId}")]
-        public async Task<ActionResult> EndSession(int sessionId)
+        public async Task<IActionResult> EndSession(int sessionId)
         {
             await _context.EndSessionAsync(sessionId);
             return NoContent();
         }
 
         // Payment transactions management
-        [HttpGet("PaymentTransaction/{sessionId}")]
-        public async Task<ActionResult<IEnumerable<PaymentTransaction>>> GetClientPayment(int sessionId)
+        [HttpGet("sessions/{sessionId}/payments")]
+        public async Task<ActionResult<IEnumerable<PaymentTransaction>>> GetClientPayments(int sessionId)
         {
             var result = await _context.GetClientPaymentsAsync(sessionId);
             return Ok(result);
         }
 
-        [HttpPost("PaymentTransaction")]
-        public async Task<ActionResult> AddPayment([FromBody] PaymentTransactionDto paymentDto)
+        [HttpPost("sessions/{sessionId}/payments")]
+        public async Task<ActionResult<PaymentTransactionDtoResponse>> AddPayment([FromBody] PaymentTransactionDto paymentDto)
         {
-            var addedPatment = await _context.AddPaymentAsync(paymentDto);
-            //  return CreatedAtAction(nameof(GetClientPayment), new { sessionId = paymentDto.SessionId }, paymentDto);
-            PaymentTransactionDtoResponse paymentTransactionDtoResponse = new PaymentTransactionDtoResponse()
+            var addedPayment = await _context.AddPaymentAsync(paymentDto);
+
+            var response = new PaymentTransactionDtoResponse
             {
-                PaymentTransactionId = addedPatment.PaymentTransactionId,
-                SessionId = addedPatment.SessionId,
-                ClientId = addedPatment.ClientId,
-                Amount = addedPatment.Amount,
-                PaymentDate = addedPatment.PaymentDate,
-                PaymentMethod = addedPatment.PaymentMethod,
-                Status = addedPatment.Status,
+                PaymentTransactionId = addedPayment.PaymentTransactionId,
+                SessionId = addedPayment.SessionId,
+                ClientId = addedPayment.ClientId,
+                Amount = addedPayment.Amount,
+                PaymentDate = addedPayment.PaymentDate,
+                PaymentMethod = addedPayment.PaymentMethod,
+                Status = addedPayment.Status
             };
-            return Ok(paymentTransactionDtoResponse);
+
+            return CreatedAtAction(nameof(GetClientPayments), new { sessionId = addedPayment.SessionId }, response);
         }
 
-        [HttpDelete("PaymentTransaction/{paymentId}")]
-        public async Task<ActionResult> RemovePayment(int paymentId)
+        [HttpDelete("payments/{paymentId}")]
+        public async Task<IActionResult> RemovePayment(int paymentId)
         {
             await _context.RemovePaymentAsync(paymentId);
             return NoContent();
         }
+
 
         // Favorites management
         // Retrieve all charging station favorites for a client
@@ -201,49 +207,67 @@ namespace MidProject.Controllers
 
 
         // Booking management
+
+        // Retrieve bookings for a specific client
         [HttpGet("bookings/{clientId}")]
         public async Task<ActionResult<IEnumerable<Booking>>> GetClientBookings(int clientId)
         {
             var bookings = await _context.GetClientBookingsAsync(clientId);
+            if (bookings == null || !bookings.Any())
+                return NotFound("No bookings found for this client.");
             return Ok(bookings);
         }
 
+        // Retrieve a specific booking by its ID
         [HttpGet("booking/{bookingId}")]
         public async Task<ActionResult<Booking>> GetBookingById(int bookingId)
         {
             var booking = await _context.GetBookingByIdAsync(bookingId);
             if (booking == null)
-                return NotFound();
+                return NotFound("Booking not found.");
             return Ok(booking);
         }
 
+        // Create a new booking
         [HttpPost("bookings")]
-        public async Task<ActionResult> AddBooking([FromBody] BookingDto bookingDto)
+        public async Task<ActionResult<BookingResponseDto>> AddBooking([FromBody] BookingDto bookingDto)
         {
-            var newBooking = await _context.AddBookingAsync(bookingDto);
-            // return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingDto.BookingId }, bookingDto);
+            // Ensure the bookingDto contains valid data
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            BookingResponseDto bookingResponseDto = new BookingResponseDto()
+            var newBooking = await _context.AddBookingAsync(bookingDto);
+
+            if (newBooking == null)
+                return BadRequest("Error creating booking.");
+
+            var bookingResponseDto = new BookingResponseDto()
             {
                 BookingId = newBooking.BookingId,
                 ClientId = newBooking.ClientId,
-                ServiceInfoId = newBooking.ServiceInfoId,
+                ChargingStationId = newBooking.ChargingStationId, // Updated field
                 VehicleId = newBooking.VehicleId,
                 StartTime = newBooking.StartTime,
                 EndTime = newBooking.EndTime,
                 Status = newBooking.Status,
                 Cost = newBooking.Cost
-
             };
-            return Ok(bookingResponseDto);
+
+            return CreatedAtAction(nameof(GetBookingById), new { bookingId = bookingResponseDto.BookingId }, bookingResponseDto);
         }
 
+        // Remove a specific booking by its ID
         [HttpDelete("bookings/{bookingId}")]
         public async Task<ActionResult> RemoveBooking(int bookingId)
         {
+            var bookingExists = await _context.GetBookingByIdAsync(bookingId);
+            if (bookingExists == null)
+                return NotFound("Booking not found.");
+
             await _context.RemoveBookingAsync(bookingId);
             return NoContent();
         }
+
 
         // Service request management
         [HttpGet("service-requests/{clientId}")]

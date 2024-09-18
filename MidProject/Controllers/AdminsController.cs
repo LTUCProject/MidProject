@@ -318,61 +318,7 @@ namespace MidProject.Controllers
         }
         // End Vehicle management ================================================================================================
 
-        // Start Booking management ================================================================================================
-        [HttpGet("Bookings")]
-        public async Task<IActionResult> GetAllBookings()
-        {
-            var bookings = await _adminService.GetAllBookingsAsync();
-            var bookingDtos = bookings.Select(b => new BookingResponseDto
-            {
-                BookingId = b.BookingId,
-                ClientId = b.ClientId,
-                ServiceInfoId = b.ServiceInfoId,
-                VehicleId = b.VehicleId,
-                StartTime = b.StartTime,
-                EndTime = b.EndTime,
-                Status = b.Status,
-                Cost = b.Cost
-            });
-            return Ok(bookingDtos);
-        }
-
-        [HttpGet("Bookings/{id}")]
-        public async Task<IActionResult> GetBookingById(int id)
-        {
-            var booking = await _adminService.GetBookingByIdAsync(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-            var bookingDto = new BookingResponseDto
-            {
-                BookingId = booking.BookingId,
-                ClientId = booking.ClientId,
-                ServiceInfoId = booking.ServiceInfoId,
-                VehicleId = booking.VehicleId,
-                StartTime = booking.StartTime,
-                EndTime = booking.EndTime,
-                Status = booking.Status,
-                Cost = booking.Cost
-            };
-            return Ok(bookingDto);
-        }
-
-        [HttpDelete("Bookings/{id}")]
-        public async Task<IActionResult> DeleteBooking(int id)
-        {
-            var booking = await _adminService.GetBookingByIdAsync(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-
-            await _adminService.DeleteBookingAsync(id);
-            return NoContent();
-        }
-        // End Booking management ================================================================================================
-
+       
         // Start Location management ================================================================================================
         [HttpGet("Locations")]
         public async Task<IActionResult> GetAllLocations()

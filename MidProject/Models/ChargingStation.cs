@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace MidProject.Models
 {
     public class ChargingStation
@@ -18,9 +19,11 @@ namespace MidProject.Models
         public string PaymentMethod { get; set; }
 
         [Required]
-        public int ProviderId { get; set; } // New foreign key
-        public Provider Provider { get; set; } // Navigation property
+        public int ProviderId { get; set; }
+        public Provider Provider { get; set; }
+
         public ICollection<Charger> Chargers { get; set; }
+        public ICollection<Booking> Bookings { get; set; } 
         public ICollection<Session> Sessions { get; set; }
         public ICollection<MaintenanceLog> MaintenanceLogs { get; set; }
         public ICollection<ChargingStationFavorite> ChargingStationFavorites { get; set; }

@@ -1,5 +1,5 @@
 using MidProject.Models;
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace MidProject.Models.Dto.Response
 {
@@ -7,7 +7,7 @@ namespace MidProject.Models.Dto.Response
     {
         public int BookingId { get; set; }
         public int ClientId { get; set; }
-        public int ServiceInfoId { get; set; }
+        public int ChargingStationId { get; set; } // Updated field
         public int VehicleId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

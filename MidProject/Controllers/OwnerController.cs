@@ -23,35 +23,7 @@ namespace MidProject.Controllers
         {
             _ownerService = ownerService;
         }
-        [HttpGet("sessions/{stationId}")]
-        [Authorize(Policy = "OwnerPolicy")]
-        public async Task<IActionResult> GetSessionsByChargingStationAsync(int stationId)
-        {
-            // Extract the account ID from the claims (assuming it's stored in the claims)
-            var accountId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(accountId))
-            {
-                return Unauthorized("User is not authenticated.");
-            }
-
-            try
-            {
-                var sessions = await _ownerService.GetSessionsByChargingStationAsync(stationId, accountId);
-
-                if (sessions == null)
-                {
-                    return NotFound("Charging station or sessions not found.");
-                }
-
-                return Ok(sessions);
-            }
-            catch (Exception ex)
-            {
-                // Log exception details (ex) here as needed
-                return StatusCode(500, "Internal server error.");
-            }
-        }
+        
         private string GetAccountId() => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         // Charging Station Management
@@ -480,6 +452,87 @@ namespace MidProject.Controllers
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             await _ownerService.DeleteCommentAsync(commentId);
+            return NoContent();
+        }
+
+
+        //Booking
+        // Get all bookings for a specific charging station
+        [HttpGet("station/{stationId}")]
+        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetBookingsByChargingStation(int stationId)
+        {
+            var bookings = await _ownerService.GetBookingsByChargingStationAsync(stationId);
+            if (bookings == null || !bookings.Any())
+                return NotFound();
+            return Ok(bookings);
+        }
+
+        // Get a booking by its ID
+        [HttpGet("{bookingId}")]
+        public async Task<ActionResult<BookingAdminDto>> GetBookingById(int bookingId)
+        {
+            var booking = await _ownerService.GetBookingByIdAsync(bookingId);
+            if (booking == null)
+                return NotFound();
+            return Ok(booking);
+        }
+
+        // Get bookings by date range for a specific charging station
+        [HttpGet("station/{stationId}/range")]
+        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetBookingsByDateRange(int stationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var bookings = await _ownerService.GetBookingsByDateRangeAsync(stationId, startDate, endDate);
+            if (bookings == null || !bookings.Any())
+                return NotFound();
+            return Ok(bookings);
+        }
+
+        // Get pending bookings for a specific charging station
+        [HttpGet("station/{stationId}/pending")]
+        public async Task<ActionResult<IEnumerable<BookingAdminDto>>> GetPendingBookingsByChargingStation(int stationId)
+        {
+            var bookings = await _ownerService.GetPendingBookingsByChargingStationAsync(stationId);
+            if (bookings == null || !bookings.Any())
+                return NotFound();
+            return Ok(bookings);
+        }
+
+        // Update booking details
+        [HttpPut("{bookingId}")]
+        public async Task<IActionResult> UpdateBookingDetails(int bookingId, [FromBody] BookingUpdateDto bookingUpdateDto)
+        {
+            if (bookingUpdateDto == null)
+                return BadRequest("BookingUpdateDto is null.");
+
+            await _ownerService.UpdateBookingDetailsAsync(bookingId, bookingUpdateDto.NewStatus, bookingUpdateDto.NewCost);
+
+            return NoContent();
+        }
+
+        //Session
+        // Session management
+        [HttpGet("sessionsByChargingStation/{stationId}")]
+        public async Task<ActionResult<IEnumerable<SessionDtoResponse>>> GetSessionsByChargingStation(int stationId)
+        {
+            var sessions = await _ownerService.GetSessionsByChargingStationAsync(stationId);
+            return Ok(sessions);
+        }
+
+        [HttpGet("sessionsById/{sessionId}")]
+        public async Task<ActionResult<SessionDtoResponse>> GetSessionById(int sessionId)
+        {
+            var session = await _ownerService.GetSessionByIdAsync(sessionId);
+            if (session == null)
+            {
+                return NotFound();
+            }
+            return Ok(session);
+        }
+
+        [HttpPut("sessions/{sessionId}")]
+        public async Task<ActionResult> UpdateSessionDetails(int sessionId, [FromBody] UpdateSessionDto updateSessionDto)
+        {
+            await _ownerService.UpdateSessionDetailsAsync(sessionId, updateSessionDto.EnergyConsumed, updateSessionDto.Cost);
             return NoContent();
         }
 
