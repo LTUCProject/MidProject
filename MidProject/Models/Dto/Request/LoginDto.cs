@@ -1,4 +1,4 @@
-﻿namespace MidProject.Models.Dto.Response
+﻿namespace MidProject.Models.Dto.Request
 {
     public class LoginDto
     {

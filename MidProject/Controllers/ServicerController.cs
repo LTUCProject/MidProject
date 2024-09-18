@@ -74,12 +74,12 @@ namespace MidProject.Controllers
 
         // ServiceRequest Endpoints
 
-        [HttpPost("servicerequest")]
-        public async Task<IActionResult> CreateServiceRequest(ServiceRequestDto serviceRequestDto)
-        {
-            var serviceRequestId = await _servicerService.CreateServiceRequestAsync(serviceRequestDto);
-            return CreatedAtAction(nameof(GetServiceRequestById), new { id = serviceRequestId }, serviceRequestId);
-        }
+        //[HttpPost("servicerequest")]
+        //public async Task<IActionResult> CreateServiceRequest(ServiceRequestDto serviceRequestDto)
+        //{
+        //    var serviceRequestId = await _servicerService.CreateServiceRequestAsync(serviceRequestDto);
+        //    return CreatedAtAction(nameof(GetServiceRequestById), new { id = serviceRequestId }, serviceRequestId);
+        //}
 
         [HttpGet("servicerequest/{id}")]
         public async Task<IActionResult> GetServiceRequestById(int id)

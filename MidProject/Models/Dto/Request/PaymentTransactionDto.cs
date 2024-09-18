@@ -2,7 +2,6 @@
 {
     public class PaymentTransactionDto
     {
-       // public int PaymentTransactionId { get; set; }
         public int SessionId { get; set; } // Foreign key
         public int ClientId { get; set; } // Foreign key
         public int Amount { get; set; }

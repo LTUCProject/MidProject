@@ -10,9 +10,5 @@ namespace MidProject.Models.Dto.Response
         public string Description { get; set; }
         public string Contact { get; set; }
         public string Type { get; set; }
-
-       
-
-        
     }
 }

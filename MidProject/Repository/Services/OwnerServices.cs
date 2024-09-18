@@ -718,11 +718,11 @@ namespace MidProject.Repository.Services
         }
 
         // Booking management
-        public async Task<IEnumerable<BookingAdminDto>> GetBookingsByChargingStationAsync(int stationId)
+        public async Task<IEnumerable<BookingDto>> GetBookingsByChargingStationAsync(int stationId)
         {
             return await _context.Bookings
                 .Where(b => b.ChargingStationId == stationId)
-                .Select(b => new BookingAdminDto
+                .Select(b => new BookingDto
                 {
                     BookingId = b.BookingId,
                     ClientId = b.ClientId,
@@ -736,7 +736,7 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-        public async Task<BookingAdminDto> GetBookingByIdAsync(int bookingId)
+        public async Task<BookingDto> GetBookingByIdAsync(int bookingId)
         {
             var booking = await _context.Bookings
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
@@ -744,7 +744,7 @@ namespace MidProject.Repository.Services
             if (booking == null)
                 return null;
 
-            return new BookingAdminDto
+            return new BookingDto
             {
                 BookingId = booking.BookingId,
                 ClientId = booking.ClientId,
@@ -757,11 +757,11 @@ namespace MidProject.Repository.Services
             };
         }
 
-        public async Task<IEnumerable<BookingAdminDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<BookingDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate)
         {
             return await _context.Bookings
                 .Where(b => b.ChargingStationId == stationId && b.StartTime >= startDate && b.EndTime <= endDate)
-                .Select(b => new BookingAdminDto
+                .Select(b => new BookingDto
                 {
                     BookingId = b.BookingId,
                     ClientId = b.ClientId,
@@ -775,11 +775,11 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<BookingAdminDto>> GetPendingBookingsByChargingStationAsync(int stationId)
+        public async Task<IEnumerable<BookingDto>> GetPendingBookingsByChargingStationAsync(int stationId)
         {
             return await _context.Bookings
                 .Where(b => b.ChargingStationId == stationId && b.Status == "Pending")
-                .Select(b => new BookingAdminDto
+                .Select(b => new BookingDto
                 {
                     BookingId = b.BookingId,
                     ClientId = b.ClientId,

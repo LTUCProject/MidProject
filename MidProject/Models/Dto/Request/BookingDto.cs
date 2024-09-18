@@ -1,18 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace MidProject.Models.Dto.Request2
+namespace MidProject.Models.Dto.Response
 {
     public class BookingDto
     {
         public int BookingId { get; set; }
-        public int ClientId { get; set; } // Foreign key to Client
-        public int ChargingStationId { get; set; } // Foreign key to ChargingStation
-        public int VehicleId { get; set; } // Foreign key to Vehicle
+
+        [Required]
+        public int ClientId { get; set; }
+
+        [Required]
+        public int ChargingStationId { get; set; }
+
+        [Required]
+        public int VehicleId { get; set; }
+
+        [Required]
         public DateTime StartTime { get; set; }
+
+        [Required]
         public DateTime EndTime { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Status { get; set; } = "Pending"; // Default to "Pending"
 
+        [Range(0, int.MaxValue)]
         public int Cost { get; set; } = 0; // Default to 0
-        
     }
 }

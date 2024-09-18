@@ -123,21 +123,21 @@ public class ServicerService : IServicer
 
     // Service requests management
 
-    public async Task<ServiceRequestDto> CreateServiceRequestAsync(ServiceRequestDto serviceRequestDto)
-    {
-        var serviceRequest = new ServiceRequest
-        {
-            ServiceInfoId = serviceRequestDto.ServiceInfoId,
-            ClientId = serviceRequestDto.ClientId,
-            ProviderId = serviceRequestDto.ProviderId,
-            Status = serviceRequestDto.Status
-        };
+    //public async Task<ServiceRequestDto> CreateServiceRequestAsync(ServiceRequestDto serviceRequestDto)
+    //{
+    //    var serviceRequest = new ServiceRequest
+    //    {
+    //        ServiceInfoId = serviceRequestDto.ServiceInfoId,
+    //        ClientId = serviceRequestDto.ClientId,
+    //        ProviderId = serviceRequestDto.ProviderId,
+    //        Status = serviceRequestDto.Status
+    //    };
 
-        _context.ServiceRequests.Add(serviceRequest);
-        await _context.SaveChangesAsync();
+    //    _context.ServiceRequests.Add(serviceRequest);
+    //    await _context.SaveChangesAsync();
 
-        return serviceRequestDto;
-    }
+    //    return serviceRequestDto;
+    //}
 
     public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(int serviceRequestId)
     {

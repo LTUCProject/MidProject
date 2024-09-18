@@ -54,10 +54,10 @@ namespace MidProject.Repository.Interfaces
         Task DeleteCommentAsync(int commentId);
 
         // Booking management
-        Task<IEnumerable<BookingAdminDto>> GetBookingsByChargingStationAsync(int stationId);
-        Task<BookingAdminDto> GetBookingByIdAsync(int bookingId);
-        Task<IEnumerable<BookingAdminDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate);
-        Task<IEnumerable<BookingAdminDto>> GetPendingBookingsByChargingStationAsync(int stationId);
+        Task<IEnumerable<BookingDto>> GetBookingsByChargingStationAsync(int stationId);
+        Task<BookingDto> GetBookingByIdAsync(int bookingId);
+        Task<IEnumerable<BookingDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<BookingDto>> GetPendingBookingsByChargingStationAsync(int stationId);
         Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost); // Combined method for status and cost updates
 
         // Session management

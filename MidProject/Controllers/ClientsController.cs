@@ -178,7 +178,7 @@ namespace MidProject.Controllers
 
                 var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
 
-                VehicleDtoResponse vehicleDtoResponse = new VehicleDtoResponse
+                VehicleResponseDto vehicleDtoResponse = new VehicleResponseDto
                 {
                     VehicleId = addedVehicle.VehicleId,
                     LicensePlate = addedVehicle.LicensePlate,
