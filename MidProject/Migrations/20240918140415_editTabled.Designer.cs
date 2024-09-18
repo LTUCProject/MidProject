@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MidProject.Data;
 
@@ -11,9 +12,11 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    partial class MidprojectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240918140415_editTabled")]
+    partial class editTabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,28 +55,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "624a3aa1-02d5-4a85-8aea-ab6703ed0020",
+                            ConcurrencyStamp = "f15e9239-f9a5-4e5d-a2f3-52cd04c1b2ee",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "814fa491-8960-469f-80f7-04d3a62dd512",
+                            ConcurrencyStamp = "aecc4007-e5e5-4f36-ae92-98e53e128096",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "3308af07-d50d-41c5-b21c-4dd2c5eca54d",
+                            ConcurrencyStamp = "394865e0-3170-4c47-961a-0f3a89b229f1",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "a29e04bb-d94a-4c6d-98ee-f9e98f404eed",
+                            ConcurrencyStamp = "40aefd76-a499-46b3-96c6-d4c3a94e097f",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -857,9 +860,6 @@ namespace MidProject.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cost")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndTime")

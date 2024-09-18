@@ -8,6 +8,8 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int EnergyConsumed { get; set; }
+        public int Cost { get; set; }
+
 
     }
 }

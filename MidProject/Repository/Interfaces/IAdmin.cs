@@ -44,10 +44,6 @@ namespace MidProject.Repository.Interfaces
         Task<Vehicle> GetVehicleByIdAsync(int vehicleId);
         Task DeleteVehicleAsync(int vehicleId);
 
-        // Booking management
-        Task<IEnumerable<Booking>> GetAllBookingsAsync();
-        Task<Booking> GetBookingByIdAsync(int bookingId);
-        Task DeleteBookingAsync(int bookingId);
 
         // Location management
         Task<IEnumerable<Location>> GetAllLocationsAsync();

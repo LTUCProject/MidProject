@@ -121,62 +121,7 @@ namespace MidProject.Controllers
             return NoContent();
         }
 
-        // Booking Endpoints
-
-        [HttpPost("booking")]
-        public async Task<IActionResult> CreateBooking(BookingRequestDto bookingRequestDto)
-        {
-            var bookingId = await _servicerService.CreateBookingAsync(bookingRequestDto);
-            return CreatedAtAction(nameof(GetBookingById), new { id = bookingId }, bookingId);
-        }
-
-        [HttpGet("booking/{id}")]
-        public async Task<IActionResult> GetBookingById(int id)
-        {
-            var booking = await _servicerService.GetBookingByIdAsync(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-            return Ok(booking);
-        }
-
-        [HttpGet("bookings/client/{clientId}")]
-        public async Task<IActionResult> GetBookingsByClientId(int clientId)
-        {
-            var bookings = await _servicerService.GetBookingsByClientIdAsync(clientId);
-            return Ok(bookings);
-        }
-
-        [HttpGet("bookings/serviceinfo/{serviceInfoId}")]
-        public async Task<IActionResult> GetBookingsByServiceInfoId(int serviceInfoId)
-        {
-            var bookings = await _servicerService.GetBookingsByServiceInfoIdAsync(serviceInfoId);
-            return Ok(bookings);
-        }
-
-        [HttpPut("booking/{id}/status")]
-        public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] string status)
-        {
-            var result = await _servicerService.UpdateBookingStatusAsync(id, status);
-            if (!result)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
-
-        [HttpDelete("booking/{id}")]
-        public async Task<IActionResult> CancelBooking(int id)
-        {
-            var result = await _servicerService.CancelBookingAsync(id);
-            if (!result)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
-
+        
         // Notification Management
         [HttpPost("ServicerNotifications")]
         public async Task<ActionResult<NotificationResponseDto>> CreateNotificationAsync([FromBody] NotificationDto notificationDto)

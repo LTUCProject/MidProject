@@ -20,35 +20,7 @@ namespace MidProject.Repository.Services
         {
             _context = context;
         }
-        public async Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId, string accountId)
-        {
 
-            var chargingStation = await _context.ChargingStations
-                .Include(cs => cs.Provider)
-                .FirstOrDefaultAsync(cs => cs.ChargingStationId == stationId && cs.Provider.AccountId == accountId);
-
-            if (chargingStation == null)
-            {
-                return new List<SessionDtoResponse>();
-            }
-
-            var sessions = await _context.Sessions
-                .Where(s => s.ChargingStationId == stationId)
-                .Select(s => new SessionDtoResponse
-                {
-                    SessionId = s.SessionId,
-                    StartTime = s.StartTime,
-                    EndTime = s.EndTime,
-                    EnergyConsumed = s.EnergyConsumed,
-                    ClientId = s.ClientId,
-                    ChargingStationId = s.ChargingStationId,
-                    ProviderId = s.ProviderId,
-
-                })
-                .ToListAsync();
-
-            return sessions;
-        }
         // Charging Station Management
         public async Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync(string accountId)
         {
@@ -744,6 +716,151 @@ namespace MidProject.Repository.Services
                 await _context.SaveChangesAsync();
             }
         }
-    }
 
+        // Booking management
+        public async Task<IEnumerable<BookingAdminDto>> GetBookingsByChargingStationAsync(int stationId)
+        {
+            return await _context.Bookings
+                .Where(b => b.ChargingStationId == stationId)
+                .Select(b => new BookingAdminDto
+                {
+                    BookingId = b.BookingId,
+                    ClientId = b.ClientId,
+                    ChargingStationId = b.ChargingStationId,
+                    VehicleId = b.VehicleId,
+                    StartTime = b.StartTime,
+                    EndTime = b.EndTime,
+                    Status = b.Status,
+                    Cost = b.Cost
+                })
+                .ToListAsync();
+        }
+
+        public async Task<BookingAdminDto> GetBookingByIdAsync(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null)
+                return null;
+
+            return new BookingAdminDto
+            {
+                BookingId = booking.BookingId,
+                ClientId = booking.ClientId,
+                ChargingStationId = booking.ChargingStationId,
+                VehicleId = booking.VehicleId,
+                StartTime = booking.StartTime,
+                EndTime = booking.EndTime,
+                Status = booking.Status,
+                Cost = booking.Cost
+            };
+        }
+
+        public async Task<IEnumerable<BookingAdminDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate)
+        {
+            return await _context.Bookings
+                .Where(b => b.ChargingStationId == stationId && b.StartTime >= startDate && b.EndTime <= endDate)
+                .Select(b => new BookingAdminDto
+                {
+                    BookingId = b.BookingId,
+                    ClientId = b.ClientId,
+                    ChargingStationId = b.ChargingStationId,
+                    VehicleId = b.VehicleId,
+                    StartTime = b.StartTime,
+                    EndTime = b.EndTime,
+                    Status = b.Status,
+                    Cost = b.Cost
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<BookingAdminDto>> GetPendingBookingsByChargingStationAsync(int stationId)
+        {
+            return await _context.Bookings
+                .Where(b => b.ChargingStationId == stationId && b.Status == "Pending")
+                .Select(b => new BookingAdminDto
+                {
+                    BookingId = b.BookingId,
+                    ClientId = b.ClientId,
+                    ChargingStationId = b.ChargingStationId,
+                    VehicleId = b.VehicleId,
+                    StartTime = b.StartTime,
+                    EndTime = b.EndTime,
+                    Status = b.Status,
+                    Cost = b.Cost
+                })
+                .ToListAsync();
+        }
+
+        public async Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost)
+        {
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking != null)
+            {
+                booking.Status = newStatus;
+                booking.Cost = newCost;
+
+                _context.Bookings.Update(booking);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        //Session
+        // Session management
+        public async Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId)
+        {
+            return await _context.Sessions
+                .Where(s => s.ChargingStationId == stationId)
+                .Select(s => new SessionDtoResponse
+                {
+                    SessionId = s.SessionId,
+                    ClientId = s.ClientId,
+                    ChargingStationId = s.ChargingStationId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    EnergyConsumed = s.EnergyConsumed,
+                    Cost = s.Cost // Make sure this line matches the property name in your Session class
+                })
+                .ToListAsync();
+        }
+
+
+        public async Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId)
+        {
+            var session = await _context.Sessions
+                .Where(s => s.SessionId == sessionId)
+                .Select(s => new SessionDtoResponse
+                {
+                    SessionId = s.SessionId,
+                    ClientId = s.ClientId,
+                    ChargingStationId = s.ChargingStationId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    EnergyConsumed = s.EnergyConsumed,
+                    Cost = s.Cost
+
+                })
+                .FirstOrDefaultAsync();
+
+            return session;
+        }
+
+        public async Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost)
+        {
+            var session = await _context.Sessions.FindAsync(sessionId);
+            if (session != null)
+            {
+                session.EnergyConsumed = energyConsumed;
+
+                session.Cost = cost;
+
+                _context.Sessions.Update(session);
+                await _context.SaveChangesAsync();
+            }
+
+        }
+    }
 }

@@ -21,7 +21,7 @@ namespace MidProject.Models
 
         public ICollection<Feedback> Feedbacks { get; set; }
         public ICollection<ServiceRequest> ServiceRequests { get; set; }
-        public ICollection<Booking> Bookings { get; set; }
+
         public ICollection<ServiceInfoFavorite> ServiceInfoFavorites { get; set; }
     }
 }

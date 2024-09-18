@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace MidProject.Models
 {
     public class Booking
@@ -10,8 +11,8 @@ namespace MidProject.Models
         public Client Client { get; set; }
 
         [Required]
-        public int ServiceInfoId { get; set; }
-        public ServiceInfo ServiceInfo { get; set; }
+        public int ChargingStationId { get; set; } // Changed to book a ChargingStation instead of ServiceInfo
+        public ChargingStation ChargingStation { get; set; }
 
         [Required]
         public int VehicleId { get; set; }
@@ -29,6 +30,5 @@ namespace MidProject.Models
 
         [Range(0, int.MaxValue)]
         public int Cost { get; set; }
-
     }
 }

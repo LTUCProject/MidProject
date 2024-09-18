@@ -362,36 +362,6 @@ namespace MidProject.Repository.Services
         }
         // End Vehicle management ================================================================================================
 
-        // Start Booking management ================================================================================================
-        public async Task<IEnumerable<Booking>> GetAllBookingsAsync()
-        {
-            return await _context.Bookings
-                .Include(b => b.Client)
-                .Include(b => b.ServiceInfo)
-                .Include(b => b.Vehicle)
-                .ToListAsync();
-        }
-
-        public async Task<Booking> GetBookingByIdAsync(int bookingId)
-        {
-            return await _context.Bookings
-                .Include(b => b.Client)
-                .Include(b => b.ServiceInfo)
-                .Include(b => b.Vehicle)
-                .SingleOrDefaultAsync(b => b.BookingId == bookingId);
-        }
-
-        public async Task DeleteBookingAsync(int bookingId)
-        {
-            var booking = await _context.Bookings.FindAsync(bookingId);
-            if (booking != null)
-            {
-                _context.Bookings.Remove(booking);
-                await _context.SaveChangesAsync();
-            }
-        }
-        // End Booking management ================================================================================================
-
 
         // Start Location management ================================================================================================
         public async Task<IEnumerable<Location>> GetAllLocationsAsync()

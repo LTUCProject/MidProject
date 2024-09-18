@@ -52,8 +52,19 @@ namespace MidProject.Repository.Interfaces
         Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
         Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
         Task DeleteCommentAsync(int commentId);
-        // for session
-        Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId, string accountId); // New Method
+
+        // Booking management
+        Task<IEnumerable<BookingAdminDto>> GetBookingsByChargingStationAsync(int stationId);
+        Task<BookingAdminDto> GetBookingByIdAsync(int bookingId);
+        Task<IEnumerable<BookingAdminDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<BookingAdminDto>> GetPendingBookingsByChargingStationAsync(int stationId);
+        Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost); // Combined method for status and cost updates
+
+        // Session management
+        Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId);
+        Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId);
+        Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost);
+
 
 
     }
