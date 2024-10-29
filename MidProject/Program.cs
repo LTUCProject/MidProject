@@ -35,6 +35,14 @@ namespace MidProject
                 options.TokenValidationParameters = JwtTokenService.ValidatToken(builder.Configuration);
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    builder => builder.WithOrigins("http://localhost:5173") // Replace with React dev server
+                                       .AllowAnyMethod()
+                                       .AllowAnyHeader());
+            });
+
 
             //policy 
             // Add authorization policies here
@@ -124,6 +132,9 @@ namespace MidProject
                     options.RoutePrefix = "";
                 }
                 );
+
+
+            app.UseCors("AllowReactApp");
 
             //==================================
             app.MapControllers();
