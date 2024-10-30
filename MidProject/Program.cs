@@ -20,8 +20,13 @@ namespace MidProject
             string ConnectionStringVar = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<MidprojectDbContext>(optionsX => optionsX.UseSqlServer(ConnectionStringVar));
 
-            builder.Services.AddIdentity<Account, IdentityRole>()
-   .AddEntityFrameworkStores<MidprojectDbContext>();
+            builder.Services.AddIdentity<Account, IdentityRole>(options =>
+            {
+                // Identity options can be configured here
+                options.User.RequireUniqueEmail = true; // Require unique email for users
+            })
+                .AddEntityFrameworkStores<MidprojectDbContext>()
+                .AddDefaultTokenProviders(); // Register default token providers
 
 
 
@@ -66,6 +71,7 @@ namespace MidProject
             builder.Services.AddScoped<IServicer, ServicerService>();
             builder.Services.AddScoped<IAccountx, IdentityAccountService>();
             builder.Services.AddScoped<JwtTokenService>();
+            builder.Services.AddScoped<MailjetEmailService>();
 
             
             //============swagger============================

@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MidProject.Models;
 using MidProject.Models.Dto.Request;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
+using MidProject.Repository.Services;
 
 namespace MidProject.Controllers
 {
@@ -13,10 +16,14 @@ namespace MidProject.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountx _accountServices;
+        private readonly MailjetEmailService _emailService;
+        private readonly UserManager<Account> _identityUserManager;
 
-        public AccountController(IAccountx accountServices)
+        public AccountController(IAccountx accountServices, MailjetEmailService emailService, UserManager<Account> identityUserManager)
         {
             _accountServices = accountServices;
+            _emailService = emailService;
+            _identityUserManager = identityUserManager;
         }
 
         [HttpPost("Register")]
@@ -33,17 +40,32 @@ namespace MidProject.Controllers
                         return BadRequest($"Invalid role: {role}. Allowed roles are: Admin, Client, Owner, Servicer.");
                     }
                 }
+
+                // Register account
                 var account = await _accountServices.Register(registerdAccount);
                 if (account == null)
                 {
                     return BadRequest("Registration failed");
                 }
+
+                // Send registration email
+                string emailBody = "<h1>Welcome to EV Management System</h1><p>Thank you for registering! You can now log in and start using the platform.</p>";
+                bool emailSent = await _emailService.SendEmailAsync(registerdAccount.Email, registerdAccount.UserName, emailBody);
+
+                if (!emailSent)
+                {
+                    // Optionally log the email sending failure
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Registration succeeded, but email sending failed." });
+                }
+
+                // Prepare and return response
                 var responseDto = new AccountRegisterdResponseDto
                 {
                     Id = account.Id,
                     UserName = account.UserName,
                     Roles = account.Roles
                 };
+
                 return CreatedAtAction(nameof(Profile), new { id = responseDto.Id }, responseDto);
             }
             catch (Exception ex)
@@ -107,7 +129,7 @@ namespace MidProject.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount(string username)
         {
@@ -125,6 +147,47 @@ namespace MidProject.Controllers
                 // Log the exception if you have a logging service
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the account.", details = ex.Message });
             }
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            await _accountServices.SendPasswordResetEmailAsync(forgotPasswordDto.Email);
+            return Ok("If the email is registered, a password reset link will be sent.");
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var result = await _accountServices.ResetPasswordAsync(resetPasswordDto);
+
+            if (result)
+            {
+                return Ok("Password has been reset successfully.");
+            }
+
+            return BadRequest("Error occurred while resetting the password.");
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = _identityUserManager.GetUserId(User); // Get the currently logged-in user's ID
+            var result = await _accountServices.ChangePasswordAsync(userId, changePasswordDTO);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Password changed successfully.");
         }
     }
 }
