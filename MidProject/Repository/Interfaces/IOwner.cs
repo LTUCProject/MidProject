@@ -32,12 +32,12 @@ namespace MidProject.Repository.Interfaces
         Task<NotificationResponseDto> GetNotificationByIdAsync(int notificationId);
         Task<IEnumerable<NotificationResponseDto>> GetNotificationsByClientIdAsync(int clientId);
 
-        // Location management
-        Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync();
-        Task<LocationResponseDto> GetLocationByIdAsync(int id);
-        Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto);
-        Task UpdateLocationAsync(int id, LocationDto locationDto);
-        Task DeleteLocationAsync(int id);
+        //// Location management
+        //Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync();
+        //Task<LocationResponseDto> GetLocationByIdAsync(int id);
+        //Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto);
+        //Task UpdateLocationAsync(int id, LocationDto locationDto);
+        //Task DeleteLocationAsync(int id);
 
 
         // Post management

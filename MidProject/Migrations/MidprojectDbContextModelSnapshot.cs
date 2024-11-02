@@ -52,28 +52,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "624a3aa1-02d5-4a85-8aea-ab6703ed0020",
+                            ConcurrencyStamp = "1e131991-fe82-4340-a546-ece6e5902474",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "814fa491-8960-469f-80f7-04d3a62dd512",
+                            ConcurrencyStamp = "313b986d-351e-4d2f-949c-e8ad8f7a3128",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "3308af07-d50d-41c5-b21c-4dd2c5eca54d",
+                            ConcurrencyStamp = "0da9430a-6142-4181-93bd-8cc89aeff954",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "a29e04bb-d94a-4c6d-98ee-f9e98f404eed",
+                            ConcurrencyStamp = "f17537e1-116f-48a6-8deb-0c76a4045784",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -358,14 +358,25 @@ namespace MidProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChargingStationId"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
                     b.Property<bool>("HasParking")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LocationId")
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1051,19 +1062,15 @@ namespace MidProject.Migrations
                         .WithMany("ChargingStations")
                         .HasForeignKey("AdminId");
 
-                    b.HasOne("MidProject.Models.Location", "Location")
+                    b.HasOne("MidProject.Models.Location", null)
                         .WithMany("ChargingStations")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
 
                     b.HasOne("MidProject.Models.Provider", "Provider")
                         .WithMany("ChargingStations")
                         .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Location");
 
                     b.Navigation("Provider");
                 });

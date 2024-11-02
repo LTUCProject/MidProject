@@ -319,119 +319,119 @@ namespace MidProject.Controllers
         // End Vehicle management ================================================================================================
 
        
-        // Start Location management ================================================================================================
-        [HttpGet("Locations")]
-        public async Task<IActionResult> GetAllLocations()
-        {
-            var locations = await _adminService.GetAllLocationsAsync();
-            var locationDtos = locations.Select(l => new LocationResponseDto
-            {
-                LocationId = l.LocationId,
-                Name = l.Name,
-                Address = l.Address,
-                Latitude = l.Latitude,
-                Longitude = l.Longitude,
-                ChargingStations = l.ChargingStations.Select(cs => new ChargingStationResponseDto
-                {
-                    ChargingStationId = cs.ChargingStationId,
-                    StationLocation = cs.StationLocation,
-                    LocationId = l.LocationId, // Map LocationId here if needed
-                    Name = cs.Name,
-                    HasParking = cs.HasParking,
-                    Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
-                }).ToList()
-            }).ToList();
-            return Ok(locationDtos);
-        }
+        //// Start Location management ================================================================================================
+        //[HttpGet("Locations")]
+        //public async Task<IActionResult> GetAllLocations()
+        //{
+        //    var locations = await _adminService.GetAllLocationsAsync();
+        //    var locationDtos = locations.Select(l => new LocationResponseDto
+        //    {
+        //        LocationId = l.LocationId,
+        //        Name = l.Name,
+        //        Address = l.Address,
+        //        Latitude = l.Latitude,
+        //        Longitude = l.Longitude,
+        //        ChargingStations = l.ChargingStations.Select(cs => new ChargingStationResponseDto
+        //        {
+        //            ChargingStationId = cs.ChargingStationId,
+        //            StationLocation = cs.StationLocation,
+        //            LocationId = l.LocationId, // Map LocationId here if needed
+        //            Name = cs.Name,
+        //            HasParking = cs.HasParking,
+        //            Status = cs.Status,
+        //            PaymentMethod = cs.PaymentMethod
+        //        }).ToList()
+        //    }).ToList();
+        //    return Ok(locationDtos);
+        //}
 
 
-        [HttpGet("Locations/{id}")]
-        public async Task<IActionResult> GetLocationById(int id)
-        {
-            var location = await _adminService.GetLocationByIdAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-            var locationDto = new LocationResponseDto
-            {
-                LocationId = location.LocationId,
-                Name = location.Name,
-                Address = location.Address,
-                Latitude = location.Latitude,
-                Longitude = location.Longitude,
-                ChargingStations = location.ChargingStations.Select(cs => new ChargingStationResponseDto
-                {
-                    ChargingStationId = cs.ChargingStationId,
-                    StationLocation = cs.StationLocation,
-                    LocationId = location.LocationId, // Map LocationId here if needed
-                    Name = cs.Name,
-                    HasParking = cs.HasParking,
-                    Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
-                }).ToList()
-            };
-            return Ok(locationDto);
-        }
+        //[HttpGet("Locations/{id}")]
+        //public async Task<IActionResult> GetLocationById(int id)
+        //{
+        //    var location = await _adminService.GetLocationByIdAsync(id);
+        //    if (location == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var locationDto = new LocationResponseDto
+        //    {
+        //        LocationId = location.LocationId,
+        //        Name = location.Name,
+        //        Address = location.Address,
+        //        Latitude = location.Latitude,
+        //        Longitude = location.Longitude,
+        //        ChargingStations = location.ChargingStations.Select(cs => new ChargingStationResponseDto
+        //        {
+        //            ChargingStationId = cs.ChargingStationId,
+        //            StationLocation = cs.StationLocation,
+        //            LocationId = location.LocationId, // Map LocationId here if needed
+        //            Name = cs.Name,
+        //            HasParking = cs.HasParking,
+        //            Status = cs.Status,
+        //            PaymentMethod = cs.PaymentMethod
+        //        }).ToList()
+        //    };
+        //    return Ok(locationDto);
+        //}
 
 
-        [HttpPost("Locations")]
-        public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //[HttpPost("Locations")]
+        //public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            var location = new Location
-            {
-                Name = locationDto.Name,
-                Address = locationDto.Address,
-                Latitude = locationDto.Latitude,
-                Longitude = locationDto.Longitude
-            };
+        //    var location = new Location
+        //    {
+        //        Name = locationDto.Name,
+        //        Address = locationDto.Address,
+        //        Latitude = locationDto.Latitude,
+        //        Longitude = locationDto.Longitude
+        //    };
 
-            await _adminService.CreateLocationAsync(location);
-            return CreatedAtAction(nameof(GetLocationById), new { id = location.LocationId }, location);
-        }
+        //    await _adminService.CreateLocationAsync(location);
+        //    return CreatedAtAction(nameof(GetLocationById), new { id = location.LocationId }, location);
+        //}
 
-        [HttpPut("Locations/{id}")]
-        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //[HttpPut("Locations/{id}")]
+        //public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            var location = await _adminService.GetLocationByIdAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
+        //    var location = await _adminService.GetLocationByIdAsync(id);
+        //    if (location == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            location.Name = locationDto.Name;
-            location.Address = locationDto.Address;
-            location.Latitude = locationDto.Latitude;
-            location.Longitude = locationDto.Longitude;
+        //    location.Name = locationDto.Name;
+        //    location.Address = locationDto.Address;
+        //    location.Latitude = locationDto.Latitude;
+        //    location.Longitude = locationDto.Longitude;
 
-            await _adminService.UpdateLocationAsync(location);
-            return NoContent();
-        }
+        //    await _adminService.UpdateLocationAsync(location);
+        //    return NoContent();
+        //}
 
-        [HttpDelete("Locations/{id}")]
-        public async Task<IActionResult> DeleteLocation(int id)
-        {
-            var location = await _adminService.GetLocationByIdAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("Locations/{id}")]
+        //public async Task<IActionResult> DeleteLocation(int id)
+        //{
+        //    var location = await _adminService.GetLocationByIdAsync(id);
+        //    if (location == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            await _adminService.DeleteLocationAsync(id);
-            return NoContent();
-        }
-        // End Location management ================================================================================================
+        //    await _adminService.DeleteLocationAsync(id);
+        //    return NoContent();
+        //}
+        //// End Location management ================================================================================================
 
         // Start Post management ================================================================================================
         [HttpGet("Posts")]

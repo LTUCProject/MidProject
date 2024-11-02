@@ -40,11 +40,13 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
-                    LocationId = cs.LocationId,
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
                     PaymentMethod = cs.PaymentMethod,
+                    Address = cs.Address,               // Location properties
+                    Latitude = cs.Latitude,
+                    Longitude = cs.Longitude,
                     Chargers = cs.Chargers.Select(c => new ChargerResponseDto
                     {
                         ChargerId = c.ChargerId,
@@ -64,8 +66,6 @@ namespace MidProject.Repository.Services
             }
         }
 
-
-
         public async Task<ChargingStationResponseDto> GetChargingStationByIdAsync(int stationId)
         {
             try
@@ -80,11 +80,13 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = station.ChargingStationId,
                     StationLocation = station.StationLocation,
-                    LocationId = station.LocationId,
                     Name = station.Name,
                     HasParking = station.HasParking,
                     Status = station.Status,
                     PaymentMethod = station.PaymentMethod,
+                    Address = station.Address,           // Location properties
+                    Latitude = station.Latitude,
+                    Longitude = station.Longitude,
                     Chargers = station.Chargers.Select(c => new ChargerResponseDto
                     {
                         ChargerId = c.ChargerId,
@@ -102,8 +104,6 @@ namespace MidProject.Repository.Services
             }
         }
 
-
-
         public async Task<ChargingStationResponseDto> CreateChargingStationAsync(ChargingStationDto stationDtoRequest, string accountId)
         {
             try
@@ -118,11 +118,13 @@ namespace MidProject.Repository.Services
                 var station = new ChargingStation
                 {
                     StationLocation = stationDtoRequest.StationLocation,
-                    LocationId = stationDtoRequest.LocationId,
                     Name = stationDtoRequest.Name,
                     HasParking = stationDtoRequest.HasParking,
                     Status = stationDtoRequest.Status,
                     PaymentMethod = stationDtoRequest.PaymentMethod,
+                    Address = stationDtoRequest.Address,           // Location properties
+                    Latitude = stationDtoRequest.Latitude,
+                    Longitude = stationDtoRequest.Longitude,
                     ProviderId = owner.ProviderId // Set the owner as the provider
                 };
 
@@ -133,11 +135,13 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = station.ChargingStationId,
                     StationLocation = station.StationLocation,
-                    LocationId = station.LocationId,
                     Name = station.Name,
                     HasParking = station.HasParking,
                     Status = station.Status,
-                    PaymentMethod = station.PaymentMethod
+                    PaymentMethod = station.PaymentMethod,
+                    Address = station.Address,                   // Location properties
+                    Latitude = station.Latitude,
+                    Longitude = station.Longitude
                 };
             }
             catch (DbUpdateException ex)
@@ -160,11 +164,13 @@ namespace MidProject.Repository.Services
                 }
 
                 station.StationLocation = stationDtoRequest.StationLocation;
-                station.LocationId = stationDtoRequest.LocationId;
                 station.Name = stationDtoRequest.Name;
                 station.HasParking = stationDtoRequest.HasParking;
                 station.Status = stationDtoRequest.Status;
                 station.PaymentMethod = stationDtoRequest.PaymentMethod;
+                station.Address = stationDtoRequest.Address;           // Location properties
+                station.Latitude = stationDtoRequest.Latitude;
+                station.Longitude = stationDtoRequest.Longitude;
 
                 _context.ChargingStations.Update(station);
                 await _context.SaveChangesAsync();
@@ -175,6 +181,7 @@ namespace MidProject.Repository.Services
                 throw new Exception("An error occurred while updating the charging station.", ex);
             }
         }
+
 
         public async Task DeleteChargingStationAsync(int stationId, string accountId)
         {
@@ -434,93 +441,93 @@ namespace MidProject.Repository.Services
                 Date = n.Date
             });
         }
-        //Location
-        public async Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync()
-        {
-            return await _context.Locations
-                .Select(loc => new LocationResponseDto
-                {
-                    LocationId = loc.LocationId,
-                    Name = loc.Name,
-                    Address = loc.Address,
-                    Latitude = loc.Latitude,
-                    Longitude = loc.Longitude,
-                    ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
-                    {
-                        ChargingStationId = cs.ChargingStationId,
-                        StationLocation = cs.StationLocation,
-                        LocationId = cs.LocationId,
-                        Name = cs.Name,
-                        HasParking = cs.HasParking,
-                        Status = cs.Status,
-                        PaymentMethod = cs.PaymentMethod
-                    })
-                }).ToListAsync();
-        }
+        ////Location
+        //public async Task<IEnumerable<LocationResponseDto>> GetAllLocationsAsync()
+        //{
+        //    return await _context.Locations
+        //        .Select(loc => new LocationResponseDto
+        //        {
+        //            LocationId = loc.LocationId,
+        //            Name = loc.Name,
+        //            Address = loc.Address,
+        //            Latitude = loc.Latitude,
+        //            Longitude = loc.Longitude,
+        //            ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
+        //            {
+        //                ChargingStationId = cs.ChargingStationId,
+        //                StationLocation = cs.StationLocation,
+        //                LocationId = cs.LocationId,
+        //                Name = cs.Name,
+        //                HasParking = cs.HasParking,
+        //                Status = cs.Status,
+        //                PaymentMethod = cs.PaymentMethod
+        //            })
+        //        }).ToListAsync();
+        //}
 
-        public async Task<LocationResponseDto> GetLocationByIdAsync(int id)
-        {
-            return await _context.Locations
-                .Where(loc => loc.LocationId == id)
-                .Select(loc => new LocationResponseDto
-                {
-                    LocationId = loc.LocationId,
-                    Name = loc.Name,
-                    Address = loc.Address,
-                    Latitude = loc.Latitude,
-                    Longitude = loc.Longitude,
-                    ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
-                    {
-                        // Map ChargingStation properties here
-                    })
-                }).FirstOrDefaultAsync();
-        }
+        //public async Task<LocationResponseDto> GetLocationByIdAsync(int id)
+        //{
+        //    return await _context.Locations
+        //        .Where(loc => loc.LocationId == id)
+        //        .Select(loc => new LocationResponseDto
+        //        {
+        //            LocationId = loc.LocationId,
+        //            Name = loc.Name,
+        //            Address = loc.Address,
+        //            Latitude = loc.Latitude,
+        //            Longitude = loc.Longitude,
+        //            ChargingStations = loc.ChargingStations.Select(cs => new ChargingStationResponseDto
+        //            {
+        //                // Map ChargingStation properties here
+        //            })
+        //        }).FirstOrDefaultAsync();
+        //}
 
-        public async Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto)
-        {
-            var location = new Location
-            {
-                Name = locationDto.Name,
-                Address = locationDto.Address,
-                Latitude = locationDto.Latitude,
-                Longitude = locationDto.Longitude
-            };
+        //public async Task<LocationResponseDto> CreateLocationAsync(LocationDto locationDto)
+        //{
+        //    var location = new Location
+        //    {
+        //        Name = locationDto.Name,
+        //        Address = locationDto.Address,
+        //        Latitude = locationDto.Latitude,
+        //        Longitude = locationDto.Longitude
+        //    };
 
-            _context.Locations.Add(location);
-            await _context.SaveChangesAsync();
+        //    _context.Locations.Add(location);
+        //    await _context.SaveChangesAsync();
 
-            return new LocationResponseDto
-            {
-                LocationId = location.LocationId,
-                Name = location.Name,
-                Address = location.Address,
-                Latitude = location.Latitude,
-                Longitude = location.Longitude
-            };
-        }
+        //    return new LocationResponseDto
+        //    {
+        //        LocationId = location.LocationId,
+        //        Name = location.Name,
+        //        Address = location.Address,
+        //        Latitude = location.Latitude,
+        //        Longitude = location.Longitude
+        //    };
+        //}
 
-        public async Task UpdateLocationAsync(int id, LocationDto locationDto)
-        {
-            var location = await _context.Locations.FindAsync(id);
-            if (location == null) throw new KeyNotFoundException("Location not found.");
+        //public async Task UpdateLocationAsync(int id, LocationDto locationDto)
+        //{
+        //    var location = await _context.Locations.FindAsync(id);
+        //    if (location == null) throw new KeyNotFoundException("Location not found.");
 
-            location.Name = locationDto.Name;
-            location.Address = locationDto.Address;
-            location.Latitude = locationDto.Latitude;
-            location.Longitude = locationDto.Longitude;
+        //    location.Name = locationDto.Name;
+        //    location.Address = locationDto.Address;
+        //    location.Latitude = locationDto.Latitude;
+        //    location.Longitude = locationDto.Longitude;
 
-            _context.Locations.Update(location);
-            await _context.SaveChangesAsync();
-        }
+        //    _context.Locations.Update(location);
+        //    await _context.SaveChangesAsync();
+        //}
 
-        public async Task DeleteLocationAsync(int id)
-        {
-            var location = await _context.Locations.FindAsync(id);
-            if (location == null) throw new KeyNotFoundException("Location not found.");
+        //public async Task DeleteLocationAsync(int id)
+        //{
+        //    var location = await _context.Locations.FindAsync(id);
+        //    if (location == null) throw new KeyNotFoundException("Location not found.");
 
-            _context.Locations.Remove(location);
-            await _context.SaveChangesAsync();
-        }
+        //    _context.Locations.Remove(location);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {

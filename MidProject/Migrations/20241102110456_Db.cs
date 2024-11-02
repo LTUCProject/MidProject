@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MidProject.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDb : Migration
+    public partial class Db : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -385,14 +385,17 @@ namespace MidProject.Migrations
                 {
                     ChargingStationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false),
                     StationLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     HasParking = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProviderId = table.Column<int>(type: "int", nullable: false),
-                    AdminId = table.Column<int>(type: "int", nullable: true)
+                    AdminId = table.Column<int>(type: "int", nullable: true),
+                    LocationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -406,8 +409,7 @@ namespace MidProject.Migrations
                         name: "FK_ChargingStations_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
-                        principalColumn: "LocationId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "LocationId");
                     table.ForeignKey(
                         name: "FK_ChargingStations_Providers_ProviderId",
                         column: x => x.ProviderId,
@@ -564,7 +566,7 @@ namespace MidProject.Migrations
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EnergyConsumed = table.Column<int>(type: "int", nullable: false),
-                    ProviderId = table.Column<int>(type: "int", nullable: false)
+                    Cost = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -580,12 +582,6 @@ namespace MidProject.Migrations
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Sessions_Providers_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Providers",
-                        principalColumn: "ProviderId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -720,10 +716,10 @@ namespace MidProject.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "admin_role_id", "2da02577-8fd3-4d21-bb2d-5ac251b3b0b6", "Admin", "ADMIN" },
-                    { "client_role_id", "f9fb523e-f1b5-42a9-beaf-bb289759dbf8", "Client", "CLIENT" },
-                    { "owner_role_id", "4a585e46-376a-4a12-9fc2-bb2987760312", "Owner", "OWNER" },
-                    { "servicer_role_id", "2692969a-097c-4b4d-b889-be359eb6fa05", "Servicer", "SERVICER" }
+                    { "admin_role_id", "1e131991-fe82-4340-a546-ece6e5902474", "Admin", "ADMIN" },
+                    { "client_role_id", "313b986d-351e-4d2f-949c-e8ad8f7a3128", "Client", "CLIENT" },
+                    { "owner_role_id", "0da9430a-6142-4181-93bd-8cc89aeff954", "Owner", "OWNER" },
+                    { "servicer_role_id", "f17537e1-116f-48a6-8deb-0c76a4045784", "Servicer", "SERVICER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -932,11 +928,6 @@ namespace MidProject.Migrations
                 name: "IX_Sessions_ClientId",
                 table: "Sessions",
                 column: "ClientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sessions_ProviderId",
-                table: "Sessions",
-                column: "ProviderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_ClientId",
