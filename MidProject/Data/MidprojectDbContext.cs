@@ -87,12 +87,12 @@ namespace MidProject.Data
                 .HasForeignKey(c => c.ChargingStationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ChargingStation and Location relationship
-            modelBuilder.Entity<ChargingStation>()
-                .HasOne(cs => cs.Location)
-                .WithMany(l => l.ChargingStations)
-                .HasForeignKey(cs => cs.LocationId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //// ChargingStation and Location relationship
+            //modelBuilder.Entity<ChargingStation>()
+            //    .HasOne(cs => cs.Location)
+            //    .WithMany(l => l.ChargingStations)
+            //    .HasForeignKey(cs => cs.LocationId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             // ChargingStation and Provider relationship
             modelBuilder.Entity<ChargingStation>()

@@ -98,6 +98,9 @@ namespace MidProject.Controllers
         [HttpDelete("chargingstations/{id}")]
         public async Task<IActionResult> DeleteChargingStation(int id)
         {
+
+
+
             try
             {
                 var accountId = GetAccountId();
@@ -109,6 +112,8 @@ namespace MidProject.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+         
+            
             }
         }
 
@@ -272,83 +277,83 @@ namespace MidProject.Controllers
             return Ok(notifications);
         }
 
-        // GET: api/location
-        [HttpGet("locations")]
-        public async Task<ActionResult<IEnumerable<LocationResponseDto>>> GetAllLocations()
-        {
-            try
-            {
-                var locations = await _ownerService.GetAllLocationsAsync();
-                return Ok(locations);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //// GET: api/location
+        //[HttpGet("locations")]
+        //public async Task<ActionResult<IEnumerable<LocationResponseDto>>> GetAllLocations()
+        //{
+        //    try
+        //    {
+        //        var locations = await _ownerService.GetAllLocationsAsync();
+        //        return Ok(locations);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // GET: api/location/{id}
-        [HttpGet("locations/{id}")]
-        public async Task<ActionResult<LocationResponseDto>> GetLocationById(int id)
-        {
-            try
-            {
-                var locationDto = await _ownerService.GetLocationByIdAsync(id);
-                if (locationDto == null) return NotFound();
-                return Ok(locationDto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //// GET: api/location/{id}
+        //[HttpGet("locations/{id}")]
+        //public async Task<ActionResult<LocationResponseDto>> GetLocationById(int id)
+        //{
+        //    try
+        //    {
+        //        var locationDto = await _ownerService.GetLocationByIdAsync(id);
+        //        if (locationDto == null) return NotFound();
+        //        return Ok(locationDto);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // POST: api/location
-        [HttpPost("locations")]
-        public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDtoRequest)
-        {
-            try
-            {
-                var createdLocation = await _ownerService.CreateLocationAsync(locationDtoRequest);
-                return CreatedAtAction(nameof(GetLocationById), new { id = createdLocation.LocationId }, createdLocation);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //// POST: api/location
+        //[HttpPost("locations")]
+        //public async Task<IActionResult> CreateLocation([FromBody] LocationDto locationDtoRequest)
+        //{
+        //    try
+        //    {
+        //        var createdLocation = await _ownerService.CreateLocationAsync(locationDtoRequest);
+        //        return CreatedAtAction(nameof(GetLocationById), new { id = createdLocation.LocationId }, createdLocation);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // PUT: api/location/{id}
-        [HttpPut("locations/{id}")]
-        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDtoRequest)
-        {
-            try
-            {
-                if (id <= 0) return BadRequest("Invalid ID.");
+        //// PUT: api/location/{id}
+        //[HttpPut("locations/{id}")]
+        //public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDtoRequest)
+        //{
+        //    try
+        //    {
+        //        if (id <= 0) return BadRequest("Invalid ID.");
 
-                await _ownerService.UpdateLocationAsync(id, locationDtoRequest);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //        await _ownerService.UpdateLocationAsync(id, locationDtoRequest);
+        //        return NoContent();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
-        // DELETE: api/location/{id}
-        [HttpDelete("locations/{id}")]
-        public async Task<IActionResult> DeleteLocation(int id)
-        {
-            try
-            {
-                await _ownerService.DeleteLocationAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //// DELETE: api/location/{id}
+        //[HttpDelete("locations/{id}")]
+        //public async Task<IActionResult> DeleteLocation(int id)
+        //{
+        //    try
+        //    {
+        //        await _ownerService.DeleteLocationAsync(id);
+        //        return NoContent();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
 
         [HttpGet("posts")]

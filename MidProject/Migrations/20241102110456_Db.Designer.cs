@@ -12,8 +12,8 @@ using MidProject.Data;
 namespace MidProject.Migrations
 {
     [DbContext(typeof(MidprojectDbContext))]
-    [Migration("20240918132856_CreateDb")]
-    partial class CreateDb
+    [Migration("20241102110456_Db")]
+    partial class Db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,28 +55,28 @@ namespace MidProject.Migrations
                         new
                         {
                             Id = "admin_role_id",
-                            ConcurrencyStamp = "2da02577-8fd3-4d21-bb2d-5ac251b3b0b6",
+                            ConcurrencyStamp = "1e131991-fe82-4340-a546-ece6e5902474",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "client_role_id",
-                            ConcurrencyStamp = "f9fb523e-f1b5-42a9-beaf-bb289759dbf8",
+                            ConcurrencyStamp = "313b986d-351e-4d2f-949c-e8ad8f7a3128",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
                             Id = "owner_role_id",
-                            ConcurrencyStamp = "4a585e46-376a-4a12-9fc2-bb2987760312",
+                            ConcurrencyStamp = "0da9430a-6142-4181-93bd-8cc89aeff954",
                             Name = "Owner",
                             NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = "servicer_role_id",
-                            ConcurrencyStamp = "2692969a-097c-4b4d-b889-be359eb6fa05",
+                            ConcurrencyStamp = "f17537e1-116f-48a6-8deb-0c76a4045784",
                             Name = "Servicer",
                             NormalizedName = "SERVICER"
                         });
@@ -361,14 +361,25 @@ namespace MidProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChargingStationId"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
                     b.Property<bool>("HasParking")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LocationId")
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -862,13 +873,13 @@ namespace MidProject.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Cost")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("EnergyConsumed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProviderId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -879,8 +890,6 @@ namespace MidProject.Migrations
                     b.HasIndex("ChargingStationId");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("ProviderId");
 
                     b.ToTable("Sessions");
                 });
@@ -1056,19 +1065,15 @@ namespace MidProject.Migrations
                         .WithMany("ChargingStations")
                         .HasForeignKey("AdminId");
 
-                    b.HasOne("MidProject.Models.Location", "Location")
+                    b.HasOne("MidProject.Models.Location", null)
                         .WithMany("ChargingStations")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
 
                     b.HasOne("MidProject.Models.Provider", "Provider")
                         .WithMany("ChargingStations")
                         .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Location");
 
                     b.Navigation("Provider");
                 });
@@ -1306,17 +1311,9 @@ namespace MidProject.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MidProject.Models.Provider", "Provider")
-                        .WithMany("Sessions")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("ChargingStation");
 
                     b.Navigation("Client");
-
-                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("MidProject.Models.Vehicle", b =>
@@ -1406,8 +1403,6 @@ namespace MidProject.Migrations
                     b.Navigation("ServiceRequests");
 
                     b.Navigation("Services");
-
-                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("MidProject.Models.ServiceInfo", b =>

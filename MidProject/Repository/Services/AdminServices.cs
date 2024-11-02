@@ -261,11 +261,16 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
-                    LocationId = cs.LocationId,
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
                     PaymentMethod = cs.PaymentMethod,
+
+                    // Location properties
+                    Address = cs.Address,
+                    Latitude = cs.Latitude,
+                    Longitude = cs.Longitude,
+
                     Chargers = cs.Chargers.Select(c => new ChargerResponseDto
                     {
                         ChargerId = c.ChargerId,
@@ -285,8 +290,6 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
-
-
         public async Task<ChargingStationResponseAdminDto> GetChargingStationByIdAsync(int chargingStationId)
         {
             var chargingStation = await _context.ChargingStations
@@ -297,11 +300,16 @@ namespace MidProject.Repository.Services
                 {
                     ChargingStationId = cs.ChargingStationId,
                     StationLocation = cs.StationLocation,
-                    LocationId = cs.LocationId,
                     Name = cs.Name,
                     HasParking = cs.HasParking,
                     Status = cs.Status,
                     PaymentMethod = cs.PaymentMethod,
+
+                    // Location properties
+                    Address = cs.Address,
+                    Latitude = cs.Latitude,
+                    Longitude = cs.Longitude,
+
                     Chargers = cs.Chargers.Select(c => new ChargerResponseDto
                     {
                         ChargerId = c.ChargerId,
@@ -322,6 +330,7 @@ namespace MidProject.Repository.Services
 
             return chargingStation;
         }
+
 
 
 
