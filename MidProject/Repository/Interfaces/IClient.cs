@@ -28,9 +28,9 @@ namespace MidProject.Repository.Interfaces
         Task RemoveServiceInfoFavoriteAsync(int favoriteId);
 
         // Vehicle management
-        Task<IEnumerable<Vehicle>> GetClientVehiclesAsync(int clientId);
+        Task<IEnumerable<VehicleResponseDto>> GetClientVehiclesAsync(string accountId);
         Task<Vehicle> GetVehicleByIdAsync(int vehicleId);
-        Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto);
+        Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto, string accountId);
         Task RemoveVehicleAsync(int vehicleId);
 
         // Booking management

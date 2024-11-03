@@ -228,12 +228,42 @@ namespace MidProject.Repository.Services
         }
 
         // Vehicle management
-        public async Task<IEnumerable<Vehicle>> GetClientVehiclesAsync(int clientId)
+        public async Task<IEnumerable<VehicleResponseDto>> GetClientVehiclesAsync(string accountId)
         {
-            return await _context.Vehicles
-                .Where(v => v.ClientId == clientId)
-                .ToListAsync();
+            try
+            {
+                // Fetch the client based on the accountId and include related Vehicles
+                var client = await _context.Clients
+                    .Include(c => c.Vehicles)
+                    .FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Client not found");
+                }
+
+                // Map the vehicles to a DTO
+                var vehicleDtos = client.Vehicles.Select(v => new VehicleResponseDto
+                {
+                    VehicleId = v.VehicleId,
+                    LicensePlate = v.LicensePlate,
+                    Model = v.Model,
+                    Year = v.Year,
+                    BatteryCapacity = v.BatteryCapacity,
+                    ElectricType = v.ElectricType,
+                    ClientId = v.ClientId  // Optional: Remove if sensitive
+                }).ToList();
+
+                return vehicleDtos;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while retrieving client vehicles.", ex);
+            }
         }
+
+
 
         public async Task<Vehicle> GetVehicleByIdAsync(int vehicleId)
         {
@@ -241,8 +271,17 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(v => v.VehicleId == vehicleId);
         }
 
-        public async Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto)
+        public async Task<Vehicle> AddVehicleAsync(VehicleDto vehicleDto, string accountId)
         {
+            // Retrieve the client using the accountId
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+            if (client == null)
+            {
+                throw new UnauthorizedAccessException("Client not found.");
+            }
+
+            // Create the vehicle and assign the ClientId from the found client
             var vehicle = new Vehicle
             {
                 LicensePlate = vehicleDto.LicensePlate,
@@ -250,10 +289,10 @@ namespace MidProject.Repository.Services
                 Year = vehicleDto.Year,
                 BatteryCapacity = vehicleDto.BatteryCapacity,
                 ElectricType = vehicleDto.ElectricType,
-                ClientId = vehicleDto.ClientId
-
+                ClientId = client.ClientId  // Automatically assign ClientId
             };
 
+            // Add vehicle to the database and save changes
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
 

@@ -73,7 +73,16 @@ namespace MidProject
             builder.Services.AddScoped<JwtTokenService>();
             builder.Services.AddScoped<MailjetEmailService>();
 
-            
+
+
+
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
+
+
             //============swagger============================
 
             // Swagger configuration
