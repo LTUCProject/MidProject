@@ -7,6 +7,7 @@ using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
 using MidProject.Repository.Services;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MidProject.Controllers
@@ -21,6 +22,11 @@ namespace MidProject.Controllers
         public ClientsController(IClient context)
         {
             _context = context;
+        }
+
+        private string GetAccountId()
+        {
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // or another claim type for accountId
         }
 
         // Session management
@@ -152,11 +158,27 @@ namespace MidProject.Controllers
         }
 
         // Vehicle management
-        [HttpGet("vehicles/{clientId}")]
-        public async Task<ActionResult<IEnumerable<Vehicle>>> GetClientVehicles(int clientId)
+        [HttpGet("vehicle")]
+        public async Task<ActionResult<IEnumerable<VehicleResponseDto>>> GetClientVehicles()
         {
-            var vehicles = await _context.GetClientVehiclesAsync(clientId);
-            return Ok(vehicles);
+            // Retrieve account ID of the logged-in user
+            var accountId = GetAccountId(); // Assuming GetAccountId() returns the string accountId
+
+            if (string.IsNullOrEmpty(accountId))
+            {
+                return Unauthorized("Invalid account ID in token.");
+            }
+
+            try
+            {
+                var vehicles = await _context.GetClientVehiclesAsync(accountId);
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                // Log the error if necessary
+                return StatusCode(500, "An error occurred while retrieving vehicles.");
+            }
         }
 
         [HttpGet("vehicle/{vehicleId}")]
@@ -166,37 +188,27 @@ namespace MidProject.Controllers
             return Ok(vehicle);
         }
 
-        [HttpPost("vehicle")]
-        public async Task<IActionResult> AddVehicle([FromBody] VehicleDto vehicleDto)
+        [HttpPost("add-vehicle")]
+        public async Task<ActionResult<Vehicle>> AddVehicle(VehicleDto vehicleDto)
         {
+            var accountId = GetAccountId(); // Retrieve the account ID from the token
+
+            if (string.IsNullOrEmpty(accountId))
+            {
+                return Unauthorized("Invalid account ID in token.");
+            }
+
             try
             {
-                if (vehicleDto == null)
-                {
-                    return BadRequest("Vehicle data is required.");
-                }
-
-                var addedVehicle = await _context.AddVehicleAsync(vehicleDto);
-
-                VehicleResponseDto vehicleDtoResponse = new VehicleResponseDto
-                {
-                    VehicleId = addedVehicle.VehicleId,
-                    LicensePlate = addedVehicle.LicensePlate,
-                    Model = addedVehicle.Model,
-                    Year = addedVehicle.Year,
-                    BatteryCapacity = addedVehicle.BatteryCapacity,
-                    ElectricType = addedVehicle.ElectricType,
-                    ClientId = addedVehicle.ClientId
-                   
-                };
-
-                return Ok(vehicleDtoResponse);
+                var vehicle = await _context.AddVehicleAsync(vehicleDto, accountId);
+                return Ok(vehicle);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while adding the vehicle: {ex.Message}");
+                return StatusCode(500, "An error occurred while adding the vehicle.");
             }
         }
+
 
         [HttpDelete("vehicles/{vehicleId}")]
         public async Task<ActionResult> RemoveVehicle(int vehicleId)

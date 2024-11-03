@@ -151,7 +151,7 @@ namespace MidProject.Controllers
         {
 
             var newCharger = await _ownerService.CreateChargerAsync(chargerDtoRequest);
-            //  return CreatedAtAction(nameof(GetChargerById), new { id = chargerDtoRequest.ChargingStationId }, chargerDtoRequest);
+
 
             ChargerResponseDto chargerResponseDto = new ChargerResponseDto()
             {
