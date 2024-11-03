@@ -9,27 +9,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using MidProject.Models.Dto.Request;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 public class ServicerService : IServicer
 {
     private readonly MidprojectDbContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ServicerService(MidprojectDbContext context)
+    public ServicerService(MidprojectDbContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     // Service management
 
+    private string GetAccountId() =>
+        _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
     public async Task<ServiceInfoResponseDto> CreateServiceInfoAsync(ServiceInfoRequestDto serviceInfoDto)
     {
+        var accountId = GetAccountId();
+        var owner = await _context.Providers.FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+        if (owner == null)
+        {
+            throw new UnauthorizedAccessException("Owner not found");
+        }
+
         var serviceInfo = new ServiceInfo
         {
             Name = serviceInfoDto.Name,
             Description = serviceInfoDto.Description,
             Contact = serviceInfoDto.Contact,
             Type = serviceInfoDto.Type,
-            ProviderId = serviceInfoDto.ProviderId,
+            ProviderId = owner.ProviderId, // Auto-generate ProviderId
         };
 
         _context.ServiceInfos.Add(serviceInfo);
@@ -42,7 +57,6 @@ public class ServicerService : IServicer
             Description = serviceInfo.Description,
             Contact = serviceInfo.Contact,
             Type = serviceInfo.Type,
-
         };
     }
 
@@ -64,13 +78,21 @@ public class ServicerService : IServicer
             Description = serviceInfo.Description,
             Contact = serviceInfo.Contact,
             Type = serviceInfo.Type,
-
         };
     }
 
     public async Task<IEnumerable<ServiceInfoResponseDto>> GetAllServiceInfosAsync()
     {
+        var accountId = GetAccountId();
+        var owner = await _context.Providers.FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+        if (owner == null)
+        {
+            throw new UnauthorizedAccessException("Owner not found");
+        }
+
         return await _context.ServiceInfos
+            .Where(serviceInfo => serviceInfo.ProviderId == owner.ProviderId) // Filter by ProviderId
             .Include(s => s.Provider)
             .Select(serviceInfo => new ServiceInfoResponseDto
             {
@@ -79,11 +101,9 @@ public class ServicerService : IServicer
                 Description = serviceInfo.Description,
                 Contact = serviceInfo.Contact,
                 Type = serviceInfo.Type,
-
-
-
             }).ToListAsync();
     }
+
 
     public async Task<bool> UpdateServiceInfoAsync(int serviceInfoId, ServiceInfoRequestDto serviceInfoDto)
     {
@@ -98,7 +118,6 @@ public class ServicerService : IServicer
         serviceInfo.Description = serviceInfoDto.Description;
         serviceInfo.Contact = serviceInfoDto.Contact;
         serviceInfo.Type = serviceInfoDto.Type;
-        serviceInfo.ProviderId = serviceInfoDto.ProviderId;
 
         _context.ServiceInfos.Update(serviceInfo);
         await _context.SaveChangesAsync();
