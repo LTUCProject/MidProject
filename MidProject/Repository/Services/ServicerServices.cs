@@ -160,15 +160,17 @@ public class ServicerService : IServicer
 
     public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(int serviceRequestId)
     {
+        var accountId = GetAccountId();
+
         var serviceRequest = await _context.ServiceRequests
             .Include(sr => sr.ServiceInfo)
             .Include(sr => sr.Client)
             .Include(sr => sr.Provider)
-            .FirstOrDefaultAsync(sr => sr.ServiceRequestId == serviceRequestId);
+            .FirstOrDefaultAsync(sr => sr.ServiceRequestId == serviceRequestId && sr.Provider.AccountId == accountId);
 
         if (serviceRequest == null)
         {
-            return null;
+            return null; // Either request doesn't exist or doesn't belong to the current user
         }
 
         return new ServiceRequestDto
@@ -198,12 +200,14 @@ public class ServicerService : IServicer
 
     public async Task<IEnumerable<ServiceRequestDto>> GetServiceRequestsByServiceInfoIdAsync(int serviceInfoId)
     {
+        var accountId = GetAccountId();
+
         return await _context.ServiceRequests
-            .Where(sr => sr.ServiceInfoId == serviceInfoId)
+            .Where(sr => sr.ServiceInfoId == serviceInfoId && sr.Provider.AccountId == accountId)
             .Include(sr => sr.ServiceInfo)
             .Include(sr => sr.Client)
             .Include(sr => sr.Provider)
-            .Include(sr => sr.Vehicle) // Ensure Vehicle is included
+            .Include(sr => sr.Vehicle)
             .Select(serviceRequest => new ServiceRequestDto
             {
                 ServiceRequestId = serviceRequest.ServiceRequestId,
@@ -252,14 +256,16 @@ public class ServicerService : IServicer
     }
 
 
-
     public async Task<bool> UpdateServiceRequestStatusAsync(int serviceRequestId, string status)
     {
-        var serviceRequest = await _context.ServiceRequests.FindAsync(serviceRequestId);
+        var accountId = GetAccountId();
+
+        var serviceRequest = await _context.ServiceRequests
+            .FirstOrDefaultAsync(sr => sr.ServiceRequestId == serviceRequestId && sr.Provider.AccountId == accountId);
 
         if (serviceRequest == null)
         {
-            return false;
+            return false; // Either request doesn't exist or doesn't belong to the current user
         }
 
         serviceRequest.Status = status;
@@ -271,11 +277,14 @@ public class ServicerService : IServicer
 
     public async Task<bool> DeleteServiceRequestAsync(int serviceRequestId)
     {
-        var serviceRequest = await _context.ServiceRequests.FindAsync(serviceRequestId);
+        var accountId = GetAccountId();
+
+        var serviceRequest = await _context.ServiceRequests
+            .FirstOrDefaultAsync(sr => sr.ServiceRequestId == serviceRequestId && sr.Provider.AccountId == accountId);
 
         if (serviceRequest == null)
         {
-            return false;
+            return false; // Either request doesn't exist or doesn't belong to the current user
         }
 
         _context.ServiceRequests.Remove(serviceRequest);

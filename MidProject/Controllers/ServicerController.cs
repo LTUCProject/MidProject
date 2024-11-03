@@ -97,44 +97,86 @@ namespace MidProject.Controllers
         [HttpGet("servicerequest/{id}")]
         public async Task<IActionResult> GetServiceRequestById(int id)
         {
-            var serviceRequest = await _servicerService.GetServiceRequestByIdAsync(id);
-            if (serviceRequest == null)
+            try
             {
-                return NotFound();
+                var serviceRequest = await _servicerService.GetServiceRequestByIdAsync(id);
+                if (serviceRequest == null)
+                {
+                    return NotFound(new { message = "Service request not found or access denied." });
+                }
+                return Ok(serviceRequest);
             }
-            return Ok(serviceRequest);
+            catch (Exception ex)
+            {
+                // Log exception for debugging if needed
+                return StatusCode(500, new { message = "An error occurred while retrieving the service request.", details = ex.Message });
+            }
         }
 
         [HttpGet("servicerequests/serviceinfo/{serviceInfoId}")]
         public async Task<IActionResult> GetServiceRequestsByServiceInfoId(int serviceInfoId)
         {
-            var serviceRequests = await _servicerService.GetServiceRequestsByServiceInfoIdAsync(serviceInfoId);
-            return Ok(serviceRequests);
+            try
+            {
+                var serviceRequests = await _servicerService.GetServiceRequestsByServiceInfoIdAsync(serviceInfoId);
+                if (serviceRequests == null || !serviceRequests.Any())
+                {
+                    return NotFound(new { message = "No service requests found for the provided ServiceInfo ID." });
+                }
+                return Ok(serviceRequests);
+            }
+            catch (Exception ex)
+            {
+                // Log exception for debugging if needed
+                return StatusCode(500, new { message = "An error occurred while retrieving service requests.", details = ex.Message });
+            }
         }
 
         [HttpPut("servicerequest/{id}/status")]
         public async Task<IActionResult> UpdateServiceRequestStatus(int id, [FromBody] string status)
         {
-            var result = await _servicerService.UpdateServiceRequestStatusAsync(id, status);
-            if (!result)
+            if (string.IsNullOrWhiteSpace(status))
             {
-                return NotFound();
+                return BadRequest(new { message = "Status is required." });
             }
-            return NoContent();
+
+            try
+            {
+                var result = await _servicerService.UpdateServiceRequestStatusAsync(id, status);
+                if (!result)
+                {
+                    return NotFound(new { message = "Service request not found or access denied." });
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Log exception for debugging if needed
+                return StatusCode(500, new { message = "An error occurred while updating the service request status.", details = ex.Message });
+            }
         }
 
         [HttpDelete("servicerequest/{id}")]
         public async Task<IActionResult> DeleteServiceRequest(int id)
         {
-            var result = await _servicerService.DeleteServiceRequestAsync(id);
-            if (!result)
+            try
             {
-                return NotFound();
+                var result = await _servicerService.DeleteServiceRequestAsync(id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Service request not found or access denied." });
+                }
+                return NoContent();
             }
-            return NoContent();
+            catch (Exception ex)
+            {
+                // Log exception for debugging if needed
+                return StatusCode(500, new { message = "An error occurred while deleting the service request.", details = ex.Message });
+            }
         }
 
-        
+
+
         // Notification Management
         [HttpPost("ServicerNotifications")]
         public async Task<ActionResult<NotificationResponseDto>> CreateNotificationAsync([FromBody] NotificationDto notificationDto)
