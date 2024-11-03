@@ -7,6 +7,7 @@ using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Response;
 using MidProject.Repository.Interfaces;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MidProject.Controllers
@@ -23,13 +24,25 @@ namespace MidProject.Controllers
             _servicerService = servicerService;
         }
 
+
         // ServiceInfo Endpoints
 
         [HttpPost("serviceinfo")]
         public async Task<IActionResult> CreateServiceInfo(ServiceInfoRequestDto serviceInfoDto)
         {
-            var serviceInfoId = await _servicerService.CreateServiceInfoAsync(serviceInfoDto);
-            return CreatedAtAction(nameof(GetServiceInfoById), new { id = serviceInfoId }, serviceInfoId);
+            try
+            {
+                var createdServiceInfo = await _servicerService.CreateServiceInfoAsync(serviceInfoDto);
+                return CreatedAtAction(nameof(GetServiceInfoById), new { id = createdServiceInfo.ServiceInfoId }, createdServiceInfo);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet("serviceinfo/{id}")]
@@ -43,7 +56,7 @@ namespace MidProject.Controllers
             return Ok(serviceInfo);
         }
 
-        [HttpGet("serviceinfos")]
+        [HttpGet("serviceinfo")]
         public async Task<IActionResult> GetAllServiceInfos()
         {
             var serviceInfos = await _servicerService.GetAllServiceInfosAsync();
