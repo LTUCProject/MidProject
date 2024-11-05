@@ -27,10 +27,10 @@ namespace MidProject.Repository.Services
             {
                 Resource = Send.Resource,
             }
-            .Property(Send.FromEmail, "abedradwan84.5@gmail.com")
+            .Property(Send.FromEmail, "electrovehicleworld@gmail.com")
             .Property(Send.FromName, "EV Management System")
             .Property(Send.Subject, "Registering")
-            .Property(Send.TextPart, "\"Welcome to EV Management System\",\r\n\"Thank you for registering! You can now log in and start using the platform.\"").Property(Send.HtmlPart, htmlPart)
+            .Property(Send.HtmlPart, "This is your virifacation code " + htmlPart)
             .Property(Send.Recipients, new JArray {
             new JObject {
                 {"Email", toEmail},
