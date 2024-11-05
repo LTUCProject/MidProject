@@ -843,11 +843,16 @@ namespace MidProject.Repository.Services
             }
 
             return await _context.Bookings
+                .Include(b => b.Client) // Include Client data
+                .Include(b => b.Vehicle) // Include Vehicle data if necessary
                 .Where(b => b.ChargingStationId == stationId && b.Status == "Pending")
                 .Select(b => new BookingDto
                 {
                     BookingId = b.BookingId,
                     ClientId = b.ClientId,
+                    ClientName = b.Client.Name,
+                    ClientEmail = b.Client.Email,
+                    VehicleModel = b.Vehicle.Model, // Changed to VehicleModel assuming Vehicle is a navigation property
                     ChargingStationId = b.ChargingStationId,
                     VehicleId = b.VehicleId,
                     StartTime = b.StartTime,
@@ -857,7 +862,6 @@ namespace MidProject.Repository.Services
                 })
                 .ToListAsync();
         }
-
 
         public async Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost)
         {
