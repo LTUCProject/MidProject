@@ -12,8 +12,9 @@ namespace MidProject.Repository.Interfaces
         public Task<AccountRegisterdResponseDto> LogOut(string username);
         public Task<AccountRegisterdResponseDto> GetTokens(ClaimsPrincipal claimsPrincipal);
         public Task<AccountRegisterdResponseDto> DeleteAccount(string username);
-        Task<bool> SendPasswordResetEmailAsync(string email);
-        Task<bool> ResetPasswordAsync(ResetPasswordDto passwordDto);
+        Task SendPasswordResetEmailAsync(string email);
+        bool ValidateCode(int code);
+        Task<string> NewPassword(string newPassword, int c);
         public Task<IdentityResult> ChangePasswordAsync(string userId, ChangePasswordDTO model);
     }
 }

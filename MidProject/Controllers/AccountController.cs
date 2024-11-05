@@ -149,25 +149,52 @@ namespace MidProject.Controllers
             }
         }
 
-        [HttpPost("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
-        {
-            await _accountServices.SendPasswordResetEmailAsync(forgotPasswordDto.Email);
-            return Ok("If the email is registered, a password reset link will be sent.");
-        }
-
         [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword(string email)
         {
-            var result = await _accountServices.ResetPasswordAsync(resetPasswordDto);
-
-            if (result)
+            try
             {
-                return Ok("Password has been reset successfully.");
+                await _accountServices.SendPasswordResetEmailAsync(email);
+                return Ok("Verification code sent to email.");
             }
-
-            return BadRequest("Error occurred while resetting the password.");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+        [HttpPost("ValidateCode")]
+        public async Task<IActionResult> ValidateCode(int code)
+        {
+            try
+            {
+                var isValid = _accountServices.ValidateCode(code);
+                if (!isValid)
+                {
+                    return BadRequest("Invalid or expired code.");
+                }
+                return Ok("Code is valid.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("NewPassword")]
+        public async Task<IActionResult> NewPassword(string newPassword, int code)
+        {
+            try
+            {
+                var result = await _accountServices.NewPassword(newPassword, code);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)

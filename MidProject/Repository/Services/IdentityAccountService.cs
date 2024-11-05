@@ -36,43 +36,48 @@ namespace MidProject.Repository.Services
             _emailService = emailService;
             _baseUrl = configuration["BaseUrl"]; // Assume you have a setting called BaseUrl
             }
-        
 
-        public async Task<bool> SendPasswordResetEmailAsync(string email)
+
+        private static int? ran;
+        private static string? email;
+
+        public async Task SendPasswordResetEmailAsync(string email1)
         {
-            var account = await _accountManager.FindByEmailAsync(email);
-            if (account == null)
+            var resetEmail = await _accountManager.FindByEmailAsync(email1);
+            if (resetEmail != null)
             {
-                // Optionally, return true to prevent user enumeration
-                return true;
+                ran = new Random().Next(1111, 9999);
+                await _emailService.SendEmailAsync(resetEmail.Email, resetEmail.UserName, ran.ToString());
+                email = email1;
             }
 
-            var token = await _accountManager.GeneratePasswordResetTokenAsync(account);
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-            // Prepare the reset password link
-            var resetLink = $"{_baseUrl}/reset-password?email={account.Email}&token={encodedToken}";
-            var subject = "Reset Password";
-
-            // Prepare email content
-            string emailBody = $"<h1>Password Reset Request</h1><p>Please reset your password by clicking the link below:</p><a href=\"{resetLink}\">Reset Password</a>";
-
-            // Send the email
-            await _emailService.SendEmailAsync(email, subject, emailBody);
-            return true;
         }
-
-        public async Task<bool> ResetPasswordAsync(ResetPasswordDto passwordDto)
+        public bool ValidateCode(int code)
         {
-            var account = await _accountManager.FindByEmailAsync(passwordDto.Email);
-            if (account == null)
-            {
-                return false; // Consider returning a more informative response
-            }
+            return ran.HasValue && code == ran; // Validate the code
+        }
+        public async Task<string> NewPassword(string newPassword, int c)
 
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(passwordDto.Token));
-            var result = await _accountManager.ResetPasswordAsync(account, decodedToken, passwordDto.NewPassword);
-            return result.Succeeded;
+        {
+            bool code = ValidateCode(c);
+            if (code)
+            {
+                // Find the user by the stored email
+                var user = await _accountManager.FindByEmailAsync(email);
+                if (user != null)
+                {
+                    // Set the new password directly
+                    user.PasswordHash = _accountManager.PasswordHasher.HashPassword(user, newPassword);
+                    // Update the user in the database
+                    var result = await _accountManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return "Password has been reset successfully.";
+                    }
+                    return "Failed to reset password.";
+                }
+            }
+            return "User not found.";
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
