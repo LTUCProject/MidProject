@@ -9,6 +9,9 @@ namespace MidProject.Models.Dto.Response
 
         [Required]
         public int ClientId { get; set; }
+        public string ClientName { get; internal set; }
+        public string ClientEmail { get; internal set; }
+        public string VehicleModel { get; internal set; }
 
         [Required]
         public int ChargingStationId { get; set; }
@@ -28,5 +31,6 @@ namespace MidProject.Models.Dto.Response
 
         [Range(0, int.MaxValue)]
         public int Cost { get; set; } = 0; // Default to 0
+
     }
 }

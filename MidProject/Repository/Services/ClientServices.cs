@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using MidProject.Data;
 using MidProject.Models;
@@ -12,12 +13,16 @@ namespace MidProject.Repository.Services
     public class ClientServices : IClient
     {
         private readonly MidprojectDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ClientServices(MidprojectDbContext context)
+        public ClientServices(MidprojectDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        private string GetAccountId()=> _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
         // Session management
         public async Task<IEnumerable<Session>> GetClientSessionsAsync(int clientId)
         {
@@ -467,19 +472,45 @@ namespace MidProject.Repository.Services
             }
         }
 
+      
+
         // Notification management
-        public async Task<IEnumerable<Notification>> GetClientNotificationsAsync(int clientId)
+        public async Task<IEnumerable<Notification>> GetClientNotificationsAsync()
         {
+            var accountId = GetAccountId();
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+            if (client == null)
+            {
+                throw new UnauthorizedAccessException("Client not found");
+            }
+
             return await _context.Notifications
-                .Where(n => n.ClientId == clientId)
+                .Where(n => n.ClientId == client.ClientId)
                 .ToListAsync();
         }
 
         public async Task<Notification> GetNotificationByIdAsync(int notificationId)
         {
-            return await _context.Notifications
-                .FirstOrDefaultAsync(n => n.NotificationId == notificationId);
+            var accountId = GetAccountId();
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+            if (client == null)
+            {
+                throw new UnauthorizedAccessException("Client not found");
+            }
+
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.NotificationId == notificationId && n.ClientId == client.ClientId);
+
+            if (notification == null)
+            {
+                throw new KeyNotFoundException("Notification not found or does not belong to the client");
+            }
+
+            return notification;
         }
+
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {

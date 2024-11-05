@@ -358,20 +358,43 @@ namespace MidProject.Controllers
 
         // Notification management
         [HttpGet("notifications/{clientId}")]
-        public async Task<ActionResult<IEnumerable<Notification>>> GetClientNotifications(int clientId)
+        public async Task<ActionResult<IEnumerable<NotResDto>>> GetClientNotifications()
         {
-            var notifications = await _context.GetClientNotificationsAsync(clientId);
-            return Ok(notifications);
+            var notifications = await _context.GetClientNotificationsAsync();
+
+            // Map Notifications to NotResDto
+            var notResDtos = notifications.Select(n => new NotResDto
+            {
+                NotificationId = n.NotificationId,
+                ClientId = n.ClientId,
+                Title = n.Title,
+                Message = n.Message,
+                Date = n.Date
+            });
+
+            return Ok(notResDtos);
         }
 
         [HttpGet("notification/{notificationId}")]
-        public async Task<ActionResult<Notification>> GetNotificationById(int notificationId)
+        public async Task<ActionResult<NotResDto>> GetNotificationById(int notificationId)
         {
             var notification = await _context.GetNotificationByIdAsync(notificationId);
             if (notification == null)
                 return NotFound();
-            return Ok(notification);
+
+            // Map Notification to NotResDto
+            var notResDto = new NotResDto
+            {
+                NotificationId = notification.NotificationId,
+                ClientId = notification.ClientId,
+                Title = notification.Title,
+                Message = notification.Message,
+                Date = notification.Date
+            };
+
+            return Ok(notResDto);
         }
+
 
         // Post management
         [HttpGet("posts")]
