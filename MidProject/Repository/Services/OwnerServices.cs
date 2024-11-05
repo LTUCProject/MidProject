@@ -9,17 +9,24 @@ using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Request;
 using System;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace MidProject.Repository.Services
 {
     public class OwnerServices : IOwner
     {
         private readonly MidprojectDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OwnerServices(MidprojectDbContext context)
+        public OwnerServices(MidprojectDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string GetAccountId() =>
+       _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         // Charging Station Management
         public async Task<IEnumerable<ChargingStationResponseDto>> GetAllChargingStationsAsync(string accountId)
@@ -724,15 +731,32 @@ namespace MidProject.Repository.Services
             }
         }
 
+
+
         // Booking management
         public async Task<IEnumerable<BookingDto>> GetBookingsByChargingStationAsync(int stationId)
         {
+            var accountId = GetAccountId();
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to access these bookings.");
+            }
+
             return await _context.Bookings
+                .Include(b => b.Client) // Include Client data
+                .Include(b => b.Vehicle) // Include Vehicle data if necessary
                 .Where(b => b.ChargingStationId == stationId)
                 .Select(b => new BookingDto
                 {
                     BookingId = b.BookingId,
                     ClientId = b.ClientId,
+                    ClientName = b.Client.Name,
+                    ClientEmail = b.Client.Email,
+                    VehicleModel = b.Vehicle.Model, // Changed to VehicleModel assuming Vehicle is a navigation property
                     ChargingStationId = b.ChargingStationId,
                     VehicleId = b.VehicleId,
                     StartTime = b.StartTime,
@@ -743,13 +767,25 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
+
+
         public async Task<BookingDto> GetBookingByIdAsync(int bookingId)
         {
+            var accountId = GetAccountId();
             var booking = await _context.Bookings
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
             if (booking == null)
                 return null;
+
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == booking.ChargingStationId))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to access this booking.");
+            }
 
             return new BookingDto
             {
@@ -764,8 +800,19 @@ namespace MidProject.Repository.Services
             };
         }
 
+
         public async Task<IEnumerable<BookingDto>> GetBookingsByDateRangeAsync(int stationId, DateTime startDate, DateTime endDate)
         {
+            var accountId = GetAccountId();
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to access these bookings.");
+            }
+
             return await _context.Bookings
                 .Where(b => b.ChargingStationId == stationId && b.StartTime >= startDate && b.EndTime <= endDate)
                 .Select(b => new BookingDto
@@ -782,8 +829,19 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
+
         public async Task<IEnumerable<BookingDto>> GetPendingBookingsByChargingStationAsync(int stationId)
         {
+            var accountId = GetAccountId();
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to access these bookings.");
+            }
+
             return await _context.Bookings
                 .Where(b => b.ChargingStationId == stationId && b.Status == "Pending")
                 .Select(b => new BookingDto
@@ -800,45 +858,49 @@ namespace MidProject.Repository.Services
                 .ToListAsync();
         }
 
+
         public async Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost)
         {
+            var accountId = GetAccountId();
             var booking = await _context.Bookings
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
-            if (booking != null)
-            {
-                booking.Status = newStatus;
-                booking.Cost = newCost;
+            if (booking == null)
+                throw new KeyNotFoundException("Booking not found.");
 
-                _context.Bookings.Update(booking);
-                await _context.SaveChangesAsync();
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == booking.ChargingStationId))
+            {
+                throw new UnauthorizedAccessException("You are not authorized to update this booking.");
             }
+
+            booking.Status = newStatus;
+            booking.Cost = newCost;
+
+            _context.Bookings.Update(booking);
+            await _context.SaveChangesAsync();
         }
+
 
         //Session
         // Session management
         public async Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId)
         {
+            var accountId = GetAccountId(); // Get the account ID from the context
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null)
+            {
+                throw new UnauthorizedAccessException("Owner not found");
+            }
+
             return await _context.Sessions
-                .Where(s => s.ChargingStationId == stationId)
-                .Select(s => new SessionDtoResponse
-                {
-                    SessionId = s.SessionId,
-                    ClientId = s.ClientId,
-                    ChargingStationId = s.ChargingStationId,
-                    StartTime = s.StartTime,
-                    EndTime = s.EndTime,
-                    EnergyConsumed = s.EnergyConsumed,
-                    Cost = s.Cost // Make sure this line matches the property name in your Session class
-                })
-                .ToListAsync();
-        }
-
-
-        public async Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId)
-        {
-            var session = await _context.Sessions
-                .Where(s => s.SessionId == sessionId)
+                .Where(s => s.ChargingStationId == stationId && owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
                 .Select(s => new SessionDtoResponse
                 {
                     SessionId = s.SessionId,
@@ -848,26 +910,72 @@ namespace MidProject.Repository.Services
                     EndTime = s.EndTime,
                     EnergyConsumed = s.EnergyConsumed,
                     Cost = s.Cost
+                })
+                .ToListAsync();
+        }
 
+        public async Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId)
+        {
+            var accountId = GetAccountId(); // Get the account ID from the context
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null)
+            {
+                throw new UnauthorizedAccessException("Owner not found");
+            }
+
+            var session = await _context.Sessions
+                .Where(s => s.SessionId == sessionId && owner.ChargingStations.Any(cs => cs.ChargingStationId == s.ChargingStationId))
+                .Select(s => new SessionDtoResponse
+                {
+                    SessionId = s.SessionId,
+                    ClientId = s.ClientId,
+                    ChargingStationId = s.ChargingStationId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    EnergyConsumed = s.EnergyConsumed,
+                    Cost = s.Cost
                 })
                 .FirstOrDefaultAsync();
+
+            if (session == null)
+            {
+                throw new UnauthorizedAccessException("Session not found for this owner");
+            }
 
             return session;
         }
 
         public async Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost)
         {
-            var session = await _context.Sessions.FindAsync(sessionId);
+            var accountId = GetAccountId(); // Get the account ID from the context
+            var owner = await _context.Providers
+                .Include(p => p.ChargingStations)
+                .FirstOrDefaultAsync(p => p.AccountId == accountId);
+
+            if (owner == null)
+            {
+                throw new UnauthorizedAccessException("Owner not found");
+            }
+
+            var session = await _context.Sessions
+                .FirstOrDefaultAsync(s => s.SessionId == sessionId && owner.ChargingStations.Any(cs => cs.ChargingStationId == s.ChargingStationId));
+
             if (session != null)
             {
                 session.EnergyConsumed = energyConsumed;
-
                 session.Cost = cost;
 
                 _context.Sessions.Update(session);
                 await _context.SaveChangesAsync();
             }
-
+            else
+            {
+                throw new UnauthorizedAccessException("Session not found for this owner");
+            }
         }
+
     }
 }

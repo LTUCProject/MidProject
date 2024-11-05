@@ -51,7 +51,7 @@ namespace MidProject.Repository.Interfaces
         Task RemoveFeedbackAsync(int feedbackId);
 
         // Notifications management
-        Task<IEnumerable<Notification>> GetClientNotificationsAsync(int clientId);
+        Task<IEnumerable<Notification>> GetClientNotificationsAsync();
         Task<Notification> GetNotificationByIdAsync(int notificationId);
 
         // Post management
