@@ -842,6 +842,7 @@ namespace MidProject.Repository.Services
                 throw new UnauthorizedAccessException("You are not authorized to access these bookings.");
             }
 
+
             return await _context.Bookings
                 .Include(b => b.Client) // Include Client data
                 .Include(b => b.Vehicle) // Include Vehicle data if necessary
