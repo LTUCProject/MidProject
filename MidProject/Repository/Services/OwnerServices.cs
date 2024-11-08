@@ -539,10 +539,12 @@ namespace MidProject.Repository.Services
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
             return await _context.Posts
-                .Include(p => p.Account)  // Include Account to fetch UserName
-                .Include(p => p.Comments) // Include Comments if needed
+                .Include(p => p.Account)          // Include Account to fetch UserName for the Post
+                .Include(p => p.Comments)         // Include Comments collection
+                    .ThenInclude(c => c.Account)  
                 .ToListAsync();
         }
+
 
 
         public async Task<PostResponseDto> AddPostAsync(PostDto postDto)
@@ -756,7 +758,7 @@ namespace MidProject.Repository.Services
                     ClientId = b.ClientId,
                     ClientName = b.Client.Name,
                     ClientEmail = b.Client.Email,
-                    VehicleModel = b.Vehicle.Model, // Changed to VehicleModel assuming Vehicle is a navigation property
+                    VehicleModel = b.Vehicle.Model, 
                     ChargingStationId = b.ChargingStationId,
                     VehicleId = b.VehicleId,
                     StartTime = b.StartTime,

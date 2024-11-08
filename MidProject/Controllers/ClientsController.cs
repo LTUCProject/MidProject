@@ -29,6 +29,13 @@ namespace MidProject.Controllers
             return User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // or another claim type for accountId
         }
 
+        [HttpGet("ChargingStations")]
+        public async Task<IActionResult> GetAllChargingStations()
+        {
+            var chargingStations = await _context.GetAllChargingStationsAsync();
+            return Ok(chargingStations);
+        }
+
         // Session management
         [HttpGet("sessions")]
         public async Task<ActionResult<IEnumerable<Session>>> GetSessions(int clientId)
@@ -222,9 +229,9 @@ namespace MidProject.Controllers
 
         // Retrieve bookings for a specific client
         [HttpGet("bookings/{clientId}")]
-        public async Task<ActionResult<IEnumerable<Booking>>> GetClientBookings(int clientId)
+        public async Task<ActionResult<IEnumerable<Booking>>> GetClientBookings()
         {
-            var bookings = await _context.GetClientBookingsAsync(clientId);
+            var bookings = await _context.GetClientBookingsAsync();
             if (bookings == null || !bookings.Any())
                 return NotFound("No bookings found for this client.");
             return Ok(bookings);
@@ -242,7 +249,7 @@ namespace MidProject.Controllers
 
         // Create a new booking
         [HttpPost("bookings")]
-        public async Task<ActionResult<BookingResponseDto>> AddBooking([FromBody] BookingDto bookingDto)
+        public async Task<ActionResult<BookingResponseDto>> AddBooking([FromBody] ClientBookingDto bookingDto)
         {
             // Ensure the bookingDto contains valid data
             if (!ModelState.IsValid)
@@ -275,6 +282,8 @@ namespace MidProject.Controllers
             var bookingExists = await _context.GetBookingByIdAsync(bookingId);
             if (bookingExists == null)
                 return NotFound("Booking not found.");
+
+
 
             await _context.RemoveBookingAsync(bookingId);
             return NoContent();
