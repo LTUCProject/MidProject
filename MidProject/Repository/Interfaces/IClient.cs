@@ -7,6 +7,9 @@ namespace MidProject.Repository.Interfaces
 {
     public interface IClient
     {
+        //ChargingStation Management
+        Task<IEnumerable<ChargingStationResponseAdminDto>> GetAllChargingStationsAsync();
+
         // Session management
         Task<IEnumerable<Session>> GetClientSessionsAsync(int clientId);
         Task<Session> GetSessionByIdAsync(int sessionId);
@@ -34,9 +37,9 @@ namespace MidProject.Repository.Interfaces
         Task RemoveVehicleAsync(int vehicleId);
 
         // Booking management
-        Task<IEnumerable<BookingDto>> GetClientBookingsAsync(int clientId);
+        Task<IEnumerable<BookingDto>> GetClientBookingsAsync();
         Task<BookingDto> GetBookingByIdAsync(int bookingId);
-        Task<Booking> AddBookingAsync(BookingDto bookingDto);
+        Task<BookingDto> AddBookingAsync(ClientBookingDto bookingDto);
         Task RemoveBookingAsync(int bookingId);
 
         // Service request management

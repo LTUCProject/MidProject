@@ -359,8 +359,9 @@ public class ServicerService : IServicer
     public async Task<IEnumerable<Post>> GetAllPostsAsync()
     {
         return await _context.Posts
-            .Include(p => p.Account)  // Include Account to fetch UserName
-            .Include(p => p.Comments) // Include Comments if needed
+            .Include(p => p.Account)          // Include Account to fetch UserName for the Post
+            .Include(p => p.Comments)         // Include Comments collection
+                .ThenInclude(c => c.Account)
             .ToListAsync();
     }
 
