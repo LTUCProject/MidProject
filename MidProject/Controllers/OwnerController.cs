@@ -515,30 +515,75 @@ namespace MidProject.Controllers
         }
 
         //Session
-        // Session management
-        [HttpGet("sessionsByChargingStation/{stationId}")]
-        public async Task<ActionResult<IEnumerable<SessionDtoResponse>>> GetSessionsByChargingStation(int stationId)
+        [HttpPost("start")]
+        public async Task<ActionResult<Session>> StartSession([FromBody] SessionDto sessionDto)
         {
-            var sessions = await _ownerService.GetSessionsByChargingStationAsync(stationId);
-            return Ok(sessions);
+            var session = await _ownerService.StartSessionAsync(sessionDto);
+            return CreatedAtAction(nameof(GetSessionById), new { sessionId = session.SessionId }, session);
         }
 
-        [HttpGet("sessionsById/{sessionId}")]
+        [HttpPost("end/{sessionId}")]
+        public async Task<ActionResult> EndSession(int sessionId, int energyConsumed, int cost)
+        {
+            try
+            {
+                await _ownerService.EndSessionAsync(sessionId, energyConsumed,cost);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("byChargingStation/{stationId}")]
+        public async Task<ActionResult<IEnumerable<SessionDtoResponse>>> GetSessionsByChargingStation(int stationId)
+        {
+            try
+            {
+                var sessions = await _ownerService.GetSessionsByChargingStationAsync(stationId);
+                return Ok(sessions);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+        }
+
+        [HttpGet("sessions/{sessionId}")]
         public async Task<ActionResult<SessionDtoResponse>> GetSessionById(int sessionId)
         {
-            var session = await _ownerService.GetSessionByIdAsync(sessionId);
-            if (session == null)
+            try
+            {
+                var session = await _ownerService.GetSessionByIdAsync(sessionId);
+                return Ok(session);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-            return Ok(session);
         }
 
-        [HttpPut("sessions/{sessionId}")]
+        [HttpPut("update/{sessionId}")]
         public async Task<ActionResult> UpdateSessionDetails(int sessionId, [FromBody] UpdateSessionDto updateSessionDto)
         {
-            await _ownerService.UpdateSessionDetailsAsync(sessionId, updateSessionDto.EnergyConsumed, updateSessionDto.Cost);
-            return NoContent();
+            try
+            {
+                await _ownerService.UpdateSessionDetailsAsync(sessionId, updateSessionDto.EnergyConsumed, updateSessionDto.Cost);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
 
     }

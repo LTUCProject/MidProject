@@ -61,10 +61,15 @@ namespace MidProject.Repository.Interfaces
         Task UpdateBookingDetailsAsync(int bookingId, string newStatus, int newCost); // Combined method for status and cost updates
 
         // Session management
-        Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId);
-        Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId);
-        Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost);
+        Task<Session> StartSessionAsync(SessionDto sessionDto);
 
+        Task EndSessionAsync(int sessionId, int energyConsumed, int cost);
+
+        Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId);
+
+        Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId);
+
+        Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost);
 
 
     }

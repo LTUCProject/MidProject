@@ -541,7 +541,7 @@ namespace MidProject.Repository.Services
             return await _context.Posts
                 .Include(p => p.Account)          // Include Account to fetch UserName for the Post
                 .Include(p => p.Comments)         // Include Comments collection
-                    .ThenInclude(c => c.Account)  
+                    .ThenInclude(c => c.Account)
                 .ToListAsync();
         }
 
@@ -758,7 +758,7 @@ namespace MidProject.Repository.Services
                     ClientId = b.ClientId,
                     ClientName = b.Client.Name,
                     ClientEmail = b.Client.Email,
-                    VehicleModel = b.Vehicle.Model, 
+                    VehicleModel = b.Vehicle.Model,
                     ChargingStationId = b.ChargingStationId,
                     VehicleId = b.VehicleId,
                     StartTime = b.StartTime,
@@ -893,21 +893,61 @@ namespace MidProject.Repository.Services
 
 
         //Session
-        // Session management
+        public async Task<Session> StartSessionAsync(SessionDto sessionDto)
+        {
+            var session = new Session
+            {
+                ClientId = sessionDto.ClientId,
+                ChargingStationId = sessionDto.ChargingStationId,
+                StartTime = sessionDto.StartTime,
+                EndTime = sessionDto.EndTime,
+                //EnergyConsumed = sessionDto.EnergyConsumed,
+                //Cost = sessionDto.Cost
+            };
+
+            await _context.Sessions.AddAsync(session);
+            await _context.SaveChangesAsync();
+            return session;
+        }
+
+        public async Task EndSessionAsync(int sessionId, int energyConsumed, int cost)
+        {
+            var session = await _context.Sessions.FindAsync(sessionId);
+            if (session == null)
+            {
+                throw new KeyNotFoundException("Session not found.");
+            }
+
+            session.EndTime = DateTime.UtcNow;
+            session.EnergyConsumed = energyConsumed;
+            session.Cost = cost;
+
+            _context.Sessions.Update(session);
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task<IEnumerable<SessionDtoResponse>> GetSessionsByChargingStationAsync(int stationId)
         {
-            var accountId = GetAccountId(); // Get the account ID from the context
+            var accountId = GetAccountId();
             var owner = await _context.Providers
                 .Include(p => p.ChargingStations)
                 .FirstOrDefaultAsync(p => p.AccountId == accountId);
 
             if (owner == null)
             {
-                throw new UnauthorizedAccessException("Owner not found");
+                throw new UnauthorizedAccessException("Owner not found.");
             }
 
+            // Check if the owner has access to the specified charging station
+            if (!owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
+            {
+                throw new UnauthorizedAccessException("Access denied to the specified charging station.");
+            }
+
+            // Query sessions for the specified charging station
             return await _context.Sessions
-                .Where(s => s.ChargingStationId == stationId && owner.ChargingStations.Any(cs => cs.ChargingStationId == stationId))
+                .Where(s => s.ChargingStationId == stationId)
                 .Select(s => new SessionDtoResponse
                 {
                     SessionId = s.SessionId,
@@ -923,18 +963,18 @@ namespace MidProject.Repository.Services
 
         public async Task<SessionDtoResponse> GetSessionByIdAsync(int sessionId)
         {
-            var accountId = GetAccountId(); // Get the account ID from the context
+            var accountId = GetAccountId();
             var owner = await _context.Providers
                 .Include(p => p.ChargingStations)
                 .FirstOrDefaultAsync(p => p.AccountId == accountId);
 
             if (owner == null)
             {
-                throw new UnauthorizedAccessException("Owner not found");
+                throw new UnauthorizedAccessException("Owner not found.");
             }
 
             var session = await _context.Sessions
-                .Where(s => s.SessionId == sessionId && owner.ChargingStations.Any(cs => cs.ChargingStationId == s.ChargingStationId))
+                .Where(s => s.SessionId == sessionId)
                 .Select(s => new SessionDtoResponse
                 {
                     SessionId = s.SessionId,
@@ -947,42 +987,43 @@ namespace MidProject.Repository.Services
                 })
                 .FirstOrDefaultAsync();
 
-            if (session == null)
+            // Validate ownership of the charging station associated with the session
+            if (session == null || !owner.ChargingStations.Any(cs => cs.ChargingStationId == session.ChargingStationId))
             {
-                throw new UnauthorizedAccessException("Session not found for this owner");
+                throw new UnauthorizedAccessException("Session not found or access denied for this owner.");
             }
 
             return session;
         }
 
+
         public async Task UpdateSessionDetailsAsync(int sessionId, int energyConsumed, int cost)
         {
-            var accountId = GetAccountId(); // Get the account ID from the context
+            var accountId = GetAccountId();
             var owner = await _context.Providers
                 .Include(p => p.ChargingStations)
                 .FirstOrDefaultAsync(p => p.AccountId == accountId);
 
             if (owner == null)
             {
-                throw new UnauthorizedAccessException("Owner not found");
+                throw new UnauthorizedAccessException("Owner not found.");
             }
 
             var session = await _context.Sessions
-                .FirstOrDefaultAsync(s => s.SessionId == sessionId && owner.ChargingStations.Any(cs => cs.ChargingStationId == s.ChargingStationId));
+                .FirstOrDefaultAsync(s => s.SessionId == sessionId &&
+                    owner.ChargingStations.Any(cs => cs.ChargingStationId == s.ChargingStationId));
 
-            if (session != null)
+            if (session == null)
             {
-                session.EnergyConsumed = energyConsumed;
-                session.Cost = cost;
+                throw new UnauthorizedAccessException("Session not found for this owner.");
+            }
 
-                _context.Sessions.Update(session);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new UnauthorizedAccessException("Session not found for this owner");
-            }
+            session.EnergyConsumed = energyConsumed;
+            session.Cost = cost;
+
+            _context.Sessions.Update(session);
+            await _context.SaveChangesAsync();
         }
-
     }
+
 }
