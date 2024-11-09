@@ -23,8 +23,8 @@ namespace MidProject.Repository.Interfaces
 
 
         // Favorites management
-        Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync(int clientId);
-        Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync(int clientId);
+        Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync();
+        Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync();
         Task<FavoriteChargingStationResponseDto> AddChargingStationFavoriteAsync(FavoriteChargingStationDto favoriteDto);
         Task<FavoriteServiceInfoResponseDto> AddServiceInfoFavoriteAsync(FavoriteServiceInfoDto favoriteDto);
         Task RemoveChargingStationFavoriteAsync(int favoriteId);

@@ -152,125 +152,223 @@ namespace MidProject.Repository.Services
         }
 
         // Favorites management
-        // Retrieve all charging station favorites for a client with detailed information
-        public async Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync(int clientId)
-        {
-            return await _context.ChargingStationFavorites
-                .Where(f => f.ClientId == clientId)
-                .Include(f => f.ChargingStation) // Include the related ChargingStation entity
-                .Select(f => new FavoriteChargingStationResponseDto
-                {
-                    FavoriteId = f.ChargingStationFavoriteId,
-                    ChargingStationId = f.ChargingStationId,
-                    ClientId = f.ClientId,
-                    ChargingStationName = f.ChargingStation.Name, // Select only needed properties
-                    StationLocation = f.ChargingStation.StationLocation,
-                    HasParking = f.ChargingStation.HasParking,
-                    Status = f.ChargingStation.Status,
-                    PaymentMethod = f.ChargingStation.PaymentMethod
-                })
-                .ToListAsync();
-        }
 
-        // Retrieve all service info favorites for a client with detailed information
-        public async Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync(int clientId)
+        // Retrieve all charging station favorites for a client with detailed information
+        public async Task<IEnumerable<FavoriteChargingStationResponseDto>> GetClientChargingStationFavoritesAsync()
         {
-            return await _context.ServiceInfoFavorites
-                .Where(f => f.ClientId == clientId)
-                .Include(f => f.ServiceInfo) // Include the related ServiceInfo entity
-                .Select(f => new FavoriteServiceInfoResponseDto
+            try
+            {
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
+
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
                 {
-                    FavoriteId = f.ServiceInfoFavoriteId,
-                    ServiceInfoId = f.ServiceInfoId,
-                    ClientId = f.ClientId,
-                    ServiceInfoName = f.ServiceInfo.Name, // Select only needed properties
-                    Description = f.ServiceInfo.Description,
-                    Contact = f.ServiceInfo.Contact,
-                    Type = f.ServiceInfo.Type
-                })
-                .ToListAsync();
+                    throw new UnauthorizedAccessException("Client not found");
+                }
+
+                // Fetch the favorites for the found client
+                var favorites = await _context.ChargingStationFavorites
+                    .Where(f => f.ClientId == client.ClientId)  // Use the client.ClientId for filtering
+                    .Include(f => f.ChargingStation) // Include the related ChargingStation entity
+                    .Select(f => new FavoriteChargingStationResponseDto
+                    {
+                        FavoriteId = f.ChargingStationFavoriteId,
+                        ChargingStationId = f.ChargingStationId,
+                        ClientId = f.ClientId,
+                        ChargingStationName = f.ChargingStation.Name,
+                        StationLocation = f.ChargingStation.StationLocation,
+                        HasParking = f.ChargingStation.HasParking,
+                        Status = f.ChargingStation.Status,
+                        PaymentMethod = f.ChargingStation.PaymentMethod
+                    })
+                    .ToListAsync();
+
+                return favorites;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving client charging station favorites.", ex);
+            }
         }
 
         // Add a new charging station favorite
         public async Task<FavoriteChargingStationResponseDto> AddChargingStationFavoriteAsync(FavoriteChargingStationDto favoriteDto)
         {
-            var favorite = new ChargingStationFavorite
+            try
             {
-                ClientId = favoriteDto.ClientId,
-                ChargingStationId = favoriteDto.ChargingStationId
-            };
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
 
-            _context.ChargingStationFavorites.Add(favorite);
-            await _context.SaveChangesAsync();
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
 
-            var chargingStation = await _context.ChargingStations
-                .Where(cs => cs.ChargingStationId == favoriteDto.ChargingStationId)
-                .Select(cs => new FavoriteChargingStationResponseDto
+                if (client == null)
                 {
-                    FavoriteId = favorite.ChargingStationFavoriteId,
-                    ChargingStationId = cs.ChargingStationId,
-                    ClientId = favorite.ClientId,
-                    ChargingStationName = cs.Name, // Select only needed properties
-                    StationLocation = cs.StationLocation,
-                    HasParking = cs.HasParking,
-                    Status = cs.Status,
-                    PaymentMethod = cs.PaymentMethod
-                })
-                .FirstOrDefaultAsync();
+                    throw new UnauthorizedAccessException("Client not found");
+                }
 
-            return chargingStation;
+                // Create the new favorite
+                var favorite = new ChargingStationFavorite
+                {
+                    ClientId = client.ClientId,  // Use client.ClientId
+                    ChargingStationId = favoriteDto.ChargingStationId
+                };
+
+                _context.ChargingStationFavorites.Add(favorite);
+                await _context.SaveChangesAsync();
+
+                // Retrieve the details of the charging station just added
+                var chargingStation = await _context.ChargingStations
+                    .Where(cs => cs.ChargingStationId == favoriteDto.ChargingStationId)
+                    .Select(cs => new FavoriteChargingStationResponseDto
+                    {
+                        FavoriteId = favorite.ChargingStationFavoriteId,
+                        ChargingStationId = cs.ChargingStationId,
+                        ClientId = client.ClientId,  // Use client.ClientId
+                        ChargingStationName = cs.Name,
+                        StationLocation = cs.StationLocation,
+                        HasParking = cs.HasParking,
+                        Status = cs.Status,
+                        PaymentMethod = cs.PaymentMethod
+                    })
+                    .FirstOrDefaultAsync();
+
+                return chargingStation;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while adding a charging station favorite.", ex);
+            }
+        }
+
+        // Retrieve all service info favorites for a client with detailed information
+        public async Task<IEnumerable<FavoriteServiceInfoResponseDto>> GetClientServiceInfoFavoritesAsync()
+        {
+            try
+            {
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
+
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Client not found");
+                }
+
+                // Fetch the service info favorites for the found client
+                var favorites = await _context.ServiceInfoFavorites
+                    .Where(f => f.ClientId == client.ClientId)  // Use client.ClientId for filtering
+                    .Include(f => f.ServiceInfo) // Include the related ServiceInfo entity
+                    .Select(f => new FavoriteServiceInfoResponseDto
+                    {
+                        FavoriteId = f.ServiceInfoFavoriteId,
+                        ServiceInfoId = f.ServiceInfoId,
+                        ClientId = f.ClientId,
+                        ServiceInfoName = f.ServiceInfo.Name,
+                        Description = f.ServiceInfo.Description,
+                        Contact = f.ServiceInfo.Contact,
+                        Type = f.ServiceInfo.Type
+                    })
+                    .ToListAsync();
+
+                return favorites;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving client service info favorites.", ex);
+            }
         }
 
         // Add a new service info favorite
         public async Task<FavoriteServiceInfoResponseDto> AddServiceInfoFavoriteAsync(FavoriteServiceInfoDto favoriteDto)
         {
-            var favorite = new ServiceInfoFavorite
+            try
             {
-                ClientId = favoriteDto.ClientId,
-                ServiceInfoId = favoriteDto.ServiceInfoId
-            };
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
 
-            _context.ServiceInfoFavorites.Add(favorite);
-            await _context.SaveChangesAsync();
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
 
-            var serviceInfo = await _context.ServiceInfos
-                .Where(si => si.ServiceInfoId == favoriteDto.ServiceInfoId)
-                .Select(si => new FavoriteServiceInfoResponseDto
+                if (client == null)
                 {
-                    FavoriteId = favorite.ServiceInfoFavoriteId,
-                    ServiceInfoId = si.ServiceInfoId,
-                    ClientId = favorite.ClientId,
-                    ServiceInfoName = si.Name, // Select only needed properties
-                    Description = si.Description,
-                    Contact = si.Contact,
-                    Type = si.Type
-                })
-                .FirstOrDefaultAsync();
+                    throw new UnauthorizedAccessException("Client not found");
+                }
 
-            return serviceInfo;
+                // Create the new favorite
+                var favorite = new ServiceInfoFavorite
+                {
+                    ClientId = client.ClientId,  // Use client.ClientId
+                    ServiceInfoId = favoriteDto.ServiceInfoId
+                };
+
+                _context.ServiceInfoFavorites.Add(favorite);
+                await _context.SaveChangesAsync();
+
+                // Retrieve the details of the service info just added
+                var serviceInfo = await _context.ServiceInfos
+                    .Where(si => si.ServiceInfoId == favoriteDto.ServiceInfoId)
+                    .Select(si => new FavoriteServiceInfoResponseDto
+                    {
+                        FavoriteId = favorite.ServiceInfoFavoriteId,
+                        ServiceInfoId = si.ServiceInfoId,
+                        ClientId = client.ClientId,  // Use client.ClientId
+                        ServiceInfoName = si.Name,
+                        Description = si.Description,
+                        Contact = si.Contact,
+                        Type = si.Type
+                    })
+                    .FirstOrDefaultAsync();
+
+                return serviceInfo;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while adding a service info favorite.", ex);
+            }
         }
 
         // Remove a charging station favorite
         public async Task RemoveChargingStationFavoriteAsync(int favoriteId)
         {
-            var favorite = await _context.ChargingStationFavorites.FindAsync(favoriteId);
-            if (favorite != null)
+            try
             {
-                _context.ChargingStationFavorites.Remove(favorite);
-                await _context.SaveChangesAsync();
+                var favorite = await _context.ChargingStationFavorites.FindAsync(favoriteId);
+                if (favorite != null)
+                {
+                    _context.ChargingStationFavorites.Remove(favorite);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while removing the charging station favorite.", ex);
             }
         }
 
         // Remove a service info favorite
         public async Task RemoveServiceInfoFavoriteAsync(int favoriteId)
         {
-            var favorite = await _context.ServiceInfoFavorites.FindAsync(favoriteId);
-            if (favorite != null)
+            try
             {
-                _context.ServiceInfoFavorites.Remove(favorite);
-                await _context.SaveChangesAsync();
+                var favorite = await _context.ServiceInfoFavorites.FindAsync(favoriteId);
+                if (favorite != null)
+                {
+                    _context.ServiceInfoFavorites.Remove(favorite);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while removing the service info favorite.", ex);
             }
         }
+
 
         // Vehicle management
         public async Task<IEnumerable<VehicleResponseDto>> GetClientVehiclesAsync(string accountId)

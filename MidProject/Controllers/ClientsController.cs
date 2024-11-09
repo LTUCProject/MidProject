@@ -117,18 +117,19 @@ namespace MidProject.Controllers
 
         // Favorites management
         // Retrieve all charging station favorites for a client
-        [HttpGet("ChargingStationsFavorites/{clientId}")]
-        public async Task<ActionResult<IEnumerable<FavoriteChargingStationResponseDto>>> GetClientChargingStationFavorites(int clientId)
+        [HttpGet("ChargingStationsFavorites")]
+        public async Task<ActionResult<IEnumerable<FavoriteChargingStationResponseDto>>> GetClientChargingStationFavorites()
         {
-            var result = await _context.GetClientChargingStationFavoritesAsync(clientId);
+            var result = await _context.GetClientChargingStationFavoritesAsync();
             return Ok(result);
         }
 
+
         // Retrieve all service info favorites for a client
         [HttpGet("ServiceInfosFavorites/{clientId}")]
-        public async Task<ActionResult<IEnumerable<FavoriteServiceInfoResponseDto>>> GetClientServiceInfoFavorites(int clientId)
+        public async Task<ActionResult<IEnumerable<FavoriteServiceInfoResponseDto>>> GetClientServiceInfoFavorites()
         {
-            var result = await _context.GetClientServiceInfoFavoritesAsync(clientId);
+            var result = await _context.GetClientServiceInfoFavoritesAsync();
             return Ok(result);
         }
 
