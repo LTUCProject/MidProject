@@ -61,6 +61,7 @@ namespace MidProject.Repository.Interfaces
         // Notifications management
         Task<IEnumerable<Notification>> GetClientNotificationsAsync();
         Task<Notification> GetNotificationByIdAsync(int notificationId);
+        Task DeleteNotificationAsync(int notificationId);
 
         // Post management
         Task<IEnumerable<Post>> GetAllPostsAsync();

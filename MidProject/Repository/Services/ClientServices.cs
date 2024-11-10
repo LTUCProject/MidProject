@@ -880,7 +880,30 @@ namespace MidProject.Repository.Services
 
             return notification;
         }
+        public async Task DeleteNotificationAsync(int notificationId)
+        {
+            var accountId = GetAccountId();
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
 
+            if (client == null)
+            {
+                throw new UnauthorizedAccessException("Client not found");
+            }
+
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.NotificationId == notificationId && n.ClientId == client.ClientId);
+
+            if (notification == null)
+            {
+                throw new KeyNotFoundException("Notification not found or does not belong to the client");
+            }
+
+            _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+        }
+
+
+        //post managment 
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
