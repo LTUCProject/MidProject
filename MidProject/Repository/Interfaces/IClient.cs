@@ -43,9 +43,14 @@ namespace MidProject.Repository.Interfaces
         Task RemoveBookingAsync(int bookingId);
 
         // Service request management
-        Task<IEnumerable<ServiceRequest>> GetClientServiceRequestsAsync(int clientId);
+        Task<IEnumerable<ServiceRequestResponseDTO>> GetClientServiceRequestsAsync();
+
         Task<ServiceRequest> GetServiceRequestByIdAsync(int requestId);
-        Task<ServiceRequest> CreateServiceRequestAsync(ClientServiceRequestDto requestDto);
+
+        Task<IEnumerable<ClinetServiceInfoResponseDto>> GetAllServiceInfosAsync();
+
+        Task<ServiceRequestDtoResponse> CreateServiceRequestAsync(ClientServiceRequestDto requestDto);
+
         Task DeleteServiceRequestAsync(int requestId);
 
         // Feedback management

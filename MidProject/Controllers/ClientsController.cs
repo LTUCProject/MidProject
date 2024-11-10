@@ -291,45 +291,93 @@ namespace MidProject.Controllers
         }
 
 
-        // Service request management
-        [HttpGet("service-requests/{clientId}")]
-        public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetClientServiceRequests(int clientId)
+        // Get all service requests for a client
+        [HttpGet("service-requests")]
+        public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetClientServiceRequests()
         {
-            var serviceRequests = await _context.GetClientServiceRequestsAsync(clientId);
-            return Ok(serviceRequests);
+            try
+            {
+                var serviceRequests = await _context.GetClientServiceRequestsAsync();
+                return Ok(serviceRequests);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized("Client not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
+        // Get service request by ID
         [HttpGet("service-request/{requestId}")]
         public async Task<ActionResult<ServiceRequest>> GetServiceRequestById(int requestId)
         {
             var serviceRequest = await _context.GetServiceRequestByIdAsync(requestId);
             if (serviceRequest == null)
-                return NotFound();
+                return NotFound("Service request not found");
             return Ok(serviceRequest);
         }
 
-        [HttpPost("service-requests")]
-        public async Task<ActionResult> CreateServiceRequest([FromBody] ClientServiceRequestDto requestDto)
+        // Get all service infos
+        [HttpGet("service-infos")]
+        public async Task<ActionResult<IEnumerable<ServiceInfoResponseDto>>> GetAllServiceInfos()
         {
-            var newServiceReq = await _context.CreateServiceRequestAsync(requestDto);
-
-            ServiceRequestDtoResponse serviceRequestDtoResponse = new ServiceRequestDtoResponse()
+            try
             {
-                ServiceRequestId = newServiceReq.ServiceRequestId,
-                ServiceInfoId = newServiceReq.ServiceInfoId,
-                ClientId = newServiceReq.ClientId,
-                ProviderId = newServiceReq.ProviderId,
-                VehicleId = newServiceReq.VehicleId, // Added vehicle information to the response
-                Status = newServiceReq.Status,
-            };
-            return Ok(serviceRequestDtoResponse);
+                var serviceInfos = await _context.GetAllServiceInfosAsync();
+                return Ok(serviceInfos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
+        // Create a new service request
+        [HttpPost("service-requests")]
+        public async Task<ActionResult<ServiceRequestDtoResponse>> CreateServiceRequest([FromBody] ClientServiceRequestDto requestDto)
+        {
+            try
+            {
+                var newServiceReq = await _context.CreateServiceRequestAsync(requestDto);
+
+                var serviceRequestDtoResponse = new ServiceRequestDtoResponse
+                {
+                    ServiceRequestId = newServiceReq.ServiceRequestId,
+                    ServiceInfoId = newServiceReq.ServiceInfoId,
+                    ClientId = newServiceReq.ClientId,
+                    ProviderId = newServiceReq.ProviderId,
+                    VehicleId = newServiceReq.VehicleId, // Include vehicle information in the response
+                    Status = newServiceReq.Status
+                };
+
+                return Ok(serviceRequestDtoResponse);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized("Client not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        // Delete a service request by ID
         [HttpDelete("service-requests/{requestId}")]
         public async Task<ActionResult> DeleteServiceRequest(int requestId)
         {
-            await _context.DeleteServiceRequestAsync(requestId);
-            return NoContent();
+            try
+            {
+                await _context.DeleteServiceRequestAsync(requestId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
 

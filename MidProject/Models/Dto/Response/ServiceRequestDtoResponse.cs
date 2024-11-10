@@ -10,5 +10,6 @@
         public int ProviderId { get; set; }
         public int VehicleId { get; set; } // Added VehicleId for the vehicle info
         public string Status { get; set; }
+        public string ClientName { get; internal set; }
     }
 }
