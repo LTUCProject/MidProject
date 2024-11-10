@@ -454,6 +454,24 @@ namespace MidProject.Controllers
         }
 
 
+        [HttpDelete("notification/{notificationId}")]
+        public async Task<IActionResult> DeleteNotification(int notificationId)
+        {
+            try
+            {
+                await _context.DeleteNotificationAsync(notificationId);
+                return NoContent(); // 204 No Content response indicating successful deletion
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized("You are not authorized to delete this notification.");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("Notification not found or does not belong to the client.");
+            }
+        }
+
         // Post management
         [HttpGet("posts")]
         public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetAllPosts()
