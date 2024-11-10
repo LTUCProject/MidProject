@@ -645,12 +645,55 @@ namespace MidProject.Repository.Services
 
 
         // Service request management
-        public async Task<IEnumerable<ServiceRequest>> GetClientServiceRequestsAsync(int clientId)
+        public async Task<IEnumerable<ServiceRequestResponseDTO>> GetClientServiceRequestsAsync()
         {
-            return await _context.ServiceRequests
-                .Where(sr => sr.ClientId == clientId)
-                .ToListAsync();
+            try
+            {
+
+
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
+
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Client not found");
+                }
+
+                // Fetch the service requests for the found client and map to DTO
+                var serviceRequests = await _context.ServiceRequests
+                    .Where(sr => sr.ClientId == client.ClientId)
+                    .Include(sr => sr.ServiceInfo)  // Include related ServiceInfo
+                    .Include(sr => sr.Provider)     // Include related Provider
+                    .Include(sr => sr.Vehicle)     // Include related Vehicle
+                    .ToListAsync();
+
+                // Map ServiceRequests to ServiceRequestDTOs
+                var serviceRequestDTOs = serviceRequests.Select(sr => new ServiceRequestResponseDTO
+                {
+                    ServiceRequestId = sr.ServiceRequestId,
+                    ServiceInfoId = sr.ServiceInfoId,
+                    ServiceInfoName = sr.ServiceInfo.Name,  // Assuming Name is a field in ServiceInfo
+                    ClientId = sr.ClientId,
+                    ClientName = sr.Client.Name,            // Assuming Name is a field in Client
+                    ProviderId = sr.ProviderId,
+                    ProviderName = sr.Provider.Name,       // Assuming Name is a field in Provider
+                    VehicleId = sr.VehicleId,
+                    VehicleModel = sr.Vehicle.Model,       // Assuming Model is a field in Vehicle
+                    Status = sr.Status
+                });
+
+                return serviceRequestDTOs;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while retrieving client service requests.", ex);
+            }
         }
+
 
         public async Task<ServiceRequest> GetServiceRequestByIdAsync(int requestId)
         {
@@ -658,32 +701,112 @@ namespace MidProject.Repository.Services
                 .FirstOrDefaultAsync(sr => sr.ServiceRequestId == requestId);
         }
 
-        public async Task<ServiceRequest> CreateServiceRequestAsync(ClientServiceRequestDto requestDto)
+        public async Task<IEnumerable<ClinetServiceInfoResponseDto>> GetAllServiceInfosAsync()
         {
-            var serviceRequest = new ServiceRequest
+            try
             {
-                ServiceInfoId = requestDto.ServiceInfoId,
-                ClientId = requestDto.ClientId,
-                ProviderId = requestDto.ProviderId,
-                VehicleId = requestDto.VehicleId, // Add vehicle information to the request
-                Status = requestDto.Status
-            };
-
-            await _context.ServiceRequests.AddAsync(serviceRequest);
-            await _context.SaveChangesAsync();
-            return serviceRequest;
-        }
-
-        public async Task DeleteServiceRequestAsync(int requestId)
-        {
-            var serviceRequest = await _context.ServiceRequests.FindAsync(requestId);
-            if (serviceRequest != null)
+                // Fetch all service info records in the database
+                return await _context.ServiceInfos
+                    .Include(serviceInfo => serviceInfo.Provider)
+                    .Select(serviceInfo => new ClinetServiceInfoResponseDto
+                    {
+                        Provider = new ProviderResponseDto
+                        {
+                            ProviderId = serviceInfo.Provider.ProviderId,
+                            Name = serviceInfo.Provider.Name,
+                            Email = serviceInfo.Provider.Email,
+                            Type = serviceInfo.Provider.Type
+                        },
+                        ServiceInfoId = serviceInfo.ServiceInfoId,
+                        Name = serviceInfo.Name,
+                        Description = serviceInfo.Description,
+                        Contact = serviceInfo.Contact,
+                        Type = serviceInfo.Type,
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex)
             {
-                _context.ServiceRequests.Remove(serviceRequest);
-                await _context.SaveChangesAsync();
+                // Log the error
+                throw new Exception("An error occurred while retrieving all service information.", ex);
             }
         }
 
+        public async Task<ServiceRequestDtoResponse> CreateServiceRequestAsync(ClientServiceRequestDto requestDto)
+        {
+            try
+            {
+                // Fetch the accountId from the current user's claims
+                var accountId = GetAccountId();
+
+                // Fetch the client based on the accountId
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Client not found.");
+                }
+
+                // Fetch the vehicle based on the VehicleId from the DTO
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.VehicleId == requestDto.VehicleId);
+
+                if (vehicle == null)
+                {
+                    throw new UnauthorizedAccessException("Vehicle not found.");
+                }
+
+                // Create a new service request
+                var serviceRequest = new ServiceRequest
+                {
+                    ServiceInfoId = requestDto.ServiceInfoId,
+                    ClientId = client.ClientId,  // Use the client ID retrieved from the accountId
+                    ProviderId = requestDto.ProviderId,
+                    VehicleId = vehicle.VehicleId,  // Set the VehicleId from the found vehicle
+                    Status = requestDto.Status
+                };
+
+                await _context.ServiceRequests.AddAsync(serviceRequest);
+                await _context.SaveChangesAsync();
+
+                // Create the response DTO with additional client and vehicle info
+                var serviceRequestResponse = new ServiceRequestDtoResponse
+                {
+                    ServiceRequestId = serviceRequest.ServiceRequestId,
+                    ServiceInfoId = serviceRequest.ServiceInfoId,
+                    ClientId = client.ClientId,
+                    ClientName = client.Name,  
+                    ProviderId = serviceRequest.ProviderId,
+                    VehicleId = vehicle.VehicleId,
+                    Status = serviceRequest.Status
+                };
+
+                return serviceRequestResponse;  // Return the ServiceRequestDtoResponse
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while creating the service request.", ex);
+            }
+        }
+
+
+        public async Task DeleteServiceRequestAsync(int requestId)
+        {
+            try
+            {
+                var serviceRequest = await _context.ServiceRequests.FindAsync(requestId);
+                if (serviceRequest != null)
+                {
+                    _context.ServiceRequests.Remove(serviceRequest);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while deleting the service request.", ex);
+            }
+        }
 
         // Feedback management
         public async Task<IEnumerable<Feedback>> GetClientFeedbacksAsync(int clientId)
