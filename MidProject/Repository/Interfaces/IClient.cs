@@ -54,6 +54,9 @@ namespace MidProject.Repository.Interfaces
         Task DeleteServiceRequestAsync(int requestId);
 
         // Feedback management
+        Task<IEnumerable<Feedback>> GetAllFeedbacksAsync();
+        Task<IEnumerable<Feedback>> GetFeedbacksByServiceInfoIdAsync(int serviceInfoId);
+
         Task<IEnumerable<Feedback>> GetClientFeedbacksAsync(int clientId);
         Task<Feedback>AddFeedbackAsync(FeedbackDto feedbackDto);
         Task RemoveFeedbackAsync(int feedbackId);

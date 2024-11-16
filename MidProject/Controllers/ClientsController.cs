@@ -382,6 +382,27 @@ namespace MidProject.Controllers
 
 
         // Feedback management
+        [HttpGet("feedbacks")]
+        public async Task<ActionResult<IEnumerable<Feedback>>> GetAllFeedbacks()
+        {
+            var feedbacks = await _context.GetAllFeedbacksAsync();
+            return Ok(feedbacks);
+        }
+
+
+        [HttpGet("feedbacks/service/{serviceInfoId}")]
+        public async Task<ActionResult<IEnumerable<Feedback>>> GetFeedbacksByServiceInfoId(int serviceInfoId)
+        {
+            var feedbacks = await _context.GetFeedbacksByServiceInfoIdAsync(serviceInfoId);
+            if (feedbacks == null || !feedbacks.Any())
+            {
+                return NotFound($"No feedbacks found for ServiceInfoId {serviceInfoId}.");
+            }
+            return Ok(feedbacks);
+        }
+
+
+
         [HttpGet("feedbacks/{clientId}")]
         public async Task<ActionResult<IEnumerable<Feedback>>> GetClientFeedbacks(int clientId)
         {

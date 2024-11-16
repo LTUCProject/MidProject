@@ -809,6 +809,19 @@ namespace MidProject.Repository.Services
         }
 
         // Feedback management
+        public async Task<IEnumerable<Feedback>> GetAllFeedbacksAsync()
+        {
+            return await _context.Feedbacks.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Feedback>> GetFeedbacksByServiceInfoIdAsync(int serviceInfoId)
+        {
+            return await _context.Feedbacks
+                .Where(f => f.ServiceInfoId == serviceInfoId)
+                .ToListAsync();
+        }
+
+
         public async Task<IEnumerable<Feedback>> GetClientFeedbacksAsync(int clientId)
         {
             return await _context.Feedbacks
@@ -818,19 +831,35 @@ namespace MidProject.Repository.Services
 
         public async Task<Feedback> AddFeedbackAsync(FeedbackDto feedbackDto)
         {
+            // Fetch the accountId from the current user's claims
+            var accountId = GetAccountId();
+
+            // Fetch the client based on the accountId
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+            // Check if the client exists
+            if (client == null)
+            {
+                // Handle the case where the client does not exist
+                throw new Exception("Client not found");
+            }
+
+            // Create the Feedback object and assign the ClientId
             var feedback = new Feedback
             {
-                ClientId = feedbackDto.ClientId,
+                ClientId = client.ClientId,  // Use the AccountId as ClientId
                 ServiceInfoId = feedbackDto.ServiceInfoId,
                 Rating = feedbackDto.Rating,
                 Comments = feedbackDto.Comments,
                 Date = feedbackDto.Date
             };
 
+            // Add and save feedback
             await _context.Feedbacks.AddAsync(feedback);
             await _context.SaveChangesAsync();
             return feedback;
         }
+
 
         public async Task RemoveFeedbackAsync(int feedbackId)
         {
