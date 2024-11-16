@@ -206,31 +206,52 @@ namespace MidProject.Controllers
         // End Subscription plan management ================================================================================================
 
         // Start Notifications management ================================================================================================
-        // GET: api/Admin/Clients/{clientId}/Notifications
-        [HttpGet("Clients/{clientId}/Notifications")]
-        public async Task<IActionResult> GetClientNotifications(int clientId)
+
+        // GET: api/Admin/Notifications
+        [HttpGet("Notifications")]
+        public async Task<IActionResult> GetAdminNotifications()
         {
-            var notifications = await _adminService.GetClientNotificationsAsync(clientId);
-            if (notifications == null)
+            try
             {
-                return NotFound();
+                var notifications = await _adminService.GetAdminNotificationsAsync();
+                return Ok(notifications);
             }
-            return Ok(notifications);
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
         }
 
-        // POST: api/Admin/Clients/{clientId}/Notifications
-        [HttpPost("Clients/{clientId}/Notifications")]
-        public async Task<IActionResult> AddNotification(int clientId, [FromBody] NotificationDto notificationDto)
+        // POST: api/Admin/Notifications
+        [HttpPost("Notifications")]
+        public async Task<IActionResult> AddNotificationForAllClients([FromBody] NotificationDto notificationDto)
         {
-            if (clientId != notificationDto.ClientId)
+            if (notificationDto == null)
             {
-                return BadRequest("Client ID in the URL does not match Client ID in the request body.");
+                return BadRequest("Notification data is required.");
             }
 
-            await _adminService.AddNotificationAsync(notificationDto);
-            return CreatedAtAction(nameof(GetClientNotifications), new { clientId = notificationDto.ClientId }, notificationDto);
+            await _adminService.AddNotificationForAllClientsAsync(notificationDto);
+            return Ok(new { message = "Notification sent to all clients successfully." });
         }
+
+        // DELETE: api/Admin/Notifications/{notificationId}
+        [HttpDelete("Notifications/{notificationId}")]
+        public async Task<IActionResult> DeleteNotification(int notificationId)
+        {
+            try
+            {
+                await _adminService.DeleteNotificationAsync(notificationId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         // End Notifications management ================================================================================================
+
 
         // Start Charging station management ================================================================================================
 
