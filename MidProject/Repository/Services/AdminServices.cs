@@ -7,6 +7,7 @@ using MidProject.Models.Dto.Response;
 using MidProject.Models.Dto.Request2;
 using MidProject.Models.Dto.Request;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Security.Claims;
 
 namespace MidProject.Repository.Services
 {
@@ -15,13 +16,19 @@ namespace MidProject.Repository.Services
         private readonly MidprojectDbContext _context;
         private readonly UserManager<Account> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AdminServices(MidprojectDbContext context, UserManager<Account> userManager, RoleManager<IdentityRole> roleManager)
+
+
+        public AdminServices(MidprojectDbContext context, UserManager<Account> userManager, RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private string GetAccountId() => _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         // Start Client management ================================================================================================================
         public async Task<IEnumerable<ClientResponseDto>> GetAllClientsAsync()
@@ -217,15 +224,22 @@ namespace MidProject.Repository.Services
         // End Subscription plan management ================================================================================================
 
         // Start Notifications management ================================================================================================
-        // Retrieve notifications for a specific client
-        public async Task<IEnumerable<NotificationResponseDto>> GetClientNotificationsAsync(int clientId)
+        public async Task<IEnumerable<NotificationResponseDto>> GetAdminNotificationsAsync()
         {
+            // Get the admin's account ID
+            var accountId = GetAccountId();
+            var adminExists = await _context.Admins.AnyAsync(a => a.AccountId == accountId);
+
+            if (!adminExists)
+            {
+                throw new UnauthorizedAccessException("Admin not found");
+            }
+
+            // Retrieve all notifications
             var notifications = await _context.Notifications
-                .Where(n => n.ClientId == clientId)
                 .Select(n => new NotificationResponseDto
                 {
                     NotificationId = n.NotificationId,
-                    ClientId = n.ClientId,
                     Title = n.Title,
                     Message = n.Message,
                     Date = n.Date,
@@ -235,19 +249,38 @@ namespace MidProject.Repository.Services
             return notifications;
         }
 
-        // Add a new notification for a client
-        public async Task AddNotificationAsync(NotificationDto notificationDto)
+
+
+        // Add a notification for all clients
+        public async Task AddNotificationForAllClientsAsync(NotificationDto notificationDto)
         {
-            var notification = new Notification
+            var clientIds = await _context.Clients.Select(c => c.ClientId).ToListAsync();
+
+            var notifications = clientIds.Select(clientId => new Notification
             {
-                ClientId = notificationDto.ClientId,
+                ClientId = clientId,
                 Title = notificationDto.Title,
                 Message = notificationDto.Message,
                 Date = notificationDto.Date,
-            };
+            }).ToList();
 
-            await _context.Notifications.AddAsync(notification);
+            await _context.Notifications.AddRangeAsync(notifications);
             await _context.SaveChangesAsync();
+        }
+
+        // Delete a specific notification by its ID
+        public async Task DeleteNotificationAsync(int notificationId)
+        {
+            var notification = await _context.Notifications.FindAsync(notificationId);
+            if (notification != null)
+            {
+                _context.Notifications.Remove(notification);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Notification with ID {notificationId} not found.");
+            }
         }
         // End Notifications management ================================================================================================
 
