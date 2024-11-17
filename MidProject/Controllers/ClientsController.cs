@@ -595,5 +595,90 @@ namespace MidProject.Controllers
             await _context.DeleteCommentAsync(commentId);
             return NoContent();
         }
+
+        //ClientSubscription management
+        [HttpGet("subscriptions")]
+        public async Task<ActionResult<IEnumerable<ClientSubscriptionResponseDto>>> GetClientSubscriptions()
+        {
+            try
+            {
+                var subscriptions = await _context.GetClientSubscriptionsAsync();
+                return Ok(subscriptions);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving subscriptions.", details = ex.Message });
+            }
+        }
+
+       
+        [HttpPost("subscriptions")]
+        public async Task<ActionResult<ClientSubscription>> AddSubscription([FromBody] ClientSubscriptionDto subscriptionDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var subscription = await _context.AddSubscriptionAsync(subscriptionDto);
+                return CreatedAtAction(nameof(GetClientSubscriptions), new { id = subscription.ClientSubscriptionId }, subscription);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while adding the subscription.", details = ex.Message });
+            }
+        }
+
+    
+        [HttpDelete("subscriptions/{id}")]
+        public async Task<IActionResult> RemoveSubscription(int id)
+        {
+            try
+            {
+                await _context.RemoveSubscriptionAsync(id);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while removing the subscription.", details = ex.Message });
+            }
+        }
+
+     
+        [HttpGet("subscription-plans")]
+        public async Task<ActionResult<IEnumerable<SubscriptionPlanResponseDto>>> GetAvailableSubscriptionPlans()
+        {
+            try
+            {
+                var subscriptionPlans = await _context.GetAvailableSubscriptionPlansAsync();
+                return Ok(subscriptionPlans);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving subscription plans.", details = ex.Message });
+            }
+        }
     }
 }
