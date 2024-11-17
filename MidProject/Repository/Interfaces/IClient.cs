@@ -77,5 +77,12 @@ namespace MidProject.Repository.Interfaces
         Task<CommentResponseDto> AddCommentAsync(CommentDto commentDto);
         Task<CommentResponseDto> UpdateCommentByIdAsync(int commentId, CommentDto commentDto);
         Task DeleteCommentAsync(int commentId);
+
+        // ClientSubscription management
+        Task<IEnumerable<ClientSubscriptionResponseDto>> GetClientSubscriptionsAsync();
+        Task<ClientSubscription> AddSubscriptionAsync(ClientSubscriptionDto subscriptionDto);
+        Task RemoveSubscriptionAsync(int clientSubscriptionId);
+        Task<IEnumerable<SubscriptionPlanResponseDto>> GetAvailableSubscriptionPlansAsync();
+
     }
 }

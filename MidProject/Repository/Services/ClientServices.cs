@@ -1129,5 +1129,153 @@ namespace MidProject.Repository.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        // Subscriptions
+        // Get all subscriptions for the logged-in client
+        public async Task<IEnumerable<ClientSubscriptionResponseDto>> GetClientSubscriptionsAsync()
+        {
+            try
+            {
+                var accountId = GetAccountId();
+
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    throw new UnauthorizedAccessException("User is not authenticated.");
+                }
+
+                // Fetch the client and include related subscriptions and plans
+                var client = await _context.Clients
+                    .Include(c => c.ClientSubscriptions)
+                    .ThenInclude(cs => cs.SubscriptionPlan)
+                    .FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Client not found.");
+                }
+
+                // Map the subscriptions to DTOs
+                var subscriptionDtos = client.ClientSubscriptions.Select(cs => new ClientSubscriptionResponseDto
+                {
+                    ClientSubscriptionId = cs.ClientSubscriptionId,
+                    SubscriptionPlanName = cs.SubscriptionPlan?.Name,
+                    SubscriptionPlanDescription = cs.SubscriptionPlan?.Description,
+                    Price = cs.SubscriptionPlan?.Price ?? 0,
+                    StartDate = cs.StartDate,
+                    EndDate = cs.EndDate,
+                    Status = cs.Status
+                }).ToList();
+
+                return subscriptionDtos;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while retrieving client subscriptions.", ex);
+            }
+        }
+
+
+
+        // Add a new subscription for the logged-in client
+        public async Task<ClientSubscription> AddSubscriptionAsync(ClientSubscriptionDto subscriptionDto)
+        {
+            var accountId = GetAccountId();
+
+            if (string.IsNullOrEmpty(accountId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            // Retrieve the client using the accountId
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.AccountId == accountId);
+
+            if (client == null)
+            {
+                throw new UnauthorizedAccessException("Client not found.");
+            }
+
+            // Validate subscription plan exists
+            var subscriptionPlan = await _context.SubscriptionPlans
+                .FirstOrDefaultAsync(sp => sp.SubscriptionPlanId == subscriptionDto.SubscriptionPlanId);
+
+            if (subscriptionPlan == null)
+            {
+                throw new KeyNotFoundException("Subscription plan not found.");
+            }
+
+            // Calculate the EndDate by adding DurationInDays to StartDate
+            var endDate = subscriptionDto.StartDate.AddDays(subscriptionPlan.DurationInDays);
+
+            // Create the subscription and assign the ClientId and SubscriptionPlanId
+            var subscription = new ClientSubscription
+            {
+                ClientId = client.ClientId,
+                SubscriptionPlanId = subscriptionPlan.SubscriptionPlanId,
+                StartDate = subscriptionDto.StartDate,
+                EndDate = endDate,  // Set the calculated EndDate
+                Status = subscriptionDto.Status
+            };
+
+            // Add subscription to the database and save changes
+            _context.ClientSubscriptions.Add(subscription);
+            await _context.SaveChangesAsync();
+
+            return subscription;
+        }
+
+        // Remove a subscription for the logged-in client
+        public async Task RemoveSubscriptionAsync(int clientSubscriptionId)
+        {
+            var accountId = GetAccountId();
+
+            if (string.IsNullOrEmpty(accountId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            // Fetch the subscription and ensure it belongs to the logged-in client
+            var subscription = await _context.ClientSubscriptions
+                .Include(cs => cs.Client)
+                .FirstOrDefaultAsync(cs => cs.ClientSubscriptionId == clientSubscriptionId && cs.Client.AccountId == accountId);
+
+            if (subscription == null)
+            {
+                throw new KeyNotFoundException("Subscription not found or access denied.");
+            }
+
+            // Remove the subscription
+            _context.ClientSubscriptions.Remove(subscription);
+            await _context.SaveChangesAsync();
+        }
+
+        // Get all available subscription plans
+        public async Task<IEnumerable<SubscriptionPlanResponseDto>> GetAvailableSubscriptionPlansAsync()
+        {
+            try
+            {
+                // Fetch all subscription plans from the database
+                var subscriptionPlans = await _context.SubscriptionPlans.ToListAsync();
+
+                // Map the subscription plans to DTOs
+                var subscriptionPlanDtos = subscriptionPlans.Select(sp => new SubscriptionPlanResponseDto
+                {
+                    SubscriptionPlanId = sp.SubscriptionPlanId,
+                    Name = sp.Name,
+                    Description = sp.Description,
+                    Price = sp.Price,
+                    DurationInDays = sp.DurationInDays
+                }).ToList();
+
+                return subscriptionPlanDtos;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while retrieving subscription plans.", ex);
+            }
+        }
+
+
     }
 }
