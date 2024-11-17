@@ -19,6 +19,8 @@ namespace MidProject.Controllers
         private readonly MailjetEmailService _emailService;
         private readonly UserManager<Account> _identityUserManager;
 
+
+
         public AccountController(IAccountx accountServices, MailjetEmailService emailService, UserManager<Account> identityUserManager)
         {
             _accountServices = accountServices;

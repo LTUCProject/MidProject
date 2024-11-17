@@ -203,6 +203,29 @@ namespace MidProject.Controllers
             await _adminService.DeleteSubscriptionPlanAsync(id);
             return NoContent();
         }
+
+        // GET: api/Admin/ClientSubscriptions
+        [HttpGet("ClientSubscriptions")]
+        public async Task<ActionResult<IEnumerable<ClientSubscriptionResponseDto>>> GetAllClientSubscriptions()
+        {
+            try
+            {
+                var clientSubscriptions = await _adminService.GetAllClientSubscriptionsAsync();
+
+                if (clientSubscriptions == null || !clientSubscriptions.Any())
+                {
+                    return NotFound("No client subscriptions found.");
+                }
+
+                return Ok(clientSubscriptions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         // End Subscription plan management ================================================================================================
 
         // Start Notifications management ================================================================================================
