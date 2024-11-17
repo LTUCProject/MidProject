@@ -221,6 +221,41 @@ namespace MidProject.Repository.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<ClientSubscriptionResponseDto>> GetAllClientSubscriptionsAsync()
+        {
+            try
+            {
+                // Fetch all client subscriptions with related Client and SubscriptionPlan
+                var clientSubscriptions = await _context.ClientSubscriptions
+                    .Include(cs => cs.Client)  // Include related client data
+                    .Include(cs => cs.SubscriptionPlan)  // Include related subscription plan data
+                    .ToListAsync();
+
+                // Map the client subscriptions to a DTO
+                var subscriptionDtos = clientSubscriptions.Select(cs => new ClientSubscriptionResponseDto
+                {
+                    ClientSubscriptionId = cs.ClientSubscriptionId,
+                    ClientId = cs.ClientId,
+                    ClientName = cs.Client.Name,  // Assuming Client has a 'Name' property
+                    SubscriptionPlanName = cs.SubscriptionPlan.Name,
+                    SubscriptionPlanDescription = cs.SubscriptionPlan.Description,
+                    Price = cs.SubscriptionPlan.Price,
+                    StartDate = cs.StartDate,
+                    EndDate = cs.EndDate,
+                    Status = cs.Status
+                }).ToList();
+
+                return subscriptionDtos;
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                throw new Exception("An error occurred while retrieving client subscriptions.", ex);
+            }
+        }
+
+
         // End Subscription plan management ================================================================================================
 
         // Start Notifications management ================================================================================================

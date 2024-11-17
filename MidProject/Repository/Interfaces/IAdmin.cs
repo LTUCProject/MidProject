@@ -28,7 +28,7 @@ namespace MidProject.Repository.Interfaces
         Task<SubscriptionPlanResponseDto> GetSubscriptionPlanByIdAsync(int subscriptionPlanId);
         Task DeleteSubscriptionPlanAsync(int subscriptionPlanId);
         Task<SubscriptionPlan> CreateSubscriptionPlanAsync(SubscriptionPlanDto newSubscriptionPlanDto);
-
+        Task<IEnumerable<ClientSubscriptionResponseDto>> GetAllClientSubscriptionsAsync();
 
         // Notifications management
         Task<IEnumerable<NotificationResponseDto>> GetAdminNotificationsAsync();
