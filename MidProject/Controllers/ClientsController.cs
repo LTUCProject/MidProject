@@ -228,15 +228,32 @@ namespace MidProject.Controllers
 
         // Booking management
 
-        // Retrieve bookings for a specific client
-        [HttpGet("bookings/{clientId}")]
-        public async Task<ActionResult<IEnumerable<Booking>>> GetClientBookings()
+        // Retrieve bookings for the logged-in client based on accountId from claims
+        [HttpGet("bookings")]
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetClientBookings()
         {
-            var bookings = await _context.GetClientBookingsAsync();
-            if (bookings == null || !bookings.Any())
-                return NotFound("No bookings found for this client.");
-            return Ok(bookings);
+            try
+            {
+                // Fetch the bookings using the new async method
+                var bookings = await _context.GetClientBookingsAsync();
+
+                if (bookings == null || !bookings.Any())
+                {
+                    return NotFound("No bookings found for this client.");
+                }
+
+                // Return the bookings as an Ok result with the list of BookingDto
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                // Log and return a 500 error if there was an issue
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
+
+
+
 
         // Retrieve a specific booking by its ID
         [HttpGet("booking/{bookingId}")]
